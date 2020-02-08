@@ -1,0 +1,27 @@
+<project name="make_project" basedir="." default="build">
+
+    <!-- Папка вывода проекта, по-умолчанию -->
+    <property name="dist_dir" value="../../dist" override="false"/>
+
+    <property name="app_dir" value="Application/" override="false"/>
+    <property name="public_dir" value="public/" override="false"/>
+
+
+    <target name="build">
+        <echo>Installing packages</echo>
+        <exec command="composer install" />
+
+        <echo>Building files</echo>
+        <copy todir="${dist_dir}" includeemptydirs="true">
+            <fileset dir="." defaultexcludes="true">
+                <exclude name=".gitignore" />
+                <exclude name="build.xml" />
+                <exclude name="composer.json" />
+                <exclude name="composer.lock" />
+                <exclude name="config.example.json" />
+            </fileset>
+        </copy>
+
+    </target>
+
+</project>
