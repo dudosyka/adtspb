@@ -4,7 +4,7 @@
     <property name="dist_dir" value="../../dist" override="false"/>
 
     <property name="app_dir" value="Application/" override="false"/>
-    <property name="public_dir" value="public/" override="false"/>
+    <property name="public_dir" value="public_html/" override="false"/>
 
 
     <target name="build">
