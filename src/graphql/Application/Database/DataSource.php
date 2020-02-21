@@ -112,7 +112,7 @@ class DataSource
 		}
 
 
-		$isSuccessful = $query->execute(); //TODO: execute returns false
+		$isSuccessful = $query->execute();
 
 		if(!$isSuccessful)
 		{
