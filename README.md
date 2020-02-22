@@ -52,9 +52,11 @@ phing build
 - [PHP 7.4.2](https://www.php.net/downloads.php)
 - Сконфигурировать PHP 7.4.2, добавить MySQLi и MySQL PDO библиотеки (как показано на рисунке):
     1. Зайти в папку с установленным PHP, открыть файл `php.ini` (если такого не имеется, то скопировать файл `php.ini-production`, вставить в эту же папку и переименовать новый файл в `php.ini`):
-    ![alt text](https://i.imgur.com/ar2cmty.png)
+    
+        ![alt text](https://i.imgur.com/ar2cmty.png)
     2. Убрать символ `;` в начале слова на строках 918 и 923:
-    ![alt text](https://i.imgur.com/lQnjNg6.png)
+    
+        ![alt text](https://i.imgur.com/lQnjNg6.png)
 - [Composer](https://getcomposer.org/download/) (устанавливать после установки PHP 7.4.2)
 - [MySQL 5.7 сервер](https://dev.mysql.com/downloads/mysql/5.7.html)
 
