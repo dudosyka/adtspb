@@ -37,6 +37,29 @@ phing build
 ```
 
 ## ЧаВо
+
+#### Какой софт надо установить?
+
+1. **Редактор кода или IDE:** что удобнее будет, то и можно поставить, без разницы. Лучше всего поставить IDE Jetbrains PHPStorm и взять 30-ти дневную бесплатную версию, тогда будет намного легче работать. Либо юзать другие текстовые редакторы (Notepad++, SublineText 3, Visual Studio Code) или IDE'шки (подходят больше для фронтов: Adobe Brackets, Jetbrains Webstorm).
+2. [Git](https://git-scm.com/downloads)
+3. [GraphQL Playground](https://github.com/prisma-labs/graphql-playground/releases/tag/v1.8.10) _(по желанию)_
+
+Для фронт-эндов:
+- [Node.js 12.16.1 LTS](https://nodejs.org/dist/v12.16.1/node-v12.16.1-x64.msi )
+- [Vue.js CLI](https://cli.vuejs.org/guide/installation.html ) **(устанавливать после установки Node.js)**
+
+Для бэк-эндов:
+- [PHP 7.4.2](https://www.php.net/downloads.php)
+- Сконфигурировать PHP 7.4.2, добавить MySQLi и MySQL PDO библиотеки (как показано на рисунке):
+    1. Зайти в папку с установленным PHP, открыть файл `php.ini` (если такого не имеется, то скопировать файл `php.ini-production`, вставить в эту же папку и переименовать новый файл в `php.ini`):
+    ![alt text](https://i.imgur.com/ar2cmty.png)
+    2. Убрать символ `;` в начале слова на строках 918 и 923:
+    ![alt text](https://i.imgur.com/lQnjNg6.png)
+- [Composer](https://getcomposer.org/download/) (устанавливать после установки PHP 7.4.2)
+- [MySQL 5.7 сервер](https://dev.mysql.com/downloads/mysql/5.7.html)
+
+Если не хочется ставить PHP и MySQL по отдельности, то можно поставить [OpenServer](https://ospanel.io/) или [Xampp](https://www.apachefriends.org/ru/download.html) - комплексное ПО, включающее в себя PHP и MySQL **(но Composer всё-же надо будет потом доставить)**.
+
 #### Как мне тестировать продукт?
 **Vue.js приложение.** Запустить в консоле `npm run serve` в папке `/src/vue-app/`.
 
@@ -54,4 +77,7 @@ _Самый простой способ запуска локального се
 См. пункт "Сборка". После проведённых операций в папке `/dist/` появятся все необходимые файлы собранной программы. Их можно загружать на хостинг и содержать в дальнейшем.
 
 #### Где мне взять исходную базу данных SQL?
-В задачах Trello, пункт "Структура БД" в блоке "Информация".
+В задачах Trello, пункт "Структура БД" в блоке "Информация". База данных по умолчанию называется `app` (сам файл - `app.sql`).
+
+
+[Git]: https://git-scm.com/downloads
