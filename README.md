@@ -99,3 +99,6 @@ phing build
 
 #### Где мне взять исходную базу данных SQL?
 В задачах Trello, пункт "Структура БД" в блоке "Информация". База данных по умолчанию называется `app` (сам файл - `app.sql`).
+
+#### Ошибка Uncaught Error: Class 'GraphQL\Application\Entity\EntityBase' not found in <...>\src\graphql\Application\Entity\Association.php:11
+Скачайте обновленный файл `/src/graphql/Application/init.php` или добавьте строку `require_once __DIR__ . '/Entity/EntityBase.php';` __перед__ циклом foreach.
