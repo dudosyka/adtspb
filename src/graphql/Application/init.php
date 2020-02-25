@@ -5,6 +5,8 @@ require_once __DIR__ . '/AppContext.php';
 require_once __DIR__ . '/ConfigManager.php';
 require_once __DIR__ . '/Types.php';
 
+require_once __DIR__ . '/Entity/EntityBase.php';
+
 foreach (["Database", "Entity", "Type", "Type/RootTypes", "Type/Scalar"] as $value){
 	$dir_content = scandir(__DIR__ . '/' . $value . '/');
 
