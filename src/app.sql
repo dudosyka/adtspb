@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Мар 21 2020 г., 17:42
+-- Время создания: Мар 24 2020 г., 12:38
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -57,7 +57,7 @@ CREATE TABLE `action_list` (
   `list_id` bigint(20) NOT NULL COMMENT 'ID списка с правами',
   `role_id` bigint(20) NOT NULL COMMENT 'ID роли, которой доступна функция',
   `action_id` bigint(20) NOT NULL COMMENT 'ID права (функции)',
-  `sign` tinyint(1) NOT NULL COMMENT 'Флаг: 1 = разрешено, 0 = запрещено'
+  `sign` enum('+','-') NOT NULL COMMENT 'Флаг (разрешено/запрещено)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Таблица прав (функций), связка с ролями';
 
 --
@@ -65,9 +65,9 @@ CREATE TABLE `action_list` (
 --
 
 INSERT INTO `action_list` (`id`, `list_id`, `role_id`, `action_id`, `sign`) VALUES
-(1, 1, 1, 1, 1),
-(2, 1, 2, 2, 1),
-(3, 1, 1, 2, 0);
+(1, 1, 1, 1, '+'),
+(2, 1, 2, 2, '+'),
+(3, 1, 1, 2, '-');
 
 -- --------------------------------------------------------
 
@@ -81,15 +81,15 @@ CREATE TABLE `association` (
   `name` text,
   `min_age` tinyint(4) DEFAULT NULL,
   `max_age` tinyint(4) DEFAULT NULL,
-  `col` json DEFAULT NULL
+  `required_association_id` bigint(20) DEFAULT NULL COMMENT 'Предыдущий курс, который необходимо пройти.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ассоциация, направление в обучении';
 
 --
 -- Дамп данных таблицы `association`
 --
 
-INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`, `col`) VALUES
-(1, 'Робототехника', 12, 16, '{}');
+INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`, `required_association_id`) VALUES
+(1, 'Робототехника', 12, 16, 1);
 
 -- --------------------------------------------------------
 
@@ -114,7 +114,7 @@ DROP TABLE IF EXISTS `group_timetable`;
 CREATE TABLE `group_timetable` (
   `id` bigint(20) NOT NULL,
   `group_id` bigint(20) NOT NULL COMMENT 'ID группы (из таблицы groups)',
-  `day` int(11) NOT NULL COMMENT 'День недели (1 - пн, 2 - вт, 3 - ср, 4 - чт, 5 - пт, 6 - сб, 7 - вс)',
+  `day` enum('пн','вт','ср','чт','пт','сб','вс') NOT NULL COMMENT 'День недели',
   `time_start` tinytext NOT NULL COMMENT 'Время начала занятий (ЧЧ:ММ)',
   `time_end` tinytext NOT NULL COMMENT 'Время конца занятий (ЧЧ:ММ)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Дни посещения у групп (время и дни недели).';
@@ -155,9 +155,9 @@ CREATE TABLE `proposal` (
   `child_id` bigint(20) NOT NULL COMMENT 'ID ребенка (таргет)',
   `parent_id` bigint(20) NOT NULL COMMENT 'ID родителя (автор)',
   `association_id` bigint(20) NOT NULL COMMENT 'ID объединения',
-  `status_admin` int(11) NOT NULL DEFAULT '-1' COMMENT '-1 = ожидание ответа от админа,\r\n0 = отклонено,\r\n1 = одобрено',
-  `status_parent` int(11) NOT NULL DEFAULT '-1' COMMENT '-1 = ожидание ответа от родителя,\r\n0 = отклонено,\r\n1 = одобрено',
-  `status_teacher` int(11) NOT NULL DEFAULT '-1' COMMENT '-1 = ожидание ответа от учителя,\r\n0 = отклонено,\r\n1 = одобрено'
+  `status_admin` enum('ожидание','отклонено','принято') NOT NULL DEFAULT 'ожидание' COMMENT 'Ответ от администратора',
+  `status_parent` enum('ожидание','отклонено','принято') NOT NULL DEFAULT 'ожидание' COMMENT 'Ответ от родителя',
+  `status_teacher` enum('ожидание','отклонено','принято') NOT NULL DEFAULT 'ожидание' COMMENT 'Ответ от учителя'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -165,7 +165,7 @@ CREATE TABLE `proposal` (
 --
 
 INSERT INTO `proposal` (`id`, `timestamp`, `child_id`, `parent_id`, `association_id`, `status_admin`, `status_parent`, `status_teacher`) VALUES
-(1, '2020-03-21 17:05:29', 2, 1, 1, -1, -1, -1);
+(1, '2020-03-21 17:05:29', 2, 1, 1, 'ожидание', 'ожидание', 'ожидание');
 
 -- --------------------------------------------------------
 
@@ -203,16 +203,16 @@ CREATE TABLE `user` (
   `surname` text NOT NULL COMMENT 'Фамилия',
   `name` text NOT NULL COMMENT 'Имя',
   `midname` text NOT NULL COMMENT 'Отчество',
-  `sex` int(11) NOT NULL COMMENT 'Пол: 0 = муж, 1 = жен',
+  `sex` enum('м','ж') NOT NULL COMMENT 'Пол',
   `phone_number` varchar(255) NOT NULL COMMENT 'Основной номер телефона, формат +7 (123) 123-45-67',
   `email` text NOT NULL COMMENT 'Основной e-mail',
-  `status_email` tinyint(4) NOT NULL COMMENT 'Статус подтверждения почты: 0 = ожидание подтверждения (не подтверждена), 1 = подтверждена',
+  `status_email` enum('ожидание','подтвержден') NOT NULL COMMENT 'Статус подтверждения почты (ожидание = не подтвержден)',
   `verification_key_email` tinytext COMMENT 'Код подтверждения',
   `registration_address` text NOT NULL COMMENT 'Адрес регистрации',
   `residence_address` text COMMENT 'Адрес проживания',
   `job_place` text NOT NULL COMMENT 'Место работы',
   `job_position` text NOT NULL COMMENT 'Должность',
-  `relationship` int(11) NOT NULL COMMENT 'Степерь родства: 0 = родитель, 1 = ребенок',
+  `relationship` enum('родитель','ребенок') NOT NULL COMMENT 'Степень родства',
   `study_place` text NOT NULL COMMENT 'Адрес и номер школы (если есть)',
   `study_class` varchar(10) NOT NULL COMMENT 'Класс (если есть), формат: 1а - 11я',
   `birthday` date DEFAULT NULL COMMENT 'День рождения'
@@ -223,9 +223,9 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship`, `study_place`, `study_class`, `birthday`) VALUES
-(1, '2020-02-22 23:59:37', 'Человеков', 'Человек', 'Человекович', 0, '+ (123) 123-45-67', 'admin@site.com', 0, NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 0, '', '', '1982-10-10'),
-(2, '2020-02-22 23:59:37', 'Примеров', 'Пример', 'Примерович', 1, '+7 (321) 222-33-21', 'user@somesite.org', 0, NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 1, 'Школа №1', '8Б', '1982-10-10'),
-(3, '2020-03-21 17:10:08', 'Лоремов', 'Лоремий', 'Ипсумович', 1, '+7 (321) 999-12-34', 'test@example.com', 1, NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 1, 'Школа №2', '3А', '2018-11-06');
+(1, '2020-02-22 23:59:37', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 'родитель', '', '', '1982-10-10'),
+(2, '2020-02-22 23:59:37', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 'ребенок', 'Школа №1', '8Б', '1982-10-10'),
+(3, '2020-03-21 17:10:08', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 'ребенок', 'Школа №2', '3А', '2018-11-06');
 
 -- --------------------------------------------------------
 
