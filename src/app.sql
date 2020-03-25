@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Мар 24 2020 г., 12:38
+-- Время создания: Мар 25 2020 г., 10:42
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -80,16 +80,28 @@ CREATE TABLE `association` (
   `id` bigint(20) NOT NULL,
   `name` text,
   `min_age` tinyint(4) DEFAULT NULL,
-  `max_age` tinyint(4) DEFAULT NULL,
-  `required_association_id` bigint(20) DEFAULT NULL COMMENT 'Предыдущий курс, который необходимо пройти.'
+  `max_age` tinyint(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ассоциация, направление в обучении';
 
 --
 -- Дамп данных таблицы `association`
 --
 
-INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`, `required_association_id`) VALUES
-(1, 'Робототехника', 12, 16, 1);
+INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`) VALUES
+(1, 'Робототехника', 12, 16);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `association_requiredassociation`
+--
+
+DROP TABLE IF EXISTS `association_requiredassociation`;
+CREATE TABLE `association_requiredassociation` (
+  `id` bigint(20) NOT NULL,
+  `association_id` bigint(20) NOT NULL COMMENT 'ID ассоциации',
+  `required_association_id` bigint(20) NOT NULL COMMENT 'ID курса, который необходимо закончить'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -331,6 +343,14 @@ ALTER TABLE `association`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `association_requiredassociation`
+--
+ALTER TABLE `association_requiredassociation`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `association_id` (`association_id`),
+  ADD KEY `required_association_id` (`required_association_id`);
+
+--
 -- Индексы таблицы `group`
 --
 ALTER TABLE `group`
@@ -429,6 +449,12 @@ ALTER TABLE `association`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT для таблицы `association_requiredassociation`
+--
+ALTER TABLE `association_requiredassociation`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT для таблицы `group`
 --
 ALTER TABLE `group`
@@ -498,6 +524,13 @@ ALTER TABLE `user_role`
 ALTER TABLE `action_list`
   ADD CONSTRAINT `action_list_ibfk_1` FOREIGN KEY (`action_id`) REFERENCES `action` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `action_list_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `association_requiredassociation`
+--
+ALTER TABLE `association_requiredassociation`
+  ADD CONSTRAINT `association_requiredassociation_ibfk_1` FOREIGN KEY (`association_id`) REFERENCES `association` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `association_requiredassociation_ibfk_2` FOREIGN KEY (`required_association_id`) REFERENCES `association` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Ограничения внешнего ключа таблицы `group`
