@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Мар 25 2020 г., 10:42
+-- Время создания: Мар 27 2020 г., 15:20
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -78,17 +78,20 @@ INSERT INTO `action_list` (`id`, `list_id`, `role_id`, `action_id`, `sign`) VALU
 DROP TABLE IF EXISTS `association`;
 CREATE TABLE `association` (
   `id` bigint(20) NOT NULL,
-  `name` text,
-  `min_age` tinyint(4) DEFAULT NULL,
-  `max_age` tinyint(4) DEFAULT NULL
+  `name` text COMMENT 'Наименование объединения',
+  `min_age` tinyint(4) DEFAULT NULL COMMENT 'Минимальный порог вхождения (включительно)',
+  `max_age` tinyint(4) DEFAULT NULL COMMENT 'Максимальный порог вхождения (включительно)',
+  `study_years` int(11) NOT NULL DEFAULT '1' COMMENT 'Количество лет обучения',
+  `study_hours` int(11) NOT NULL COMMENT 'Общее количество часов в году',
+  `study_hours_week` int(11) NOT NULL COMMENT 'Индексация: количество часов в неделю (ВСЕГО_ЧАСОВ / 9 мес. / 4 нед. в сред.)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ассоциация, направление в обучении';
 
 --
 -- Дамп данных таблицы `association`
 --
 
-INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`) VALUES
-(1, 'Робототехника', 12, 16);
+INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`, `study_years`, `study_hours`, `study_hours_week`) VALUES
+(1, 'Робототехника', 12, 16, 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -102,6 +105,90 @@ CREATE TABLE `association_requiredassociation` (
   `association_id` bigint(20) NOT NULL COMMENT 'ID ассоциации',
   `required_association_id` bigint(20) NOT NULL COMMENT 'ID курса, который необходимо закончить'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `event`
+--
+
+DROP TABLE IF EXISTS `event`;
+CREATE TABLE `event` (
+  `id` bigint(20) NOT NULL,
+  `name` text NOT NULL COMMENT 'Наименование мероприятия',
+  `description` text NOT NULL COMMENT 'Описание мероприятия',
+  `date_start` datetime NOT NULL COMMENT 'Дата начала',
+  `date_end` datetime NOT NULL COMMENT 'Дата окончания'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Мероприятия и эвенты';
+
+--
+-- Дамп данных таблицы `event`
+--
+
+INSERT INTO `event` (`id`, `name`, `description`, `date_start`, `date_end`) VALUES
+(1, 'День знаний', 'Начни свое обучение вместе с Академией Цифровых Технологий.', '2020-09-01 12:00:00', '2020-09-01 17:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `event_file`
+--
+
+DROP TABLE IF EXISTS `event_file`;
+CREATE TABLE `event_file` (
+  `id` bigint(20) NOT NULL,
+  `event_id` bigint(20) NOT NULL COMMENT 'ID мероприятия',
+  `category_id` bigint(20) NOT NULL COMMENT 'ID раздела (типа) файла, напр: фото, документация, ...',
+  `path` text NOT NULL COMMENT 'Путь к файлу'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связка файлов с мероприятием';
+
+--
+-- Дамп данных таблицы `event_file`
+--
+
+INSERT INTO `event_file` (`id`, `event_id`, `category_id`, `path`) VALUES
+(1, 1, 2, '/path/to/document.pdf'),
+(2, 1, 1, '/path/to/photo.png');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `event_participant`
+--
+
+DROP TABLE IF EXISTS `event_participant`;
+CREATE TABLE `event_participant` (
+  `id` bigint(20) NOT NULL,
+  `event_id` bigint(20) NOT NULL COMMENT 'ID мероприятия',
+  `user_id` bigint(20) NOT NULL COMMENT 'ID пользователя'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связка участников (пользователей) с мероприятием';
+
+--
+-- Дамп данных таблицы `event_participant`
+--
+
+INSERT INTO `event_participant` (`id`, `event_id`, `user_id`) VALUES
+(1, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `event_speaker`
+--
+
+DROP TABLE IF EXISTS `event_speaker`;
+CREATE TABLE `event_speaker` (
+  `id` bigint(20) NOT NULL,
+  `event_id` bigint(20) NOT NULL COMMENT 'ID мероприятия',
+  `user_id` bigint(20) NOT NULL COMMENT 'ID пользователя'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связка спикеров (пользователей) с мероприятием';
+
+--
+-- Дамп данных таблицы `event_speaker`
+--
+
+INSERT INTO `event_speaker` (`id`, `event_id`, `user_id`) VALUES
+(1, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -128,8 +215,32 @@ CREATE TABLE `group_timetable` (
   `group_id` bigint(20) NOT NULL COMMENT 'ID группы (из таблицы groups)',
   `day` enum('пн','вт','ср','чт','пт','сб','вс') NOT NULL COMMENT 'День недели',
   `time_start` tinytext NOT NULL COMMENT 'Время начала занятий (ЧЧ:ММ)',
-  `time_end` tinytext NOT NULL COMMENT 'Время конца занятий (ЧЧ:ММ)'
+  `time_end` tinytext NOT NULL COMMENT 'Время конца занятий (ЧЧ:ММ)',
+  `lessons_count` int(11) NOT NULL COMMENT 'Количество уроков за год',
+  `week_times` tinyint(4) NOT NULL DEFAULT '1' COMMENT 'Коэффициент пропуска недели (занятие каждые N недель)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Дни посещения у групп (время и дни недели).';
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `group_timetableexception`
+--
+
+DROP TABLE IF EXISTS `group_timetableexception`;
+CREATE TABLE `group_timetableexception` (
+  `id` bigint(20) NOT NULL,
+  `date_start` datetime NOT NULL COMMENT 'Новая дата начала занятий',
+  `date_end` datetime NOT NULL COMMENT 'Новая дата окончания',
+  `status_id` bigint(20) NOT NULL COMMENT 'ID статуса (перенос, отмена, ...)',
+  `moved_from_date_start` datetime NOT NULL COMMENT 'Предыдущая дата, перенос с даты начала'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Временные исключения (изменения) в расписании';
+
+--
+-- Дамп данных таблицы `group_timetableexception`
+--
+
+INSERT INTO `group_timetableexception` (`id`, `date_start`, `date_end`, `status_id`, `moved_from_date_start`) VALUES
+(1, '2020-03-27 13:20:00', '2020-03-27 15:20:00', 2, '2020-03-24 13:20:00');
 
 -- --------------------------------------------------------
 
@@ -167,17 +278,17 @@ CREATE TABLE `proposal` (
   `child_id` bigint(20) NOT NULL COMMENT 'ID ребенка (таргет)',
   `parent_id` bigint(20) NOT NULL COMMENT 'ID родителя (автор)',
   `association_id` bigint(20) NOT NULL COMMENT 'ID объединения',
-  `status_admin` enum('ожидание','отклонено','принято') NOT NULL DEFAULT 'ожидание' COMMENT 'Ответ от администратора',
-  `status_parent` enum('ожидание','отклонено','принято') NOT NULL DEFAULT 'ожидание' COMMENT 'Ответ от родителя',
-  `status_teacher` enum('ожидание','отклонено','принято') NOT NULL DEFAULT 'ожидание' COMMENT 'Ответ от учителя'
+  `status_admin_id` bigint(20) NOT NULL COMMENT 'Ответ от администратора',
+  `status_parent_id` bigint(20) NOT NULL COMMENT 'Ответ от родителя',
+  `status_teacher_id` bigint(20) NOT NULL COMMENT 'Ответ от учителя'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `proposal`
 --
 
-INSERT INTO `proposal` (`id`, `timestamp`, `child_id`, `parent_id`, `association_id`, `status_admin`, `status_parent`, `status_teacher`) VALUES
-(1, '2020-03-21 17:05:29', 2, 1, 1, 'ожидание', 'ожидание', 'ожидание');
+INSERT INTO `proposal` (`id`, `timestamp`, `child_id`, `parent_id`, `association_id`, `status_admin_id`, `status_parent_id`, `status_teacher_id`) VALUES
+(1, '2020-03-21 17:05:29', 2, 1, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -205,6 +316,89 @@ INSERT INTO `role` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `settings_eventfiletype`
+--
+
+DROP TABLE IF EXISTS `settings_eventfiletype`;
+CREATE TABLE `settings_eventfiletype` (
+  `id` bigint(20) NOT NULL,
+  `name` text NOT NULL COMMENT 'Наименование категории файла'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Настройки: категории файлов для мероприятий';
+
+--
+-- Дамп данных таблицы `settings_eventfiletype`
+--
+
+INSERT INTO `settings_eventfiletype` (`id`, `name`) VALUES
+(1, 'Фото мероприятия'),
+(2, 'Документация'),
+(3, 'Для заполнения');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `settings_proposal`
+--
+
+DROP TABLE IF EXISTS `settings_proposal`;
+CREATE TABLE `settings_proposal` (
+  `id` bigint(20) NOT NULL,
+  `name` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Настройки: статусы подачи заявлений';
+
+--
+-- Дамп данных таблицы `settings_proposal`
+--
+
+INSERT INTO `settings_proposal` (`id`, `name`) VALUES
+(1, 'Ожидание'),
+(2, 'Принято'),
+(3, 'Отозвано');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `settings_relationship`
+--
+
+DROP TABLE IF EXISTS `settings_relationship`;
+CREATE TABLE `settings_relationship` (
+  `id` bigint(20) NOT NULL,
+  `name` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Настройки: родственная связь';
+
+--
+-- Дамп данных таблицы `settings_relationship`
+--
+
+INSERT INTO `settings_relationship` (`id`, `name`) VALUES
+(1, 'Родитель'),
+(2, 'Ребенок');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `settings_timetablestatus`
+--
+
+DROP TABLE IF EXISTS `settings_timetablestatus`;
+CREATE TABLE `settings_timetablestatus` (
+  `id` bigint(20) NOT NULL,
+  `name` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Настройки: статусы исключений в расписании';
+
+--
+-- Дамп данных таблицы `settings_timetablestatus`
+--
+
+INSERT INTO `settings_timetablestatus` (`id`, `name`) VALUES
+(1, 'Замещение занятий'),
+(2, 'Перенос занятий'),
+(3, 'Отмена занятий');
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `user`
 --
 
@@ -224,7 +418,7 @@ CREATE TABLE `user` (
   `residence_address` text COMMENT 'Адрес проживания',
   `job_place` text NOT NULL COMMENT 'Место работы',
   `job_position` text NOT NULL COMMENT 'Должность',
-  `relationship` enum('родитель','ребенок') NOT NULL COMMENT 'Степень родства',
+  `relationship_id` bigint(20) NOT NULL COMMENT 'Степень родства',
   `study_place` text NOT NULL COMMENT 'Адрес и номер школы (если есть)',
   `study_class` varchar(10) NOT NULL COMMENT 'Класс (если есть), формат: 1а - 11я',
   `birthday` date DEFAULT NULL COMMENT 'День рождения'
@@ -234,10 +428,10 @@ CREATE TABLE `user` (
 -- Дамп данных таблицы `user`
 --
 
-INSERT INTO `user` (`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship`, `study_place`, `study_class`, `birthday`) VALUES
-(1, '2020-02-22 23:59:37', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 'родитель', '', '', '1982-10-10'),
-(2, '2020-02-22 23:59:37', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 'ребенок', 'Школа №1', '8Б', '1982-10-10'),
-(3, '2020-03-21 17:10:08', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 'ребенок', 'Школа №2', '3А', '2018-11-06');
+INSERT INTO `user` (`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`) VALUES
+(1, '2020-02-22 23:59:37', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 1, '', '', '1982-10-10'),
+(2, '2020-02-22 23:59:37', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 2, 'Школа №1', '8Б', '1982-10-10'),
+(3, '2020-03-21 17:10:08', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 2, 'Школа №2', '3А', '2018-11-06');
 
 -- --------------------------------------------------------
 
@@ -351,6 +545,36 @@ ALTER TABLE `association_requiredassociation`
   ADD KEY `required_association_id` (`required_association_id`);
 
 --
+-- Индексы таблицы `event`
+--
+ALTER TABLE `event`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `event_file`
+--
+ALTER TABLE `event_file`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `category_id` (`category_id`),
+  ADD KEY `event_id` (`event_id`);
+
+--
+-- Индексы таблицы `event_participant`
+--
+ALTER TABLE `event_participant`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_id` (`event_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Индексы таблицы `event_speaker`
+--
+ALTER TABLE `event_speaker`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_id` (`event_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Индексы таблицы `group`
 --
 ALTER TABLE `group`
@@ -364,6 +588,13 @@ ALTER TABLE `group`
 ALTER TABLE `group_timetable`
   ADD PRIMARY KEY (`id`),
   ADD KEY `group_id` (`group_id`);
+
+--
+-- Индексы таблицы `group_timetableexception`
+--
+ALTER TABLE `group_timetableexception`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `status_id` (`status_id`);
 
 --
 -- Индексы таблицы `mailing`
@@ -380,7 +611,10 @@ ALTER TABLE `proposal`
   ADD PRIMARY KEY (`id`),
   ADD KEY `proposal_ibfk_1` (`association_id`),
   ADD KEY `child_id` (`child_id`),
-  ADD KEY `parent_id` (`parent_id`);
+  ADD KEY `parent_id` (`parent_id`),
+  ADD KEY `status_admin_id` (`status_admin_id`),
+  ADD KEY `status_parent_id` (`status_parent_id`),
+  ADD KEY `status_teacher_id` (`status_teacher_id`);
 
 --
 -- Индексы таблицы `role`
@@ -389,10 +623,35 @@ ALTER TABLE `role`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `settings_eventfiletype`
+--
+ALTER TABLE `settings_eventfiletype`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `settings_proposal`
+--
+ALTER TABLE `settings_proposal`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `settings_relationship`
+--
+ALTER TABLE `settings_relationship`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `settings_timetablestatus`
+--
+ALTER TABLE `settings_timetablestatus`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `relationship_id` (`relationship_id`);
 
 --
 -- Индексы таблицы `user_child`
@@ -455,6 +714,30 @@ ALTER TABLE `association_requiredassociation`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT для таблицы `event`
+--
+ALTER TABLE `event`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT для таблицы `event_file`
+--
+ALTER TABLE `event_file`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT для таблицы `event_participant`
+--
+ALTER TABLE `event_participant`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT для таблицы `event_speaker`
+--
+ALTER TABLE `event_speaker`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT для таблицы `group`
 --
 ALTER TABLE `group`
@@ -465,6 +748,12 @@ ALTER TABLE `group`
 --
 ALTER TABLE `group_timetable`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `group_timetableexception`
+--
+ALTER TABLE `group_timetableexception`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `mailing`
@@ -483,6 +772,30 @@ ALTER TABLE `proposal`
 --
 ALTER TABLE `role`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT для таблицы `settings_eventfiletype`
+--
+ALTER TABLE `settings_eventfiletype`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT для таблицы `settings_proposal`
+--
+ALTER TABLE `settings_proposal`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT для таблицы `settings_relationship`
+--
+ALTER TABLE `settings_relationship`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT для таблицы `settings_timetablestatus`
+--
+ALTER TABLE `settings_timetablestatus`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `user`
@@ -533,6 +846,27 @@ ALTER TABLE `association_requiredassociation`
   ADD CONSTRAINT `association_requiredassociation_ibfk_2` FOREIGN KEY (`required_association_id`) REFERENCES `association` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
+-- Ограничения внешнего ключа таблицы `event_file`
+--
+ALTER TABLE `event_file`
+  ADD CONSTRAINT `event_file_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `settings_eventfiletype` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `event_file_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `event_participant`
+--
+ALTER TABLE `event_participant`
+  ADD CONSTRAINT `event_participant_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `event_participant_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `event_speaker`
+--
+ALTER TABLE `event_speaker`
+  ADD CONSTRAINT `event_speaker_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `event_speaker_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
 -- Ограничения внешнего ключа таблицы `group`
 --
 ALTER TABLE `group`
@@ -544,6 +878,12 @@ ALTER TABLE `group`
 --
 ALTER TABLE `group_timetable`
   ADD CONSTRAINT `group_timetable_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `group_timetableexception`
+--
+ALTER TABLE `group_timetableexception`
+  ADD CONSTRAINT `group_timetableexception_ibfk_1` FOREIGN KEY (`status_id`) REFERENCES `settings_timetablestatus` (`id`) ON UPDATE NO ACTION;
 
 --
 -- Ограничения внешнего ключа таблицы `mailing`
@@ -558,7 +898,16 @@ ALTER TABLE `mailing`
 ALTER TABLE `proposal`
   ADD CONSTRAINT `proposal_ibfk_1` FOREIGN KEY (`association_id`) REFERENCES `association` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `proposal_ibfk_2` FOREIGN KEY (`child_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `proposal_ibfk_3` FOREIGN KEY (`parent_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+  ADD CONSTRAINT `proposal_ibfk_3` FOREIGN KEY (`parent_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `proposal_ibfk_4` FOREIGN KEY (`status_admin_id`) REFERENCES `settings_proposal` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `proposal_ibfk_5` FOREIGN KEY (`status_parent_id`) REFERENCES `settings_proposal` (`id`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `proposal_ibfk_6` FOREIGN KEY (`status_teacher_id`) REFERENCES `settings_proposal` (`id`) ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `user`
+--
+ALTER TABLE `user`
+  ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`relationship_id`) REFERENCES `settings_relationship` (`id`) ON UPDATE NO ACTION;
 
 --
 -- Ограничения внешнего ключа таблицы `user_child`
