@@ -1,0 +1,51 @@
+.waving {
+  width: 100vw;
+  height: 100vh;
+}
+
+.form {
+  background-color: #ffffff;
+  border-radius: 10px;
+  z-index: 10;
+  padding: 30px 30px 30px 30px;
+  width: 410px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.form-title {
+  /*
+      TODO: font
+  */
+  /*
+      TODO: color
+  */
+  padding: 40px 0 40px 0;
+  font-weight: bold;
+}
+
+.particles, .city-foreground {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.particles {
+  z-index: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.city-foreground {
+  z-index: 1;
+  height: 100%;
+  background-image: url("~@/assets/bg-spb.png");
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 100%;
+}
+
+/*# sourceMappingURL=waving-form.css.map */

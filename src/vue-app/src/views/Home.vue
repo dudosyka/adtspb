@@ -5,7 +5,7 @@
 <!--    <HelloWorld msg="Welcome to Your Vue.js App"/>-->
       <div>
           <router-link to="/login/">Вход</router-link>
-          <router-link to="/register/">Регистрация</router-link>
+          <router-link to="/register/form">Регистрация</router-link>
       </div>
 
 

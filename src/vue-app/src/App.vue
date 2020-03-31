@@ -8,6 +8,7 @@
   </div>
 </template>
 
-<style>
-@import url("assets/global.css");
+<style lang="scss">
+    @import url('./assets/global.css');
+    @import "./assets/theme.scss";
 </style>

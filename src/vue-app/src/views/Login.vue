@@ -1,6 +1,6 @@
 <template>
 
-    <div class="login d-inline-flex justify-content-center align-items-center">
+    <div class="waving d-inline-flex justify-content-center align-items-center">
 
         <b-container class="form">
             <div>
@@ -8,7 +8,24 @@
             </div>
             <b-form>
                 <b-form-row>
-                    <b-form-input class="theme-input" type="email" placeholder="E-mail, номер телефона или логин"></b-form-input>
+                    <b-form-input class="theme icon envelope" type="email" placeholder="E-mail, номер телефона или логин"></b-form-input>
+                    <b-form-input class="theme icon lock-fill" type="password" placeholder="Пароль"></b-form-input>
+
+                    <b-button class="theme" block>Войти</b-button>
+
+                    <p class="theme text-muted mx-auto lost-password">Забыли <b-link class="theme" href="/login/forgot-password">Логин / Пароль</b-link>?</p>
+
+                    <CenteredCaption>
+                        Или войти через
+                    </CenteredCaption>
+
+                    <div class="social-networks-list d-inline-flex justify-content-center">
+                        <FacebookButton class="mr-3"></FacebookButton>
+                        <GoogleButton></GoogleButton>
+                    </div>
+
+                    <p class="theme text-muted mx-auto register-account"><b-link class="theme" href="/register">Создать аккаунт</b-link> <b-icon-arrow-right></b-icon-arrow-right></p>
+
                 </b-form-row>
             </b-form>
 
@@ -22,72 +39,38 @@
 </template>
 
 <script>
+    import CenteredCaption from "../components/CenteredCaption";
+    import FacebookButton from "../components/social/FacebookButton";
+    import GoogleButton from "../components/social/GoogleButton";
+
     export default {
-        name: "Login.vue"
+        name: "Login.vue",
+        components: {
+            FacebookButton,
+            CenteredCaption,
+            GoogleButton
+        }
     }
 </script>
 
 <style lang="scss" scoped>
-
-    /*
-        TODO: передвинуть в отдельный scss файл
-     */
-    @function asset($path) {
-        @return url("~@/assets/#{$path}");
-    }
-
-    .login{
-        width: 100vw;
-        height: 100vh;
-    }
+    @import "./../assets/waving-form.scss";
 
     .form{
-        background-color: #ffffff;
-        border-radius: 10px;
-        z-index: 10;
-        padding: 30px;
-        width: 410px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        padding: 30px 30px 10px 30px;
     }
 
-    .form-title{
-        /*
-            TODO: font
-        */
-        /*
-            TODO: color
-        */
-
-        padding: 10px 0 10px 0;
-        font-weight: bold;
-    }
-
-    .particles, .city-foreground{
-        position: absolute;
-        left: 0;
-        top: 0;
+    .social-networks-list{
         width: 100%;
-        margin: 0;
-        padding: 0;
     }
 
-    .particles{
-        z-index: 0;
-        /*
-            TODO: исправить баг со скроллом при 100%
-        */
-        height: calc(100% - 10px);
+
+    .register-account {
+        margin: 50px 0 0 0;
     }
-
-    .city-foreground{
-        z-index: 1;
-
-        height: 100%;
-
-        background-image: asset('/bg-spb.png');
-        background-repeat: no-repeat;
-        background-position: bottom;
-        background-size: 100%;
+    .lost-password{
+        margin: 10px 0 0 0;
+        font-size: 10pt;
     }
 
 </style>

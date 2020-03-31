@@ -22,15 +22,3 @@ html, body{
 #nav a.router-link-exact-active {
     color: #42b983;
 }
-
-
-
-/*
-TODO theme-input
- */
-
-.theme-input{
-    border-radius: 20px !important;
-    height: 43px;
-    /*padding-left: 65px;*/
-}
