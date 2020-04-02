@@ -8,10 +8,10 @@
             </div>
             <b-form>
                 <b-form-row>
-                    <b-form-input class="theme icon envelope" type="email" placeholder="E-mail, номер телефона или логин"></b-form-input>
+                    <b-form-input class="theme icon envelope" placeholder="E-mail, номер телефона или логин"></b-form-input>
                     <b-form-input class="theme icon lock-fill" type="password" placeholder="Пароль"></b-form-input>
 
-                    <b-button class="theme" block>Войти</b-button>
+                    <b-button class="theme submit" block>Войти</b-button>
 
                     <p class="theme text-muted mx-auto lost-password">Забыли <b-link class="theme" href="/login/forgot-password">Логин / Пароль</b-link>?</p>
 
@@ -24,7 +24,7 @@
                         <GoogleButton></GoogleButton>
                     </div>
 
-                    <p class="theme text-muted mx-auto register-account"><b-link class="theme" href="/register">Создать аккаунт</b-link> <b-icon-arrow-right></b-icon-arrow-right></p>
+                    <p class="theme text-muted mx-auto register-account"><b-link class="theme" href="/register">Создать аккаунт <b-icon-arrow-right></b-icon-arrow-right></b-link></p>
 
                 </b-form-row>
             </b-form>

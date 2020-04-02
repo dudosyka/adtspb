@@ -1,39 +1,90 @@
+/* Поля ввода */
+
 /* TODO: объединить */
-input.theme{
+input.theme, select.theme{
     border-radius: 20px !important;
     height: 43px;
     padding-left: 65px;
     border: 0;
     background-color: #e6e6e6;
-    color: #c1c1c1;
     margin: 5px 0 5px 0;
+    color: #495057 !important;
 }
 
-input.theme:focus{
+input.theme::placeholder, select.theme::placeholder {
+    color: #757575 !important;
+}
+
+input.theme:focus, select.theme:focus{
     color: inherit !important;
     background-color: #e6e6e6 !important;
     outline: inherit !important;
     -webkit-box-shadow: inset 0px 0px 5px rgba(0,0,0,0.3) !important;
     box-shadow: inset 0px 0px 5px rgba(0,0,0,0.3) !important;
 }
-input.theme.icon{
+input.theme.icon, select.theme.icon{
     background-position-x: 30px;
     background-position-y: center;
     background-repeat: no-repeat;
 }
 
-input.theme.icon.envelope{
-    background-image: url("~@/assets/icons/envelope.svg");
+
+
+
+
+
+
+/* Списки (отдельно) */
+
+input.theme.select, select.theme{
+    padding-right: 50px;
+    background-repeat: no-repeat;
+    background-size: 8px 10px;
+    background-position: right 2rem center;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiBmb2N1c2FibGU9ImZhbHNlIiByb2xlPSJpbWciIGFsdD0iaWNvbiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjNzU3NTc1IiBjbGFzcz0iYmktY2FyZXQtZG93bi1maWxsIG14LWF1dG8gYi1pY29uIGJpIj48ZyBkYXRhLXYtODg5MmI5MjQ9IiI+PHBhdGggZD0iTTcuMjQ3IDExLjE0TDIuNDUxIDUuNjU4QzEuODg1IDUuMDEzIDIuMzQ1IDQgMy4yMDQgNGg5LjU5MmExIDEgMCAwMS43NTMgMS42NTlsLTQuNzk2IDUuNDhhMSAxIDAgMDEtMS41MDYgMHoiPjwvcGF0aD48L2c+PC9zdmc+");
+}
+select.theme {
+    padding-left: 61px; /* TODO: убрать лишний отступ у select'а, сделать по-нормальному */
+
 }
 
-input.theme.icon.lock-fill{
-    background-image: url("~@/assets/icons/lock-fill.svg");
+
+
+
+
+
+/* Чекбоксы */
+
+div.theme.custom-control.custom-checkbox > label::before, div.theme.custom-control.custom-checkbox > label::after {
+    left: -35px !important;
+}
+div.theme.custom-control.custom-checkbox{
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 65px;
+    padding-right: calc(65px / 2);
 }
 
 
+
+
+
+
+
+
+/* Кнопки */
 
 /* TODO: фикс уменьшения кнопки после расфокуса */
 /* TODO: фикс затемнение текста */
+
+button.theme.submit{
+    margin-top: calc(43px / 2) !important;
+    margin-bottom: calc(43px / 2) !important;
+}
+
+button.theme{
+    text-transform: uppercase;
+}
 
 button.theme{
     border-radius: 20px !important;
@@ -41,6 +92,7 @@ button.theme{
     margin: 5px 0 5px 0;
     background-color: #6c757d !important;
 }
+
 button.theme:active{
     color: #FFFFFF !important;
     outline: inherit !important;
@@ -49,6 +101,7 @@ button.theme:active{
     background-color: #545b62 !important;
     border: none !important;
 }
+
 button.theme:focus{
     color: #FFFFFF !important;
     outline: inherit !important;
@@ -62,6 +115,13 @@ button.theme:hover{
 }
 
 
+
+
+
+
+
+/* Ссылки */
+
 a.theme{
     color: #757575;
     text-decoration: underline;
@@ -73,4 +133,44 @@ b-link.theme{
 
 b-form-checkbox.theme{
     width: 200px;
+}
+
+
+
+
+
+
+
+/* Иконки */
+
+input.theme.icon.envelope{
+    background-image: url("~@/assets/icons/envelope.svg");
+}
+
+input.theme.icon.lock-fill{
+    background-image: url("~@/assets/icons/lock-fill.svg");
+}
+
+input.theme.icon.person-lines-fill{
+    background-image: url("~@/assets/icons/person-lines-fill.svg");
+}
+
+input.theme.icon.house-fill{
+    background-image: url("~@/assets/icons/house-fill.svg");
+}
+
+input.theme.icon.house-door-fill{
+    background-image: url("~@/assets/icons/house-door-fill.svg");
+}
+
+input.theme.icon.phone{
+    background-image: url("~@/assets/icons/phone.svg");
+}
+
+input.theme.icon.briefcase-fill{
+    background-image: url("~@/assets/icons/briefcase-fill.svg");
+}
+
+input.theme.icon.building{
+    background-image: url("~@/assets/icons/building.svg");
 }

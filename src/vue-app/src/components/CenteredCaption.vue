@@ -6,7 +6,7 @@
         </div>
 
         <div class="central-block">
-            <slot></slot>
+            <slot class="text"></slot>
         </div>
 
         <div class="flex-fill">
@@ -25,11 +25,18 @@
 <style scoped>
     .caption{
         width: 100% !important;
+        margin-top: calc(43px / 4);
+        margin-bottom: calc(43px / 4);
     }
 
     .central-block{
         margin: 0 10px 0 10px;
         font-size: 10pt;
+        color: #6c757d;
+    }
+
+    hr, .text{
+        opacity: 0.5;
     }
 
     hr{
