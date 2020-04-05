@@ -56,6 +56,7 @@
 <style lang="scss" scoped>
     @import "./../assets/waving-form.scss";
 
+
     .form{
         padding: 30px 30px 10px 30px;
     }

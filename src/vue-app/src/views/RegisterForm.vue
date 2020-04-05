@@ -31,8 +31,8 @@
 
                     <!-- TODO: Компонент автодополнения адресов на базе Яндекс Карт -->
                     <!-- TODO: Разделить иконки стрелочки и иконки у инпута (через ::before) -->
-                    <b-form-input  class="theme select" placeholder="Адрес регистрации"></b-form-input>
-                    <b-form-input  class="theme select" placeholder="Адрес проживания"></b-form-input>
+                    <b-form-input  class="theme select icon building" placeholder="Адрес регистрации"></b-form-input>
+                    <b-form-input  class="theme select icon building" placeholder="Адрес проживания"></b-form-input>
 
                     <b-form-checkbox
                         v-model="status"

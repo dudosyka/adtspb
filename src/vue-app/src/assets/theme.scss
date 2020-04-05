@@ -38,14 +38,13 @@ input.theme.icon, select.theme.icon{
 
 input.theme.select, select.theme{
     padding-right: 50px;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiBmb2N1c2FibGU9ImZhbHNlIiByb2xlPSJpbWciIGFsdD0iaWNvbiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjNzU3NTc1IiBjbGFzcz0iYmktY2FyZXQtZG93bi1maWxsIG14LWF1dG8gYi1pY29uIGJpIj48ZyBkYXRhLXYtODg5MmI5MjQ9IiI+PHBhdGggZD0iTTcuMjQ3IDExLjE0TDIuNDUxIDUuNjU4QzEuODg1IDUuMDEzIDIuMzQ1IDQgMy4yMDQgNGg5LjU5MmExIDEgMCAwMS43NTMgMS42NTlsLTQuNzk2IDUuNDhhMSAxIDAgMDEtMS41MDYgMHoiPjwvcGF0aD48L2c+PC9zdmc+");
     background-repeat: no-repeat;
     background-size: 8px 10px;
     background-position: right 2rem center;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiBmb2N1c2FibGU9ImZhbHNlIiByb2xlPSJpbWciIGFsdD0iaWNvbiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjNzU3NTc1IiBjbGFzcz0iYmktY2FyZXQtZG93bi1maWxsIG14LWF1dG8gYi1pY29uIGJpIj48ZyBkYXRhLXYtODg5MmI5MjQ9IiI+PHBhdGggZD0iTTcuMjQ3IDExLjE0TDIuNDUxIDUuNjU4QzEuODg1IDUuMDEzIDIuMzQ1IDQgMy4yMDQgNGg5LjU5MmExIDEgMCAwMS43NTMgMS42NTlsLTQuNzk2IDUuNDhhMSAxIDAgMDEtMS41MDYgMHoiPjwvcGF0aD48L2c+PC9zdmc+");
 }
 select.theme {
     padding-left: 61px; /* TODO: убрать лишний отступ у select'а, сделать по-нормальному */
-
 }
 
 
