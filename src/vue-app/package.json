@@ -9,6 +9,10 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-regular-svg-icons": "^5.13.0",
+    "@fortawesome/free-solid-svg-icons": "^5.13.0",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "latest",
     "core-js": "^3.6.4",
@@ -24,6 +28,7 @@
     "vue-yandex-maps": "^0.10.7"
   },
   "devDependencies": {
+    "@fortawesome/free-brands-svg-icons": "^5.13.0",
     "@vue/cli-plugin-babel": "^4.2.3",
     "@vue/cli-plugin-eslint": "^4.2.3",
     "@vue/cli-plugin-router": "^4.2.3",

@@ -1,4 +1,5 @@
 <template>
+    <!-- TODO: поменять на FontAwesome -->
     <b-button class="social-button" variant="light"></b-button>
 </template>
 

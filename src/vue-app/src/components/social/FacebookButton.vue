@@ -1,6 +1,6 @@
 <template>
-    <b-button class="social-button" variant="primary">
-    </b-button>
+    <!-- TODO: поменять на FontAwesome -->
+    <b-button class="social-button" variant="primary"></b-button>
 </template>
 
 <script>

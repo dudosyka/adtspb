@@ -1,3 +1,7 @@
+/**
+ * Основной стиль темы
+ */
+
 /* Поля ввода */
 
 /* TODO: объединить */
@@ -92,6 +96,7 @@ button.theme{
     background-color: #6c757d !important;
 }
 
+/* TODO: разобраться с border, возможная причина "скачка" кнопки при расфокусе */
 button.theme:active{
     color: #FFFFFF !important;
     outline: inherit !important;
@@ -172,4 +177,39 @@ input.theme.icon.briefcase-fill{
 
 input.theme.icon.building{
     background-image: url("~@/assets/icons/building.svg");
+}
+
+
+
+
+
+
+
+
+/**
+ * Дополнительный стиль темы
+ */
+
+/* Кнопки */
+/* TODO: убрать баг с обводкой кнопки */
+button.theme-alt{
+    text-transform: uppercase;
+    background-color: rgba(0,0,0,0);
+    border-color: rgba(0,0,0,0);
+    font-weight: lighter;
+    padding: 15px;
+}
+
+button.theme-alt:hover, button.theme-alt:active, button.theme-alt:focus{
+    color: #fff;
+    background-color: rgba(0,0,0,0.2) !important;
+    border-color: rgba(0,0,0,0) !important;
+}
+
+button.theme-alt:active, button.theme-alt:focus{
+    color: #FFFFFF !important;
+    outline: inherit !important;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-color: rgba(0,0,0,0) !important;
 }

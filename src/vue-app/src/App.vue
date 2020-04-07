@@ -9,6 +9,9 @@
 </template>
 
 <style lang="scss">
-    @import url('./assets/global.css');
     @import "./assets/theme.scss";
+</style>
+
+<style>
+    @import url('./assets/global.css');
 </style>
