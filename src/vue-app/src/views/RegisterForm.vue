@@ -2,6 +2,8 @@
 
     <div class="waving d-inline-flex justify-content-center align-items-center">
 
+        <vue-headful title="Регистрация | Личный кабинет"/>
+
         <b-container class="form">
             <div>
                 <h3 class="form-title">Регистрация</h3>
@@ -30,9 +32,9 @@
                     <b-form-input  class="theme icon building" placeholder="Место работы"></b-form-input>
 
                     <!-- TODO: Компонент автодополнения адресов на базе Яндекс Карт -->
-                    <!-- TODO: Разделить иконки стрелочки и иконки у инпута (через ::before) -->
-                    <b-form-input  class="theme select icon building" placeholder="Адрес регистрации"></b-form-input>
-                    <b-form-input  class="theme select icon building" placeholder="Адрес проживания"></b-form-input>
+                    <!-- TODO: Разделить иконки стрелочки и иконки у инпута (через 2 фона) -->
+                    <b-form-input  class="theme select icon" placeholder="Адрес регистрации"></b-form-input>
+                    <b-form-input  class="theme select icon" placeholder="Адрес проживания"></b-form-input>
 
                     <b-form-checkbox
                         v-model="status"

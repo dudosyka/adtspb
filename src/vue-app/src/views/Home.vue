@@ -1,16 +1,23 @@
 <template>
-    <div class="home">
-    <div class="content">
+    <div class="home" v-scroll="handleScroll">
+
+        <vue-headful title="Главная | Личный кабинет"/>
+
+        <div class="content">
         <div class="top-panel d-flex">
 
             <div>
-                <b-button variant="dark" class="theme-alt top-panel-button"><b-icon-chevron-double-left></b-icon-chevron-double-left> Вернуться на сайт</b-button>
+                <a href="https://adtspb.ru/">
+                    <b-button variant="dark" class="theme-alt top-panel-button" v-bind:class="(topScroll > 0) ? 'selected' : ''"><b-icon-chevron-double-left></b-icon-chevron-double-left> Вернуться на сайт</b-button>
+                </a>
             </div>
 
             <div class="spacer"></div>
 
             <div>
-                <b-button variant="dark" class="theme-alt top-panel-button">К личному кабинету <b-icon-chevron-double-right></b-icon-chevron-double-right></b-button>
+                <router-link to="/login">
+                    <b-button variant="dark" class="theme-alt top-panel-button" v-bind:class="(topScroll > 0) ? 'selected' : ''">К личному кабинету <b-icon-chevron-double-right></b-icon-chevron-double-right></b-button>
+                </router-link>
             </div>
 
 
@@ -34,96 +41,110 @@
         <div class="form advantage-form d-inline-flex justify-content-around align-items-start">
             <div class="advantage">
                 <h2>Родителям</h2>
-                <div class="advantage-image-container">
-                    <img class="advantage-image" src="../assets/parents.png" alt="For parents">
+                <div class="advantage-info-block">
+                    <div class="advantage-image-container">
+                        <img class="advantage-image" src="../assets/parents.png" alt="For parents">
+                    </div>
+
+                    <!-- TODO текст, редактируемый из БД -->
+
+                    <div class="advantage-comment">
+                        Подача заявления
+                    </div>
+
+                    <div class="advantage-comment">
+                        Отслеживание статуса заявления
+                    </div>
+
+                    <div class="advantage-comment">
+                        Отслеживание расписания
+                    </div>
+
+                    <div class="advantage-comment">
+                        Подбор курса исходя из потребностей школьника*
+                    </div>
+
+                    <div class="advantage-comment">
+                        Получение уведомлений
+                    </div>
                 </div>
-
-                <!-- TODO текст, редактируемый из БД -->
-
-                <div class="advantage-comment">
-                    Подача заявления
-                </div>
-
-                <div class="advantage-comment">
-                    Отслеживание статуса заявления
-                </div>
-
-                <div class="advantage-comment">
-                    Отслеживание расписания
-                </div>
-
-                <div class="advantage-comment">
-                    Подбор курса исходя из потребностей школьника*
-                </div>
-
-                <div class="advantage-comment">
-                    Получение уведомлений
-                </div>
-
             </div>
+
+            <div class="advantage-separator"></div>
+
             <div class="advantage">
                 <h2>Обущающимся</h2>
-                <div class="advantage-image-container">
-                    <img class="advantage-image" src="../assets/pupils.png" alt="For pupils">
+                <div class="advantage-info-block">
+                    <div class="advantage-image-container">
+                        <img class="advantage-image" src="../assets/pupils.png" alt="For pupils">
+                    </div>
+
+                    <!-- TODO текст, редактируемый из БД -->
+                    <div class="advantage-comment">
+                        Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.
+                    </div>
                 </div>
 
-                <!-- TODO текст, редактируемый из БД -->
-                <div class="advantage-comment">
-                    Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.
-                </div>
             </div>
+
+            <div class="advantage-separator"></div>
+
             <div class="advantage">
                 <h2>Педагогам</h2>
-                <div class="advantage-image-container">
-                    <img class="advantage-image" src="../assets/teachers.png" alt="For teachers">
+                <div class="advantage-info-block">
+                    <div class="advantage-image-container">
+                        <img class="advantage-image" src="../assets/teachers.png" alt="For teachers">
+                    </div>
+
+                    <!-- TODO текст, редактируемый из БД -->
+                    <div class="advantage-comment">
+                        Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.
+                    </div>
                 </div>
 
-                <!-- TODO текст, редактируемый из БД -->
-                <div class="advantage-comment">
-                    Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.
-                </div>
             </div>
         </div>
 
+        <!-- TODO замена ссылок из бд (не особо важно, месяца через 2) -->
         <div class="socials d-inline-flex justify-content-center align-items-center">
-            <div class="social">
+            <a class="social" href="https://vk.com/nabor_adtspb">
                 <i class="fab fa-vk"></i>
-            </div>
-            <div class="social">
+            </a>
+            <a class="social" href="https://www.instagram.com/adtspb/">
                 <i class="fab fa-instagram"></i>
-            </div>
-            <div class="social">
+            </a>
+            <a class="social" href="https://www.facebook.com/adtspb">
                 <i class="fab fa-facebook-f"></i>
-            </div>
-            <div class="social">
+            </a>
+            <a class="social" href="https://twitter.com/adtspb">
                 <i class="fab fa-twitter"></i>
+            </a>
+        </div>
+    </div>
+
+        <!-- TODO ссылки из бд (добавление, редактирование) (не особо важно, месяца через 2) -->
+        <div class="footer-navigation d-inline-flex justify-content-around align-items-center">
+            <div class="navigation-page">
+                <a href="https://adtspb.ru/">Главная</a>
+            </div>
+            <div class="navigation-page">
+                <a href="https://adtspb.ru/about/">Об академии</a>
+            </div>
+            <div class="navigation-page selected">
+                <a>Личный кабинет</a>
+            </div>
+            <div class="navigation-page">
+                <a href="https://adtspb.ru/blog/">Новости</a>
+            </div>
+            <div class="navigation-page">
+                <a href="https://adtspb.ru/contact/">Контакты</a>
             </div>
         </div>
-    </div>
-
-    <!-- TODO ссылки -->
-    <div class="footer-navigation d-inline-flex justify-content-around align-items-center">
-        <div class="navigation-page">
-            <a href="#">Главная</a>
-        </div>
-        <div class="navigation-page">
-            <a href="#">Об академии</a>
-        </div>
-        <div class="navigation-page selected">
-            <a href="#">Личный кабинет</a>
-        </div>
-        <div class="navigation-page">
-            <a href="#">Новости</a>
-        </div>
-        <div class="navigation-page">
-            <a href="#">Контакты</a>
-        </div>
-    </div>
 
 
-    <div class="copyright">
-        &copy; 2019 ГБНОУ Академия Цифровых Технологий Санкт-Петербурга
-    </div>
+        <div class="copyright">
+            &copy; 2019 - {{year}} ГБНОУ Академия Цифровых Технологий Санкт-Петербурга
+        </div>
 
 
 <!--    <img alt="Vue logo" src="../assets/logo.png">-->
@@ -142,10 +163,22 @@
 // import HelloWorld from '@/components/HelloWorld.vue'
 
 export default {
-  name: 'Home',
-  components: {
-    // HelloWorld
-  }
+    name: 'Home',
+    components: {
+        // HelloWorld
+    },
+    data: function(){
+        return {
+            year: new Date().getFullYear(),
+            topScroll: 0
+        };
+    },
+    methods: {
+        handleScroll: function (evt, el) {
+            this.topScroll = window.scrollY;
+        }
+
+    }
 }
 </script>
 
@@ -176,17 +209,18 @@ export default {
     }
 
     .top-panel{
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         z-index: 100;
-        padding: 10px;
+        padding: 10px 5%;
     }
 
     .top-panel-button{
-        padding-top: 40px;
-        padding-bottom: 40px;
+        padding: 20px 40px;
+        width: max-content;
+        font-size: 16pt;
     }
 
     .welcome-panel{
@@ -195,11 +229,12 @@ export default {
         position: relative;
         height: 602px;
         width: 100%;
-        z-index: 2;
     }
 
     .logo-flex{
         height: 602px;
+        z-index: 1;
+        position: relative
     }
 
     .logo{
@@ -247,6 +282,12 @@ export default {
         /* отсутп */
         flex: 1 1 auto;
         margin: 0 65px;
+    }
+
+    .advantage-separator{
+        border-left: 1px solid #ccc;
+        height: 700px;
+        width: 1px;
     }
 
     .advantage-image-container, .advantage-image{

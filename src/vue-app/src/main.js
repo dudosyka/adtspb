@@ -6,6 +6,7 @@ import App from './App.vue'
 import router from './router'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueParticles from 'vue-particles'
+import VueHeadful from 'vue-headful'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText } from '@fortawesome/vue-fontawesome'
@@ -29,8 +30,21 @@ Vue.use(IconsPlugin)
 Vue.use(VueParticles)
 
 
+Vue.component('vue-headful', VueHeadful)
+
 
 Vue.config.productionTip = false
+
+Vue.directive('scroll', {
+    inserted: function (el, binding) {
+        let f = function (evt) {
+            if (binding.value(evt, el)) {
+                window.removeEventListener('scroll', f)
+            }
+        }
+        window.addEventListener('scroll', f)
+    }
+})
 
 new Vue({
     router,

@@ -2,6 +2,8 @@
 
     <div class="waving d-inline-flex justify-content-center align-items-center">
 
+        <vue-headful title="Вход | Личный кабинет"/>
+
         <b-container class="form">
             <div>
                 <h3 class="form-title">Авторизация</h3>
@@ -13,7 +15,7 @@
 
                     <b-button class="theme submit" block>Войти</b-button>
 
-                    <p class="theme text-muted mx-auto lost-password">Забыли <b-link class="theme" href="/login/forgot-password">Логин / Пароль</b-link>?</p>
+                    <p class="theme text-muted mx-auto lost-password">Забыли <router-link class="theme" to="/login/forgot-password">Логин / Пароль</router-link>?</p>
 
                     <CenteredCaption>
                         Или войти через
@@ -24,7 +26,11 @@
                         <GoogleButton></GoogleButton>
                     </div>
 
-                    <p class="theme text-muted mx-auto register-account"><b-link class="theme" href="/register">Создать аккаунт <b-icon-arrow-right></b-icon-arrow-right></b-link></p>
+                    <p class="theme text-muted mx-auto register-account">
+                        <router-link class="theme" to="/register">
+                            Создать аккаунт <b-icon-arrow-right></b-icon-arrow-right>
+                        </router-link>
+                    </p>
 
                 </b-form-row>
             </b-form>

@@ -13,6 +13,7 @@
     "@fortawesome/free-regular-svg-icons": "^5.13.0",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
+    "ContentTools": "^1.6.12",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "latest",
     "core-js": "^3.6.4",
@@ -23,6 +24,7 @@
     "sass-loader": "^8.0.2",
     "typescript": "^3.8.3",
     "vue": "^2.6.11",
+    "vue-headful": "^2.1.0",
     "vue-particles": "^1.0.9",
     "vue-router": "^3.1.6",
     "vue-yandex-maps": "^0.10.7"
