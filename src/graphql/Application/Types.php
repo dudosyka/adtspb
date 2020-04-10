@@ -1,9 +1,14 @@
 <?php
 namespace GraphQL\Application;
 
+use GraphQL\Application\Type\MutationType;
 use GraphQL\Application\Type\NodeType;
 use GraphQL\Application\Type\QueryType;
+use GraphQL\Application\Type\Scalar\DateType;
 use GraphQL\Application\Type\Scalar\EmailType;
+use GraphQL\Application\Type\Scalar\PasswordType;
+use GraphQL\Application\Type\Scalar\PhoneNumberType;
+use GraphQL\Application\Type\Scalar\SexType;
 use GraphQL\Application\Type\Scalar\UrlType;
 use GraphQL\Application\Type\UserType;
 use GraphQL\Type\Definition\CustomScalarType;
@@ -44,7 +49,7 @@ class Types
     /* Корневые типы */
     private static $node;
 	private static $query;
-
+    private static $mutation;
     /**
      * Тип объекта, имеющего ID
      *
@@ -56,7 +61,7 @@ class Types
     }
 
 	/**
-	 * Тип объекта с общими методами
+	 * Тип объекта с методами получения данных
 	 *
 	 * @return QueryType
 	 */
@@ -64,6 +69,16 @@ class Types
 	{
 		return self::$query ?: (self::$query = new QueryType());
 	}
+
+    /**
+     * Тип объекта с методами дейстийвий
+     *
+     * @return MutationType
+     */
+    public static function mutation()
+    {
+        return self::$mutation ?: (self::$mutation = new MutationType());
+    }
 
 
 
@@ -76,6 +91,10 @@ class Types
     /* Объектные типы данных */
     private static $urlType;
     private static $emailType;
+    private static $dateType;
+    private static $passwordType;
+    private static $phoneNumberType;
+    private static $sexType;
 
 	/**
 	 * Тип e-mail
@@ -95,6 +114,46 @@ class Types
     public static function url()
     {
         return self::$urlType ?: (self::$urlType = new UrlType());
+    }
+
+    /**
+     * Тип даты
+     *
+     * @return DateType
+     */
+    public static function date()
+    {
+        return self::$dateType ?: (self::$dateType = new DateType());
+    }
+
+    /**
+     * Тип пароля
+     *
+     * @return PasswordType
+     */
+    public static function password()
+    {
+        return self::$passwordType ?: (self::$passwordType = new PasswordType());
+    }
+
+    /**
+     * Тип телефонного номера
+     *
+     * @return PhoneNumberType
+     */
+    public static function phoneNumber()
+    {
+        return self::$phoneNumberType ?: (self::$phoneNumberType = new PhoneNumberType());
+    }
+
+    /**
+     * Тип пола
+     *
+     * @return SexType
+     */
+    public static function sex()
+    {
+        return self::$sexType ?: (self::$sexType = new SexType());
     }
 
 

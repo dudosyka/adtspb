@@ -17,27 +17,28 @@ class UserType extends ObjectType
             'description' => 'Пользователи личного кабинета.',
             'fields' => function() {
 
-	            // Не забывайте писать документацию методов и полей GraphQL, иначе они не будут зарегистрированы.
-
                 return [
                     'id' => Types::id(),
-	                'password' => ['type' => Types::string()],
+	                'password' => ['type' => Types::password()],
 	                'surname' => ['type' => Types::string()],
 	                'name' => ['type' => Types::string()],
 	                'midname' => ['type' => Types::string()],
-	                'sex' => ['type' => Types::int()],
-	                'phone_number' => ['type' => Types::string()],
+
+	                'sex' => Types::sex(),
+
+	                'phone_number' => Types::phoneNumber(),
+
 	                'email' => Types::email(),
+
 	                'registration_address' => ['type' => Types::string()],
 	                'residence_address' => ['type' => Types::string()],
 	                'job_place' => ['type' => Types::string()],
 	                'job_position' => ['type' => Types::string()],
-	                'relationship' => ['type' => Types::string()],
-	                'childids' => ['type' => Types::string()],
+	                'relationship_id' => ['type' => Types::int()],
 	                'study_place' => ['type' => Types::string()],
 	                'study_class' => ['type' => Types::string()],
-	                'date_registered' => ['type' => Types::string()],
-	                'birthday' => ['type' => Types::string()],
+	                'date_registered' => ['type' => Types::date()],
+	                'birthday' => ['type' => Types::date()],
 	                'status_email' => ['type' => Types::string()],
 	                'verification_key_email' => ['type' => Types::string()],
                 ];

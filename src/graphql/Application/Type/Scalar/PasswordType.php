@@ -1,32 +1,19 @@
 <?php
-
-
-/*
- * Pay attention that the function will not validate "not latin" domains.
-
-if (filter_var('уникум@из.рф', FILTER_VALIDATE_EMAIL)) {
-    echo 'VALID';
-} else {
-    echo 'NOT VALID';
-}
-
-перегнать в ANSI через json_encode();
- */
-
 namespace GraphQL\Application\Type\Scalar;
 
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\CustomScalarType;
+use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
 
-class EmailType
+class PasswordType extends ScalarType
 {
     public static function create()
     {
         return new CustomScalarType([
-            'name' => 'Email',
-            'description' => 'Электронная почта формата user@domain.com',
+            'name' => 'Password',
+            'description' => 'Пароль',
             'serialize' => [__CLASS__, 'serialize'],
             'parseValue' => [__CLASS__, 'parseValue'],
             'parseLiteral' => [__CLASS__, 'parseLiteral'],
@@ -39,7 +26,7 @@ class EmailType
      * @param string $value
      * @return string
      */
-    public static function serialize($value)
+    public function serialize($value)
     {
         // Assuming internal representation of email is always correct:
         return $value;
@@ -55,12 +42,13 @@ class EmailType
      * @param mixed $value
      * @return mixed
      */
-    public static function parseValue($value)
+    public function parseValue($value)
     {
-        //TODO: сделать поддержку кириллицы (filter_var не умеет проверять кириллицу!)
-        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            throw new \UnexpectedValueException("Cannot represent value as email: " . Utils::printSafe($value));
-        }
+        //TODO: сделать проверку пароля (пока так не работает)
+        //пароль не должен содержать символов {}\[\]:\";'<>\/
+//        if (preg_match("/[`{}\[\]:\";'<>\/]/", $value)) {
+//            throw new \UnexpectedValueException("Cannot represent value as date: " . Utils::printSafe($value));
+//        }
         return $value;
     }
 
@@ -68,19 +56,19 @@ class EmailType
      * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input
      *
      * @param \GraphQL\Language\AST\Node $valueNode
+     * @param array|null $variables
      * @return string
      * @throws Error
      */
-    public static function parseLiteral($valueNode)
+    public function parseLiteral($valueNode, array $variables = null)
     {
         // Note: throwing GraphQL\Error\Error vs \UnexpectedValueException to benefit from GraphQL
         // error location in query:
         if (!$valueNode instanceof StringValueNode) {
             throw new Error('Query error: Can only parse strings got: ' . $valueNode->kind, [$valueNode]);
         }
-        //TODO: сделать поддержку кириллицы (filter_var не умеет проверять кириллицу!) здесь тоже
-        if (!filter_var($valueNode->value, FILTER_VALIDATE_EMAIL)) {
-            throw new Error("Not a valid email", [$valueNode]);
+        if (preg_match("/[`{}\[\]:\";'<>\/]/", $valueNode->value)) {
+            throw new Error("Not a valid password", [$valueNode]);
         }
         return $valueNode->value;
     }

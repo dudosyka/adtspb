@@ -29,4 +29,10 @@ class AppContext
      * @var \mixed
      */
     public $request;
+
+
+    //TODO: isAuthed method
+    public function isAuthed(){
+        return false;
+    }
 }

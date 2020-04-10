@@ -3,6 +3,7 @@ namespace GraphQL\Application\Database;
 
 use Error;
 use GraphQL\Application\ConfigManager;
+use GraphQL\Application\Entity\EntityBase;
 use PDO;
 use PDOException;
 
@@ -136,6 +137,53 @@ class DataSource
 		}
 		return $result;
 	}
+
+
+	public static function insert(EntityBase $instance){
+	    if(!method_exists($instance,'__getTable') || trim($instance->__getTable()) == ""){
+	        throw new Error("Отсутствует метод __getTable или возвращает неверные данные у сущности");
+        }
+
+        $assoc_table = $instance->__getTable();
+        //`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`
+        //NULL, CURRENT_TIMESTAMP, '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', '', '', NULL
+
+        $fields = [];
+        $values = [];
+        $bindings = [];
+
+        //TODO: оптимизировать
+
+        foreach((array)$instance as $key => $value){
+            if(is_null($value)){
+                $fields[] = "`".$key."`";
+                $values[] = "NULL";
+                continue;
+            }
+
+            $fields[] = "`".$key."`";
+            $values[] = ":".$key;
+            $bindings[$key] = $value;
+        }
+
+
+        $str = "INSERT INTO `{$assoc_table}` (".implode(",", $fields).") VALUES (".implode(",", $values).")";
+        $query = self::getPDO()->prepare($str);
+        foreach($bindings as $key => $value)
+        {
+            $query->bindValue($key, $value);
+        }
+
+        $isSuccessful = $query->execute();
+
+        if(!$isSuccessful)
+        {
+            $arr = print_r($query->errorInfo(), true);
+            throw new Error("Не удалось совершить запрос (".$str."): ".$arr);
+        }
+
+        return true;
+    }
 
 
 

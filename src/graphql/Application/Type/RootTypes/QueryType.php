@@ -26,20 +26,22 @@ class QueryType extends ObjectType
             	// Не забывайте писать документацию методов и полей GraphQL, иначе они не будут зарегистрированы.
 
 	            // Методы
-                'user' => [
-                    'type' => Types::user(), // Тип данных, которые возвращает метод
-                    'description' => 'Returns user by id (in range of 1-5)', // Описание метода
-                    'args' => [ // Аргументы
-                        'id' => Types::nonNull(Types::id())
-                    ]
-                ],
+//                'user' => [
+//                    'type' => Types::user(), // Тип данных, которые возвращает метод
+//                    'description' => 'Returns user by id (in range of 1-5)', // Описание метода
+//                    'args' => [ // Аргументы
+//                        'id' => Types::nonNull(Types::id())
+//                    ]
+//                ],
 
                 'viewer' => [
-                    'type' => Types::user(), // Тип данных, которые возвращает метод
-                    'description' => 'Represents currently logged-in user (for the sake of example - simply returns user with id == 1)' // Описание поля
+                    'type' => Types::user(),
+                    'description' => 'Текущий (локальный) пользователь.'
                 ],
 
-                'hello' => Type::string()
+//                'hello' => Type::string()
+
+
             ],
             'resolveField' => function($val, $args, $context, ResolveInfo $info) {
                 return $this->{$info->fieldName}($val, $args, $context, $info);
@@ -85,8 +87,8 @@ class QueryType extends ObjectType
 	 *
 	 * @return string
 	 */
-	public function hello()
-    {
-        return 'GraphQL сервер успешно работает.';
-    }
+//	public function hello()
+//    {
+//        return 'GraphQL сервер успешно работает.';
+//    }
 }

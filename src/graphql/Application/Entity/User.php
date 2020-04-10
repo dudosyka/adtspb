@@ -14,25 +14,24 @@ use GraphQL\Utils\Utils;
 
 class User extends EntityBase
 {
-    public string $password;
-    public string $surname;
-    public string $name;
-    public string $midname;
-    public int $sex;
-    public string $phone_number;
-    public string $email;
-    public string $registration_adress;
-    public string $residence_address;
-    public string $job_place;
-    public string $job_position;
-    public string $relationship;
-    public string $childids;
-    public string $study_place;
-    public string $study_class;
-    public string $date_registered;
-    public string $birthday;
-    public string $status_email;
-    public string $verification_key_email;
+    public $password;
+    public $surname;
+    public $name;
+    public $midname;
+    public $sex;
+    public $phone_number;
+    public $email;
+    public $registration_address;
+    public $residence_address;
+    public $job_position;
+    public $job_place;
+    public $relationship_id;
+    public $study_place;
+    public $study_class;
+    public $date_registered;
+    public $birthday;
+    public $status_email;
+    public $verification_key_email;
 
 	public function __construct(array $data = null)
 	{

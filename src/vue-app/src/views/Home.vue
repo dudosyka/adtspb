@@ -1,13 +1,13 @@
 <template>
     <div class="home" v-scroll="handleScroll">
 
-        <vue-headful title="Главная | Личный кабинет"/>
+        <vue-headful title="Главная страница | Личный кабинет"/>
 
         <div class="content">
         <div class="top-panel d-flex">
 
             <div>
-                <a href="https://adtspb.ru/">
+                <a href="https://adtspb.ru/" target="_blank">
                     <b-button variant="dark" class="theme-alt top-panel-button" v-bind:class="(topScroll > 0) ? 'selected' : ''"><b-icon-chevron-double-left></b-icon-chevron-double-left> Вернуться на сайт</b-button>
                 </a>
             </div>
@@ -107,16 +107,16 @@
 
         <!-- TODO замена ссылок из бд (не особо важно, месяца через 2) -->
         <div class="socials d-inline-flex justify-content-center align-items-center">
-            <a class="social" href="https://vk.com/nabor_adtspb">
+            <a class="social" href="https://vk.com/nabor_adtspb" target="_blank">
                 <i class="fab fa-vk"></i>
             </a>
-            <a class="social" href="https://www.instagram.com/adtspb/">
+            <a class="social" href="https://www.instagram.com/adtspb/" target="_blank">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a class="social" href="https://www.facebook.com/adtspb">
+            <a class="social" href="https://www.facebook.com/adtspb" target="_blank">
                 <i class="fab fa-facebook-f"></i>
             </a>
-            <a class="social" href="https://twitter.com/adtspb">
+            <a class="social" href="https://twitter.com/adtspb" target="_blank">
                 <i class="fab fa-twitter"></i>
             </a>
         </div>
@@ -125,19 +125,19 @@
         <!-- TODO ссылки из бд (добавление, редактирование) (не особо важно, месяца через 2) -->
         <div class="footer-navigation d-inline-flex justify-content-around align-items-center">
             <div class="navigation-page">
-                <a href="https://adtspb.ru/">Главная</a>
+                <a href="https://adtspb.ru/" target="_blank">Главная</a>
             </div>
             <div class="navigation-page">
-                <a href="https://adtspb.ru/about/">Об академии</a>
+                <a href="https://adtspb.ru/about/" target="_blank">Об академии</a>
             </div>
             <div class="navigation-page selected">
                 <a>Личный кабинет</a>
             </div>
             <div class="navigation-page">
-                <a href="https://adtspb.ru/blog/">Новости</a>
+                <a href="https://adtspb.ru/blog/" target="_blank">Новости</a>
             </div>
             <div class="navigation-page">
-                <a href="https://adtspb.ru/contact/">Контакты</a>
+                <a href="https://adtspb.ru/contact/" target="_blank">Контакты</a>
             </div>
         </div>
 

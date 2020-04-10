@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 require_once __DIR__ . '/AppContext.php';
@@ -10,13 +12,13 @@ require_once __DIR__ . '/Entity/EntityBase.php';
 foreach (["Database", "Entity", "Type", "Type/RootTypes", "Type/Scalar"] as $value){
 	$dir_content = scandir(__DIR__ . '/' . $value . '/');
 
-	foreach($dir_content as $key => $file)
-		if($file != '.' && $file != '..' && !is_dir(__DIR__ . '/' . $value . '/' . $file)){
-			require_once __DIR__ . '/' . $value . '/' . $file;
-		}
-
+	foreach($dir_content as $key => $file) {
+        if ($file != '.' && $file != '..' && !is_dir(__DIR__ . '/' . $value . '/' . $file)) {
+            require_once __DIR__ . '/' . $value . '/' . $file;
+        }
+    }
 }
-
+error_reporting(E_ALL);
 
 use GraphQL\Application\Entity\User;
 use \GraphQL\Application\Types;
@@ -55,7 +57,7 @@ try {
 	// Объявление контекста
 	$appContext = new AppContext();
 	$appContext->viewer = $current_user; // Симуляция текущего пользователя
-	$appContext->rootUrl = 'http://localhost:8080';
+	$appContext->rootUrl = 'http://localhost:8080'; //TODO: изменить rootUrl
 	$appContext->request = $_REQUEST;
 
 	// Parse incoming query and variables
@@ -69,12 +71,13 @@ try {
 	$data += ['query' => null, 'variables' => null];
 
 	if (null === $data['query']) {
-		$data['query'] = '{hello}';
+		$data['query'] = '{viewer}';
 	}
 
 	// Генерация GraphQL-схемы
 	$schema = new Schema([
-		'query' => Types::query()
+		'query' => Types::query(),
+		'mutation' => Types::mutation()
 	]);
 
 

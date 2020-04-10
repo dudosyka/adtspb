@@ -10,7 +10,7 @@ use GraphQL\Utils\Utils;
  *
  * @package GraphQL\Application\Entity
  */
-class EntityBase
+abstract class EntityBase
 {
 	public int $id;
 
@@ -19,4 +19,7 @@ class EntityBase
 		if($data != null)
 			Utils::assign($this, $data);
 	}
+
+	abstract public function __getTable();
+
 }
