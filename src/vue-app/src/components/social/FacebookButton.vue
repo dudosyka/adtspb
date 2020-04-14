@@ -18,8 +18,14 @@
         background-position: center;
         background-repeat: no-repeat;
 
-        background-color: #3b5997;
-        border-color: #3b5997;
-        box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        background-color: #3b5997 !important;
+        border-color: #3b5997 !important;
+        box-shadow: 0 0 2px rgba(0,0,0,0.5) !important;
+        border-radius: 5px !important;
     }
+
+    .social-button:hover{
+        background-color: #344e84 !important;
+    }
+
 </style>

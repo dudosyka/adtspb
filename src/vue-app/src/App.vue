@@ -10,9 +10,5 @@
 </template>
 
 <style lang="scss">
-    @import "./assets/theme.scss";
-</style>
-
-<style>
-    @import url('./assets/global.css');
+    @import "./assets/global.scss";
 </style>

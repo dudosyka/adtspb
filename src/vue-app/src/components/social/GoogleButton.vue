@@ -1,5 +1,6 @@
 <template>
     <!-- TODO: поменять на FontAwesome -->
+    <!-- TODO: исправить баг с анимацией -->
     <b-button class="social-button" variant="light"></b-button>
 </template>
 
@@ -18,7 +19,12 @@
         background-position: center;
         background-repeat: no-repeat;
 
-        background-color: #FFFFFF;
-        box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        background-color: #FFFFFF !important;
+        box-shadow: 0 0 2px rgba(0,0,0,0.5) !important;
+        border-radius: 5px !important;
     }
+    .social-button:hover{
+        background-color: #e4e4e4 !important;
+    }
+
 </style>

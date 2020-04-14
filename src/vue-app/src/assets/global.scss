@@ -1,6 +1,55 @@
-/* TODO: назначить стили до инициализации bootstrap */
+// File: custom.scss
+
+// Define your variable overrides here
+//$enable-shadows: true;
+//$enable-gradients: true;
+//$grid-breakpoints: (
+//        xs: 0,
+//        sm: 456px,
+//        md: 789px,
+//        lg: 999px,
+//        xl: 1234px
+//);
+//$bv-enable-table-stacked: false;
+
+// Include Bootstrap and BootstrapVue SCSS files
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~bootstrap-vue/src/index.scss';
+
+/************************************************************************
+ * Кастомизация темы
+ ************************************************************************/
+
+/**
+ * Общий стиль приложения
+ */
+
 * {
     font-family: 'Roboto', sans-serif;
+}
+
+html, body{
+    background-color: #1862b6;
+}
+
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+}
+
+#nav {
+    padding: 30px;
+}
+
+#nav a {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+    color: #42b983;
 }
 
 /**
@@ -10,7 +59,7 @@
 /* Поля ввода */
 
 /* TODO: объединить */
-input.theme, select.theme{
+input.form-control, select.custom-select{
     border-radius: 20px !important;
     height: 43px;
     padding-left: 65px;
@@ -20,18 +69,18 @@ input.theme, select.theme{
     color: #495057 !important;
 }
 
-input.theme::placeholder, select.theme::placeholder {
+input.form-control::placeholder, select.custom-select::placeholder {
     color: #757575 !important;
 }
 
-input.theme:focus, select.theme:focus{
+input.form-control:focus, select.custom-select:focus{
     color: inherit !important;
     background-color: #e6e6e6 !important;
     outline: inherit !important;
     -webkit-box-shadow: inset 0px 0px 5px rgba(0,0,0,0.3) !important;
     box-shadow: inset 0px 0px 5px rgba(0,0,0,0.3) !important;
 }
-input.theme.icon, select.theme.icon{
+input.form-control.icon, select.custom-select.icon{
     background-position-x: 30px;
     background-position-y: center;
     background-repeat: no-repeat;
@@ -45,14 +94,14 @@ input.theme.icon, select.theme.icon{
 
 /* Списки (отдельно) */
 
-input.theme.select, select.theme{
+input.form-control.select, select.custom-select{
     padding-right: 50px;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiBmb2N1c2FibGU9ImZhbHNlIiByb2xlPSJpbWciIGFsdD0iaWNvbiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjNzU3NTc1IiBjbGFzcz0iYmktY2FyZXQtZG93bi1maWxsIG14LWF1dG8gYi1pY29uIGJpIj48ZyBkYXRhLXYtODg5MmI5MjQ9IiI+PHBhdGggZD0iTTcuMjQ3IDExLjE0TDIuNDUxIDUuNjU4QzEuODg1IDUuMDEzIDIuMzQ1IDQgMy4yMDQgNGg5LjU5MmExIDEgMCAwMS43NTMgMS42NTlsLTQuNzk2IDUuNDhhMSAxIDAgMDEtMS41MDYgMHoiPjwvcGF0aD48L2c+PC9zdmc+");
     background-repeat: no-repeat;
     background-size: 8px 10px;
     background-position: right 2rem center;
 }
-select.theme {
+select.custom-select {
     padding-left: 61px; /* TODO: убрать лишний отступ у select'а, сделать по-нормальному */
 }
 
@@ -63,10 +112,10 @@ select.theme {
 
 /* Чекбоксы */
 
-div.theme.custom-control.custom-checkbox > label::before, div.theme.custom-control.custom-checkbox > label::after {
+div.custom-control.custom-checkbox > label::before, div.custom-checkbox > label::after {
     left: -35px !important;
 }
-div.theme.custom-control.custom-checkbox{
+div.custom-control.custom-checkbox{
     margin-top: 15px;
     margin-bottom: 15px;
     padding-left: 65px;
@@ -85,23 +134,23 @@ div.theme.custom-control.custom-checkbox{
 /* TODO: фикс уменьшения кнопки после расфокуса */
 /* TODO: фикс затемнение текста */
 
-button.theme.submit{
+button.btn.submit{
     margin-top: calc(43px / 2) !important;
     margin-bottom: calc(43px / 2) !important;
 }
 
-button.theme{
+button.btn{
     text-transform: uppercase;
 }
 
-button.theme{
+button.btn{
     border-radius: 20px !important;
     height: 43px;
     margin: 5px 0 5px 0;
     background-color: #6c757d !important;
 }
 
-button.theme:active{
+button.btn:active{
     color: #FFFFFF !important;
     outline: inherit !important;
     -webkit-box-shadow: inset 0px 0px 5px rgba(0,0,0,0.3) !important;
@@ -110,7 +159,7 @@ button.theme:active{
     border-color: rgba(0,0,0,0) !important;
 }
 
-button.theme:focus{
+button.btn:focus{
     color: #FFFFFF !important;
     outline: inherit !important;
     -webkit-box-shadow: none;
@@ -118,11 +167,11 @@ button.theme:focus{
     border-color: rgba(0,0,0,0) !important;
 }
 
-button.theme:hover{
+button.btn:hover{
     border-color: rgba(0,0,0,0) !important;
 }
 
-button.theme.info-block-button{
+button.btn.info-block-button{
     margin-bottom: 0 !important;
 }
 
@@ -134,16 +183,16 @@ button.theme.info-block-button{
 
 /* Ссылки */
 
-a.theme{
+a{
     color: #757575;
     text-decoration: underline;
 }
 
-b-link.theme{
+b-link{
     color: #b5b5b5;
 }
 
-b-form-checkbox.theme{
+b-form-checkbox{
     width: 200px;
 }
 
@@ -175,35 +224,35 @@ a.social:active{
 
 /* Иконки */
 
-input.theme.icon.envelope{
+input.icon.envelope{
     background-image: url("~@/assets/icons/envelope.svg");
 }
 
-input.theme.icon.lock-fill{
+input.icon.lock-fill{
     background-image: url("~@/assets/icons/lock-fill.svg");
 }
 
-input.theme.icon.person-lines-fill{
+input.icon.person-lines-fill{
     background-image: url("~@/assets/icons/person-lines-fill.svg");
 }
 
-input.theme.icon.house-fill{
+input.icon.house-fill{
     background-image: url("~@/assets/icons/house-fill.svg");
 }
 
-input.theme.icon.house-door-fill{
+input.icon.house-door-fill{
     background-image: url("~@/assets/icons/house-door-fill.svg");
 }
 
-input.theme.icon.phone{
+input.icon.phone{
     background-image: url("~@/assets/icons/phone.svg");
 }
 
-input.theme.icon.briefcase-fill{
+input.icon.briefcase-fill{
     background-image: url("~@/assets/icons/briefcase-fill.svg");
 }
 
-input.theme.icon.building{
+input.icon.building{
     background-image: url("~@/assets/icons/building.svg");
 }
 
@@ -215,7 +264,7 @@ input.theme.icon.building{
 
 /* Информационные выпадающие блоки */
 
-div.theme.info-block{
+div.info-block{
     background-color: #e8e8e8;
     border-radius: 0 0 10px 10px;
     width: 100%;
@@ -225,7 +274,7 @@ div.theme.info-block{
     padding: 0;
 }
 
-p.theme.info-block-text{
+p.info-block-text{
     text-align: center;
     color: black;
     margin: 10px;
@@ -244,12 +293,12 @@ p.theme.info-block-text{
 /* Кнопки */
 /* TODO: убрать баг с обводкой кнопки */
 button.theme-alt{
-    text-transform: uppercase;
-    background-color: rgba(0,0,0,0);
-    border-color: rgba(0,0,0,0);
-    font-weight: lighter;
-    padding: 15px;
-    border-radius: 10px;
+    text-transform: uppercase !important;
+    background-color: rgba(0,0,0,0) !important;
+    border-color: rgba(0,0,0,0) !important;
+    font-weight: lighter !important;
+    padding: 15px !important;
+    border-radius: 10px !important;
 }
 
 button.theme-alt:hover, button.theme-alt:active, button.theme-alt:focus, button.theme-alt.selected{

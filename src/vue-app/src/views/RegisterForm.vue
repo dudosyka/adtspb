@@ -20,32 +20,34 @@
                         Или
                     </CenteredCaption>
 
-                    <b-form-input  class="theme icon person-lines-fill" placeholder="Имя"></b-form-input>
-                    <b-form-input  class="theme icon person-lines-fill" placeholder="Фамилия"></b-form-input>
-                    <b-form-input  class="theme icon person-lines-fill" placeholder="Отчество"></b-form-input>
-                    <b-form-input  class="theme icon envelope" type="email" placeholder="E-mail"></b-form-input>
-                    <b-form-input  class="theme icon lock-fill" type="password" placeholder="Пароль"></b-form-input>
-                    <b-form-input  class="theme icon lock-fill" type="password" placeholder="Подтвердите пароль"></b-form-input>
-                    <b-form-input  class="theme icon phone" placeholder="Мобильный телефон"></b-form-input>
-                    <b-form-select class="theme" placeholder="Пол" v-model="sex_options_selected" :options="sex_options"></b-form-select>
-                    <b-form-input  class="theme icon briefcase-fill" placeholder="Должность"></b-form-input>
-                    <b-form-input  class="theme icon building" placeholder="Место работы"></b-form-input>
+                    <b-form-input  class="icon person-lines-fill" placeholder="Имя"></b-form-input>
+                    <b-form-input  class="icon person-lines-fill" placeholder="Фамилия"></b-form-input>
+                    <b-form-input  class="icon person-lines-fill" placeholder="Отчество"></b-form-input>
+                    <b-form-input  class="icon envelope" type="email" placeholder="E-mail"></b-form-input>
+                    <b-form-input  class="icon lock-fill" type="password" placeholder="Пароль"></b-form-input>
+                    <b-form-input  class="icon lock-fill" type="password" placeholder="Подтвердите пароль"></b-form-input>
+                    <b-form-input  class="icon phone" placeholder="Мобильный телефон"></b-form-input>
+                    <b-form-select placeholder="Пол" v-model="sex_options_selected" :options="sex_options"></b-form-select>
+                    <b-form-input  class="icon briefcase-fill" placeholder="Должность"></b-form-input>
+                    <b-form-input  class="icon building" placeholder="Место работы"></b-form-input>
 
                     <!-- TODO: Компонент автодополнения адресов на базе Яндекс Карт -->
                     <!-- TODO: Разделить иконки стрелочки и иконки у инпута (через 2 фона) -->
-                    <b-form-input  class="theme select icon" placeholder="Адрес регистрации"></b-form-input>
-                    <b-form-input  class="theme select icon" placeholder="Адрес проживания"></b-form-input>
+<!--                    <b-form-input  class="theme select icon"></b-form-input>-->
+<!--                    <b-form-input   ></b-form-input>-->
+                    <AddressInput placeholder="Адрес регистрации"></AddressInput>
+                    <AddressInput placeholder="Адрес проживания"></AddressInput>
 
                     <b-form-checkbox
                         v-model="status"
                         value="accepted"
                         unchecked-value="not_accepted"
-                        class="theme accept"
+                        class="accept"
                     >
                         Я согласен(-а) на обработку персональных данных в соответствии с п.&nbsp;4 ст.&nbsp;9 Федерального закона от 27.07.2006 №152-ФЗ "О персональных данных"
                     </b-form-checkbox>
 
-                    <b-button class="theme submit" block>Создать аккаунт</b-button>
+                    <b-button class="submit" block>Создать аккаунт</b-button>
 
                 </b-form-row>
             </b-form>
@@ -63,10 +65,12 @@
     import CenteredCaption from "../components/CenteredCaption";
     import FacebookButton from "../components/social/FacebookButton";
     import GoogleButton from "../components/social/GoogleButton";
+    import AddressInput from "../components/AddressInput";
 
     export default {
         name: "RegisterForm",
         components: {
+            AddressInput,
             FacebookButton,
             CenteredCaption,
             GoogleButton

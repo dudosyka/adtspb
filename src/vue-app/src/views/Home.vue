@@ -218,9 +218,10 @@ export default {
     }
 
     .top-panel-button{
-        padding: 20px 40px;
+        padding: 20px 40px !important;
         width: max-content;
         font-size: 16pt;
+        height: 80px !important;
     }
 
     .welcome-panel{
