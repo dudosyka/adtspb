@@ -81,6 +81,7 @@ input.form-control:focus, select.custom-select:focus{
     box-shadow: inset 0px 0px 5px rgba(0,0,0,0.3) !important;
 }
 input.form-control.icon, select.custom-select.icon{
+    background-size: auto !important;
     background-position-x: 30px;
     background-position-y: center;
     background-repeat: no-repeat;
@@ -91,15 +92,12 @@ input.form-control.icon, select.custom-select.icon{
 
 
 
-
 /* Списки (отдельно) */
 
-input.form-control.select, select.custom-select{
+.was-validated .custom-select:invalid, input.form-control.select, select.custom-select, select.custom-select.is-invalid{
     padding-right: 50px;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiBmb2N1c2FibGU9ImZhbHNlIiByb2xlPSJpbWciIGFsdD0iaWNvbiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjNzU3NTc1IiBjbGFzcz0iYmktY2FyZXQtZG93bi1maWxsIG14LWF1dG8gYi1pY29uIGJpIj48ZyBkYXRhLXYtODg5MmI5MjQ9IiI+PHBhdGggZD0iTTcuMjQ3IDExLjE0TDIuNDUxIDUuNjU4QzEuODg1IDUuMDEzIDIuMzQ1IDQgMy4yMDQgNGg5LjU5MmExIDEgMCAwMS43NTMgMS42NTlsLTQuNzk2IDUuNDhhMSAxIDAgMDEtMS41MDYgMHoiPjwvcGF0aD48L2c+PC9zdmc+");
-    background-repeat: no-repeat;
-    background-size: 8px 10px;
-    background-position: right 2rem center;
+    background: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiBmb2N1c2FibGU9ImZhbHNlIiByb2xlPSJpbWciIGFsdD0iaWNvbiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjNzU3NTc1IiBjbGFzcz0iYmktY2FyZXQtZG93bi1maWxsIG14LWF1dG8gYi1pY29uIGJpIj48ZyBkYXRhLXYtODg5MmI5MjQ9IiI+PHBhdGggZD0iTTcuMjQ3IDExLjE0TDIuNDUxIDUuNjU4QzEuODg1IDUuMDEzIDIuMzQ1IDQgMy4yMDQgNGg5LjU5MmExIDEgMCAwMS43NTMgMS42NTlsLTQuNzk2IDUuNDhhMSAxIDAgMDEtMS41MDYgMHoiPjwvcGF0aD48L2c+PC9zdmc+") #e6e6e6 no-repeat right 2rem center !important;
+    background-size: 8px 10px !important;
 }
 select.custom-select {
     padding-left: 61px; /* TODO: убрать лишний отступ у select'а, сделать по-нормальному */
@@ -134,7 +132,7 @@ div.custom-control.custom-checkbox{
 /* TODO: фикс уменьшения кнопки после расфокуса */
 /* TODO: фикс затемнение текста */
 
-button.btn.submit{
+button.btn[type="submit"], button.btn.submit{
     margin-top: calc(43px / 2) !important;
     margin-bottom: calc(43px / 2) !important;
 }
@@ -314,4 +312,17 @@ button.theme-alt:active, button.theme-alt:focus{
     box-shadow: none !important;
     background-color: rgba(0,0,0,0.4) !important;
     border-color: rgba(0,0,0,0) !important;
+}
+
+
+
+
+
+
+
+/**
+ * Группы форм
+ */
+fieldset.form-group{
+    margin-bottom: 0rem !important;
 }

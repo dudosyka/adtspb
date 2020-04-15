@@ -8,12 +8,12 @@
             <div>
                 <h3 class="form-title">Авторизация</h3>
             </div>
-            <b-form>
+            <b-form @submit="onSubmit">
                 <b-form-row>
                     <b-form-input class="theme icon envelope" placeholder="E-mail, номер телефона или логин"></b-form-input>
                     <b-form-input class="theme icon lock-fill" type="password" placeholder="Пароль"></b-form-input>
 
-                    <b-button class="theme submit" block>Войти</b-button>
+                    <b-button class="theme" type="submit" block>Войти</b-button>
 
                     <p class="theme text-muted mx-auto lost-password">Забыли <router-link class="theme" to="/login/forgot-password">Логин / Пароль</router-link>?</p>
 
@@ -55,6 +55,12 @@
             FacebookButton,
             CenteredCaption,
             GoogleButton
+        },
+        methods: {
+            onSubmit(evt){
+                evt.preventDefault();
+                //TODO login event
+            }
         }
     }
 </script>

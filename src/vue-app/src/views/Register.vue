@@ -11,17 +11,18 @@
             <b-form>
                 <b-form-row>
 
-                    <b-button class="theme submit" block @click="gotoFormClick">Я родитель</b-button>
-                    <b-button class="theme submit info-block-button" block v-b-toggle.pupil-info>Я учащийся</b-button>
-                    <b-collapse class="theme info-block mt-2" id="pupil-info">
-                        <p class="theme info-block-text">
+                    <b-button class="submit" block @click="gotoFormClick">Я родитель</b-button>
+                    <b-button class="submit info-block-button" block v-b-toggle.pupil-info>Я учащийся</b-button>
+                    <b-collapse class="info-block mt-2" id="pupil-info">
+                        <p class="info-block-text">
                             Привет!<br>
                             Сначала кто-то из родителей<br>
                             (законных представителей)<br>
                             должен зарегистрировать<br>
                             личный кабинет,<br>
                             после этого он сможет<br>
-                            создать кабинет для тебя.</p>
+                            создать кабинет для тебя.
+                        </p>
                     </b-collapse>
 
                 </b-form-row>

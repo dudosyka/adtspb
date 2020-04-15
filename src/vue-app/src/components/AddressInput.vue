@@ -2,25 +2,22 @@
 <!--    <b-form-input class="select icon" :id="id"></b-form-input>-->
 
     <!-- TODO: отобразить значок выпадающего списка -->
-
+    <!-- TODO: реализовать передачу аргументов на компонент (скопировать и вставить содержимое компонента в этот модуль) -->
     <vue-bootstrap-typeahead
+        v-bind="$attrs"
         class="autofill-container"
         :data="addresses"
         v-model="addressSearch"
         :placeholder="placeholder"
         style="width: 100%;"
+        :state="state"
+        :aria-describedby="aria_describedby"
     />
 
+    <!--        :input.required="is_required"-->
+<!--    {{is_required}}-->
 
-
-    <!--TODO-->
-    <!--
-    https://tech.yandex.ru/maps/jsbox/2.1/direct_geocode
-    https://tech.yandex.ru/maps/jsapi/doc/2.1/dg/concepts/geocoding/suggest-docpage/
-    https://tech.yandex.ru/maps/jsapi/doc/2.1/dg/concepts/geocoding/geocode-docpage/
-
-    https://tech.yandex.ru/maps/jsapi/?from=mapsapi
-    -->
+    <!--TODO: required атрибут (не стартуется сервер)-->
 
 </template>
 
@@ -32,7 +29,10 @@
     export default {
         name: "AddressInput",
         props:{
-            placeholder: String
+            placeholder: String,
+            is_required: Boolean,
+            state: String,
+            aria_describedby: String
         },
         data() {
             return {
