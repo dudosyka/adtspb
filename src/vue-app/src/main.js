@@ -36,16 +36,49 @@ Vue.use(VueParticles);
 Vue.use(_);
 
 
-
-
-
-
 //Vee-validate
 
 // Install VeeValidate rules and localization
 import * as vee_validate_rules from "vee-validate/dist/rules";
 Object.keys(vee_validate_rules).forEach(rule => {
     extend(rule, vee_validate_rules[rule]);
+
+    /*
+    https://logaretm.github.io/vee-validate/guide/rules.html
+
+    extend('required', {
+  ...required,
+  message: 'This field is required'
+});
+     */
+
+});
+
+// Кастомные типы данных для проверки:
+extend("required",{ //Есои не надо выводить наименование поля
+    ...vee_validate_rules.required,
+    message: "Обязательно для заполнения"
+});
+
+extend("password",{
+    message: "Пароль не должен содержать следующих символов: ` { } \[ \] : \" ; ' < > / ",
+    validate: function(value){
+        return value.match(/[`{}\[\]:";'<>\/]/) === null; //TODO: пофиксить проверку пароля
+    }
+});
+
+extend("phone",{
+    message: "Номер телефона должен быть заполнен в следующем формате: +7(XXX)XXX-XX-XX",
+    validate: function(value){
+        return value.match(/^\+7\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}$/) !== null;
+    }
+});
+
+extend("agreement",{
+    message: "Требуется подтверждение согласия",
+    validate: function(value){
+        return value === true;
+    }
 });
 
 import vee_validate_ru from "vee-validate/dist/locale/ru.json";
@@ -83,8 +116,8 @@ Vue.directive('scroll', {
     }
 });
 
-Vue.request_endpoint = "http://localhost:8085/api.php";
-Vue.request = request;
+Vue.prototype.$request_endpoint = "http://localhost:8085/api.php";
+Vue.prototype.$request = request;
 
 new Vue({
     router,

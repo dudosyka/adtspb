@@ -1,4 +1,6 @@
 <?php
+header("Access-Control-Allow-Origin: *"); //Временный заголовок! //TODO настройка заголовков CORS в зависимости от сервера
+
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../vendor/autoload.php';

@@ -8,18 +8,19 @@
         class="autofill-container"
         :data="addresses"
         v-model="addressSearch"
+        :value="value"
         :placeholder="placeholder"
         style="width: 100%;"
+        @input="handleInput"
         :state="state"
-        :aria-describedby="aria_describedby"
     />
 
     <!--        :input.required="is_required"-->
 <!--    {{is_required}}-->
-
-    <!--TODO: required атрибут (не стартуется сервер)-->
+    <!-- TODO: полная поддержка v-model (на перезапись значения) -->
 
 </template>
+
 
 <script>
     import {loadYmap} from "vue-yandex-maps";
@@ -32,7 +33,13 @@
             placeholder: String,
             is_required: Boolean,
             state: String,
-            aria_describedby: String
+            aria_describedby: String,
+
+            value: String
+        },
+        model: {
+            prop: 'input',
+            event: 'input'
         },
         data() {
             return {
@@ -86,6 +93,9 @@
                         baseComponent.addresses = suggested;
                     });
                 }
+            },
+            handleInput (e) {
+                this.$emit('input', this.addressSearch)
             }
         },
 

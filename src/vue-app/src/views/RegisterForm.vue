@@ -30,7 +30,6 @@
                             :rules="{ required: true }"
                             v-slot="validationContext"
                         >
-
                             <b-form-group>
                                 <b-form-input
                                     class="icon person-lines-fill"
@@ -89,7 +88,7 @@
                             style="width: 100%;"
 
                             name="E-mail"
-                            :rules="{ required: true }"
+                            :rules="{ required: true, email: true }"
                             v-slot="validationContext"
                         >
                             <b-form-group>
@@ -109,7 +108,7 @@
                             style="width: 100%;"
 
                             name="Пароль"
-                            :rules="{ required: true }"
+                            :rules="{ required: true, password: true }"
                             v-slot="validationContext"
                         >
                             <b-form-group>
@@ -130,7 +129,7 @@
                             style="width: 100%;"
 
                             name="Подтверждение пароля"
-                            :rules="{ required: true }"
+                            :rules="{ required: true, password: true }"
                             v-slot="validationContext"
                         >
                             <b-form-group>
@@ -151,7 +150,7 @@
                             style="width: 100%;"
 
                             name="Мобильный телефон"
-                            :rules="{ required: true }"
+                            :rules="{ required: true, phone: true }"
                             v-slot="validationContext"
                         >
                             <b-form-group>
@@ -227,6 +226,8 @@
                             </b-form-group>
                         </validation-provider>
 
+                        <!-- TODO проверка валидации у адресов -->
+
                         <validation-provider
                             style="width: 100%;"
 
@@ -237,9 +238,7 @@
                             <b-form-group>
                                 <AddressInput
                                     v-model="registration_address"
-                                    :is_required="true"
-                                    placeholder="Адрес регистрации"
-                                ></AddressInput>
+                                    placeholder="Адрес регистрации" />
                                 <b-form-invalid-feedback id="registration_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                             </b-form-group>
                         </validation-provider>
@@ -254,9 +253,10 @@
                             <b-form-group>
                                 <AddressInput
                                     v-model="residence_address"
-                                    :is_required="true"
                                     placeholder="Адрес проживания"
-                                ></AddressInput>
+
+                                    @input="getValidationState(validationContext)"
+                                    aria-describedby="residence_address-live-feedback" />
                                 <b-form-invalid-feedback id="residence_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                             </b-form-group>
                         </validation-provider>
@@ -267,27 +267,24 @@
 
 
                         <!-- TODO: Разделить иконки стрелочки и иконки у инпута (через 2 фона) -->
-                        <!-- TODO: сделать валидацию через validation-provider -->
 
                         <validation-provider
                             style="width: 100%;"
 
                             name="Согласие"
-                            :rules="{}"
+                            :rules="{agreement: true}"
                             v-slot="validationContext"
                         >
                             <b-form-checkbox
                                 v-model="status"
                                 class="accept"
 
-
+                                :state="getValidationState(validationContext)"
+                                aria-describedby="agreement-live-feedback"
                             >
                                 Я согласен(-а) на обработку персональных данных в соответствии с п.&nbsp;4 ст.&nbsp;9 Федерального закона от 27.07.2006 №152-ФЗ "О персональных данных"
                             </b-form-checkbox>
-
-<!--                            :state="getValidationState(validationContext)"-->
-<!--                            aria-describedby="agreement-live-feedback"-->
-
+                            <!-- Можно и не отображать -->
 <!--                            <b-form-invalid-feedback id="agreement-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
                         </validation-provider>
 
@@ -357,12 +354,8 @@
                 return dirty || validated ? valid : null;
             },
 
-            onSubmit(evt){
-
+            onSubmit(){
                 //TODO: вывод ошибок graphql
-                //TODO: выполнение блока
-
-                evt.preventDefault();
 
                 const request = `
                     mutation(
@@ -410,9 +403,11 @@
 
                 this.is_sending_request = true;
 
-                this.request(this.request_endpoint, request, data).then(function(data){
+                this.$request(this.$request_endpoint, request, data).then(function(data){
                     this.is_sending_request = false;
                     console.log(data);
+                }).catch(function(e){
+                    this.is_sending_request = false;
                 });
             }
         }
