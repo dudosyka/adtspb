@@ -1,5 +1,8 @@
 <?php
 header("Access-Control-Allow-Origin: *"); //Временный заголовок! //TODO настройка заголовков CORS в зависимости от сервера
+header('Access-Control-Allow-Methods: GET,PUT,POST,DELETE,PATCH,OPTIONS');
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Token");
+header("Access-Control-Allow-Credentials: true");
 
 error_reporting(E_ALL);
 

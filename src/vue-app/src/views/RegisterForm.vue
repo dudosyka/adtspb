@@ -326,8 +326,8 @@
                 sex_options_selected: null,
                 sex_options: [
                     { value: null, text: 'Пол', disabled: true },
-                    { value: "man", text: 'Мужской' },
-                    { value: "woman", text: 'Женский' },
+                    { value: "м", text: 'Мужской' },
+                    { value: "ж", text: 'Женский' },
                 ],
 
                 name: null,
@@ -337,7 +337,6 @@
                 password: null,
                 password_matching: null,
                 phone_number: null,
-                sex: null,
                 job_position: null,
                 job_place: null,
 
@@ -359,17 +358,17 @@
 
                 const request = `
                     mutation(
-                        $name: String,
-                        $surname: String,
-                        $midname: String,
-                        $email: String,
-                        $password: String,
-                        $phone_number: String,
-                        $sex: String,
-                        $job_position: String,
-                        $job_place: String,
-                        $registration_address: String,
-                        $residence_address: String
+                        $name: String!,
+                        $surname: String!,
+                        $midname: String!,
+                        $email: Email!,
+                        $password: Password!,
+                        $phone_number: PhoneNumber!,
+                        $sex: Sex!,
+                        $job_position: String!,
+                        $job_place: String!,
+                        $registration_address: String!,
+                        $residence_address: String!
                     ) {
                         register (
                             name: $name,
@@ -387,27 +386,34 @@
                     }
                 `;
 
-                const data = JSON.stringify({
+                const data = {
                     name:                   this.name,
                     surname:                this.surname,
                     midname:                this.midname,
                     email:                  this.email,
                     password:               this.password,
                     phone_number:           this.phone_number,
-                    sex:                    this.sex,
+                    sex:                    this.sex_options_selected,
                     job_position:           this.job_position,
                     job_place:              this.job_place,
                     registration_address:   this.registration_address,
                     residence_address:      this.residence_address
-                });
+                };
 
                 this.is_sending_request = true;
 
+                const _component = this;
+
+                console.log(request);
+                console.log(data);
+
                 this.$request(this.$request_endpoint, request, data).then(function(data){
-                    this.is_sending_request = false;
+                    _component.is_sending_request = false;
                     console.log(data);
+                    //TODO: логика после успешной отправки формы
                 }).catch(function(e){
-                    this.is_sending_request = false;
+                    _component.is_sending_request = false;
+                    //TODO: вывод об ошибке запроса
                 });
             }
         }

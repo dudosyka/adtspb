@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Мар 27 2020 г., 15:20
+-- Время создания: Апр 18 2020 г., 00:39
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -421,17 +421,23 @@ CREATE TABLE `user` (
   `relationship_id` bigint(20) NOT NULL COMMENT 'Степень родства',
   `study_place` text NOT NULL COMMENT 'Адрес и номер школы (если есть)',
   `study_class` varchar(10) NOT NULL COMMENT 'Класс (если есть), формат: 1а - 11я',
-  `birthday` date DEFAULT NULL COMMENT 'День рождения'
+  `birthday` date DEFAULT NULL COMMENT 'День рождения',
+  `password` text NOT NULL COMMENT 'Пароль пользователя (шифруется приложением!)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf16 COMMENT='Пользователи';
 
 --
 -- Дамп данных таблицы `user`
 --
 
-INSERT INTO `user` (`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`) VALUES
-(1, '2020-02-22 23:59:37', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 1, '', '', '1982-10-10'),
-(2, '2020-02-22 23:59:37', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 2, 'Школа №1', '8Б', '1982-10-10'),
-(3, '2020-03-21 17:10:08', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 2, 'Школа №2', '3А', '2018-11-06');
+INSERT INTO `user` (`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`, `password`) VALUES
+(1, '2020-02-22 23:59:37', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 1, '', '', '1982-10-10', ''),
+(2, '2020-02-22 23:59:37', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 2, 'Школа №1', '8Б', '1982-10-10', ''),
+(3, '2020-03-21 17:10:08', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 2, 'Школа №2', '3А', '2018-11-06', ''),
+(4, '2020-04-10 19:23:03', 'Тестов', 'Тест', 'Тесович', 'м', '+7 (123) 123-12-12', 'admin@localh.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwf'),
+(5, '2020-04-10 19:34:01', 'Тестов', 'Тест', 'Тесович', 'м', '+7 (123) 123-12-12', 'admin@localh.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwf'),
+(6, '2020-04-10 20:32:14', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwБMf'),
+(7, '2020-04-15 19:55:50', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwБMf'),
+(8, '2020-04-17 21:33:00', '123@123.ru', '123@123.ru', '123@123.ru', 'ж', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '123@123.ru', '123@123.ru', '123@123.ru', '123@123.ru', 1, '', '', NULL, '$2y$12$GggrDCuzFCm.dGnX7TRpjOI9W5WfM6Ia3QDkFA.aLM7rbMrquevgC');
 
 -- --------------------------------------------------------
 
@@ -511,6 +517,28 @@ INSERT INTO `user_role` (`id`, `role_id`, `user_id`) VALUES
 (1, 2, 1),
 (2, 1, 2),
 (3, 1, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `user_token`
+--
+
+DROP TABLE IF EXISTS `user_token`;
+CREATE TABLE `user_token` (
+  `id` int(11) NOT NULL,
+  `token` text NOT NULL COMMENT 'Токен',
+  `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Время создания',
+  `user_id` bigint(20) NOT NULL COMMENT 'ID пользователя, которому принадлежит токен'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Токены пользователей для доступа с API (выд. посл. авториз.)';
+
+--
+-- Дамп данных таблицы `user_token`
+--
+
+INSERT INTO `user_token` (`id`, `token`, `date_created`, `user_id`) VALUES
+(1, '$2y$12$dloL3rACzw.6Oldj5EJqQ.krYl3FnpVl4/62VCtBdWR5RGZyJ0rOu', '2020-04-17 21:35:47', 2),
+(2, '$2y$12$ijpXPpnBI2S5hS2oyfuqG.aWduQr9D8u/KJUvOd0nB9HcGRcwhOfu', '2020-04-17 21:38:26', 8);
 
 --
 -- Индексы сохранённых таблиц
@@ -686,6 +714,13 @@ ALTER TABLE `user_role`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Индексы таблицы `user_token`
+--
+ALTER TABLE `user_token`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- AUTO_INCREMENT для сохранённых таблиц
 --
 
@@ -801,7 +836,7 @@ ALTER TABLE `settings_timetablestatus`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
@@ -826,6 +861,12 @@ ALTER TABLE `user_group`
 --
 ALTER TABLE `user_role`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT для таблицы `user_token`
+--
+ALTER TABLE `user_token`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -935,6 +976,12 @@ ALTER TABLE `user_group`
 ALTER TABLE `user_role`
   ADD CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `user_role_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `user_token`
+--
+ALTER TABLE `user_token`
+  ADD CONSTRAINT `user_token_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

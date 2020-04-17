@@ -48,4 +48,19 @@ class User extends EntityBase
     {
     	return "user";
     }
+
+
+    /* Статические методы */
+    public static $password_default_options = [
+        "cost" => 12
+    ];
+
+    public static function hashPassword($password): string{
+	    return password_hash($password, PASSWORD_BCRYPT, self::$password_default_options);
+    }
+
+    public static function validatePassword($password, $hash): bool{
+        return password_verify($password, $hash);
+    }
+
 }

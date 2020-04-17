@@ -4,10 +4,12 @@ namespace GraphQL\Application\Type;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\User;
+use GraphQL\Application\Entity\UserToken;
 use GraphQL\Application\Types;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use mysql_xdevapi\Exception;
 
 /**
  * Class QueryType
@@ -55,6 +57,15 @@ class MutationType extends ObjectType
                     ]
                 ],
 
+                'login' => [
+                    'type' => Types::listOf(Types::string()),
+                    'description' => 'Авторизация пользователя',
+                    'args' => [
+                        'username' => Types::nonNull(Types::string()),
+                        'password' => Types::nonNull(Types::string()),
+                    ]
+                ],
+
 
             ],
             'resolveField' => function($val, $args, $context, ResolveInfo $info) {
@@ -70,13 +81,15 @@ class MutationType extends ObjectType
         //TODO: проверка на уникальность пользователя(?) (ФИО, e-mail, phone_number)
         //TODO: капча(?)
         //TODO: анти-DDOS регистрации
+        //TODO: защита от распространенных атак
+        //TODO: запрет на регистрацию кириллического пароля
 
         $instance = new User([
             'name' => $args['name'],
             'surname' => $args['surname'],
             'midname' => $args['midname'],
             'email' => $args['email'],
-            'password' => $args['password'],
+            'password' => User::hashPassword($args['password']),
             'phone_number' => $args['phone_number'],
             'sex' => $args['sex'],
             'job_position' => $args['job_position'],
@@ -92,6 +105,35 @@ class MutationType extends ObjectType
 
         return DataSource::insert($instance);
     }
+
+    public function login($rootValue, $args, AppContext $context){
+
+        //TODO: проверка на уникальность пользователя(?) (ФИО, e-mail, phone_number)
+        //TODO: капча(?)
+        //TODO: анти-DDOS авторизации
+        //TODO: защита от распространенных атак
+
+        $found = DataSource::findOne("user", "email = :username OR phone_number = :username", [
+            ':username' => $args['username']
+        ]);
+
+        if($found == null || !User::validatePassword($args['password'], $found->password))
+            throw new Exception("Неверный логин или пароль");
+
+        // Создание токена пользователя и сохранение в базу данных
+        $token = User::hashPassword($found->password."_".$found->email."_".$found->date_registered."_".date('U').'_'.rand(1,100));
+        $token_inst = new UserToken([
+            "token" => $token,
+            "date_created" => date("Y-m-d H:i:s"), //TODO: отдельная функция getTimeInMYSQLFormat()
+            "user_id" => $found->id
+        ]);
+        DataSource::insert($token_inst);
+
+        return [
+            'token' => $token
+        ];
+    }
+
 
     /**
      * "Ping" о том, что сервер работает корректно
