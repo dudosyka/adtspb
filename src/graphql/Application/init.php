@@ -1,9 +1,4 @@
 <?php
-header("Access-Control-Allow-Origin: *"); //Временный заголовок! //TODO настройка заголовков CORS в зависимости от сервера
-header('Access-Control-Allow-Methods: GET,PUT,POST,DELETE,PATCH,OPTIONS');
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Token");
-header("Access-Control-Allow-Credentials: true");
-
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -25,6 +20,7 @@ foreach (["Database", "Entity", "Type", "Type/RootTypes", "Type/Scalar"] as $val
 }
 error_reporting(E_ALL);
 
+use GraphQL\Application\ConfigManager;
 use GraphQL\Application\Entity\User;
 use \GraphQL\Application\Types;
 use \GraphQL\Application\AppContext;
@@ -34,6 +30,19 @@ use \GraphQL\GraphQL;
 use \GraphQL\Error\FormattedError;
 use \GraphQL\Error\Debug;
 
+
+
+$http_origin = $_SERVER['HTTP_ORIGIN'];
+if ($http_origin == "https://lk.adtspb.ru/" || ConfigManager::getField("debug")) {
+    header("Access-Control-Allow-Origin: ".$http_origin);
+}
+
+header('Access-Control-Allow-Methods: GET,POST');
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Bearer");
+header("Access-Control-Allow-Credentials: true");
+
+
+
 // Disable default PHP error reporting - we have better one for debug mode (see bellow)
 ini_set('display_errors', 0);
 
@@ -41,12 +50,13 @@ $debug = false;
 
 // Подлкючение отладчика PHP кода, вывод ошибок серверного кода пользователю:
 // [ВАЖНО!] данный блок используется ТОЛЬКО во время тестирования продукта, при выходе на "продакшн" (финальной сборке проекта) данный блок (33-38 строки, блок if) следует закомменитровать или удалить.
-//if (!empty($_GET['debug'])) {
-	set_error_handler(function($severity, $message, $file, $line) use (&$phpErrors) {
-		throw new ErrorException($message, 0, $severity, $file, $line);
-	});
-	$debug = Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE;
-//}
+
+if(ConfigManager::getField("debug")){
+    set_error_handler(function($severity, $message, $file, $line) use (&$phpErrors) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    });
+    $debug = Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE;
+}
 
 
 
@@ -54,10 +64,10 @@ $debug = false;
 try {
 
 	// Симуляция текущего пользователя
-	$current_user = DataSource::find('User', 2);
-	if($current_user == null){
-		throw new Exception("Текущий пользователь не найден.");
-	}
+    //TODO: неавторизованный пользователь с ID = 0;
+	$current_user = DataSource::find('User', 0);
+	//TODO: устанавливать пользователя при получении Bearer-токена
+    //TODO: проверка isAuthed
 
 	// Объявление контекста
 	$appContext = new AppContext();
