@@ -31,6 +31,13 @@ class AppContext
     public $request;
 
 
+    /**
+     * Приложение
+     * @var Application
+     */
+    public Application $app;
+
+
     //TODO: isAuthed method
     public function isAuthed(){
         return false;

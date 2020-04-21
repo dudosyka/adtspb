@@ -1,6 +1,7 @@
 <?php
 namespace GraphQL\Application\Type;
 
+use GraphQL\Application\Bearer;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\User;
@@ -121,7 +122,7 @@ class MutationType extends ObjectType
             throw new Exception("Неверный логин или пароль");
 
         // Создание токена пользователя и сохранение в базу данных
-        $token = User::hashPassword($found->password."_".$found->email."_".$found->date_registered."_".date('U').'_'.rand(1,100));
+        $token = Bearer::generate($context, $found);
         $token_inst = new UserToken([
             "token" => $token,
             "date_created" => date("Y-m-d H:i:s"), //TODO: отдельная функция getTimeInMYSQLFormat()

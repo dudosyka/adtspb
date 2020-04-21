@@ -179,7 +179,7 @@ class DataSource
         if(!$isSuccessful)
         {
             $arr = print_r($query->errorInfo(), true);
-            throw new Error("Не удалось совершить запрос (".$str."): ".$arr);
+            throw new ErrorError("Не удалось совершить запрос (".$str."): ".$arr);
         }
 
         return true;

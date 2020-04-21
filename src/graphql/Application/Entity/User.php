@@ -63,4 +63,8 @@ class User extends EntityBase
         return password_verify($password, $hash);
     }
 
+    public function isAuthorized(){
+        return isset($this->id) && $this->id != 0;
+    }
+
 }

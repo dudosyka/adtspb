@@ -1,5 +1,7 @@
 <?php
+namespace GraphQL\Application;
 
+use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\User;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
@@ -36,5 +38,27 @@ class Bearer
     }
 
     //TODO: validation https://github.com/lcobucci/jwt/blob/3.3/README.md
+
+
+    /**
+     * @param string $bearer_token
+     * @return mixed
+     * @throws Exception
+     */
+    public static function getUserIDFromBearer(string $bearer_token){
+
+        $token = Bearer::parseBearer($bearer_token);
+        $user_id = $token->getClaim("uid");
+        if($user_id == "" || $user_id == null || !isset($user_id)){
+            throw new Exception("Неверный Bearer-токен");
+        }
+
+        $data = DataSource::findOne("UserToken", "token = ? AND user_id = ?", [$bearer_token, $user_id]);
+        if($data){
+            throw new Exception("Неверный Bearer-токен");
+        }
+
+        return $user_id;
+    }
 
 }
