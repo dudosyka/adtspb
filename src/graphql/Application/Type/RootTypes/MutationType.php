@@ -7,6 +7,7 @@ use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\User;
 use GraphQL\Application\Entity\UserToken;
 use GraphQL\Application\Types;
+use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
@@ -76,7 +77,14 @@ class MutationType extends ObjectType
         parent::__construct($config);
     }
 
-
+    /**
+     * Регистрация пользователя
+     *
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     */
     public function register($rootValue, $args, AppContext $context){
 
         //TODO: проверка на уникальность пользователя(?) (ФИО, e-mail, phone_number)
@@ -100,13 +108,22 @@ class MutationType extends ObjectType
             'relationship_id' => 1, //TODO: поиск родителя из бд (исходя из настроек администратора)
             'study_place' => '',
             'study_class' => '',
-            'date_registered' => date("Y-m-d H:i:s"), //TODO: сделать метод getMySQLTimeStamp()
+            'date_registered' => DataSource::timeInMYSQLFormat(),
             'status_email' => 'ожидание'
         ]);
 
         return DataSource::insert($instance);
     }
 
+    /**
+     * Авторизация пользователя, вывод токена
+     *
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return array
+     * @throws RequestError
+     */
     public function login($rootValue, $args, AppContext $context){
 
         //TODO: проверка на уникальность пользователя(?) (ФИО, e-mail, phone_number)
@@ -119,13 +136,13 @@ class MutationType extends ObjectType
         ]);
 
         if($found == null || !User::validatePassword($args['password'], $found->password))
-            throw new Exception("Неверный логин или пароль");
+            throw new RequestError("Неверный логин или пароль");
 
         // Создание токена пользователя и сохранение в базу данных
         $token = Bearer::generate($context, $found);
         $token_inst = new UserToken([
             "token" => $token,
-            "date_created" => date("Y-m-d H:i:s"), //TODO: отдельная функция getTimeInMYSQLFormat()
+            "date_created" => DataSource::timeInMYSQLFormat(),
             "user_id" => $found->id
         ]);
         DataSource::insert($token_inst);
@@ -133,16 +150,5 @@ class MutationType extends ObjectType
         return [
             'token' => $token
         ];
-    }
-
-
-    /**
-     * "Ping" о том, что сервер работает корректно
-     *
-     * @return string
-     */
-    public function haudy()
-    {
-        return 'GraphQL сервер успешно работает.';
     }
 }

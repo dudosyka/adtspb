@@ -23,7 +23,7 @@ class Application
 
 
     /**
-     * Application constructor.
+     * Инициализация запроса
      */
     public function __construct(){
         $this->applicationHeaders = $this->getRequestHeaders();
@@ -32,7 +32,9 @@ class Application
         $this->handleRequest();
     }
 
-
+    /**
+     * Инициализация и подгрузка модулей
+     */
     public function requireModules(){
         require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -54,17 +56,27 @@ class Application
         }
     }
 
+    /**
+     * Вывод заголовков ответа
+     */
+
     public function echoHeaders(){
         $http_origin = $_SERVER['HTTP_ORIGIN'];
-        if ($http_origin == "https://lk.adtspb.ru/" || ConfigManager::getField("debug")) {
+        if ($http_origin == "https://lk.adtspb.ru/") {
             header("Access-Control-Allow-Origin: ".$http_origin);
+        } elseif(ConfigManager::getField("debug")){
+            header("Access-Control-Allow-Origin: *");
         }
 
-        header('Access-Control-Allow-Methods: GET,POST');
+        header('Access-Control-Allow-Methods: GET,POST,OPTIONS');
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Bearer");
         header("Access-Control-Allow-Credentials: true");
     }
 
+    /**
+     * Инициализация модуля отладки
+     *
+     */
     public function initDebug(){
         // Disable default PHP error reporting - we have better one for debug mode (see bellow)
         ini_set('display_errors', 0);
@@ -82,7 +94,11 @@ class Application
         }
     }
 
-
+    /**
+     * Обработка запроса, вывод схемы пользователю, мониторинг ошибок
+     *
+     * @throws \Throwable
+     */
     public function handleRequest(){
         try {
             $this->echoHeaders();
@@ -111,7 +127,7 @@ class Application
             $httpStatus = 200;
 
         } catch (\Exception $error) {
-            $httpStatus = 500;
+            $httpStatus = 200; //TODO: не отправляется CORS-запрос при выводе ошибки 500 (Причина: неудача ответа CORS preflight)
             $output['errors'] = [
                 FormattedError::createFromException($error, $this->debug)
             ];
@@ -120,7 +136,12 @@ class Application
         $this->sendJSON($output, $httpStatus);
     }
 
-
+    /**
+     * Вывод текста в формате JSON, завершение обработки запроса
+     *
+     * @param $output
+     * @param int $httpStatus
+     */
     public function sendJSON($output, int $httpStatus = 200){
         header('Content-Type: application/json', true, $httpStatus);
         die(json_encode($output));
@@ -128,6 +149,8 @@ class Application
 
 
     /**
+     * Создание контекста запроса (используется в методах схемы GraphQL)
+     *
      * @return \GraphQL\Application\AppContext
      * @throws Exception
      */
@@ -147,7 +170,7 @@ class Application
 
         // Объявление контекста
         $appContext = new AppContext();
-        $appContext->viewer = $current_user; // Симуляция текущего пользователя
+        $appContext->viewer = $current_user;
         $appContext->rootUrl = 'http://localhost:8080'; //TODO: изменить rootUrl
         $appContext->request = $_REQUEST;
         $appContext->app = $this;
@@ -156,6 +179,8 @@ class Application
     }
 
     /**
+     * Обработка данных запроса
+     *
      * @return array
      * @throws Exception
      */
@@ -184,15 +209,11 @@ class Application
 //    }
 
 
-
-
-
-
-
-
-
-
-
+    /**
+     * Получение списка всех заголовков запроса, кеширование в поле класса
+     *
+     * @return array
+     */
     public function getRequestHeaders() {
         if($this->applicationHeaders == null){
             $headers = [];
@@ -210,11 +231,23 @@ class Application
         return $headers;
     }
 
+    /**
+     * Получение определённого заголовка
+     *
+     * @param $header
+     * @return mixed|null
+     */
     public function getRequestHeaderValue($header){
         return (isset($this->getRequestHeaders()[$header])) ? $this->getRequestHeaders()[$header] : null;
     }
 
     private int $current_uid;
+
+    /**
+     * Получение ID текущего пользователя из его Bearer-токена
+     *
+     * @return int
+     */
 
     public function getCurrentUserID(): int{
 
@@ -236,7 +269,6 @@ class Application
         }
 
         return $uid;
-
     }
 
 

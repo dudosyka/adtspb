@@ -1,6 +1,7 @@
 <?php
 namespace GraphQL\Application;
 
+use Exception;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\User;
 use Lcobucci\JWT\Builder;
@@ -50,12 +51,12 @@ class Bearer
         $token = Bearer::parseBearer($bearer_token);
         $user_id = $token->getClaim("uid");
         if($user_id == "" || $user_id == null || !isset($user_id)){
-            throw new Exception("Неверный Bearer-токен");
+            throw new Exception("Пользователь использовал неверный Bearer-токен: uid не найден в токене.");
         }
 
         $data = DataSource::findOne("UserToken", "token = ? AND user_id = ?", [$bearer_token, $user_id]);
         if($data){
-            throw new Exception("Неверный Bearer-токен");
+            throw new Exception("Пользователь использовал неверный Bearer-токен: токен не найден в системе с таким uid.");
         }
 
         return $user_id;

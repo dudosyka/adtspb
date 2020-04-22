@@ -51,18 +51,43 @@ class User extends EntityBase
 
 
     /* Статические методы */
+
+    /**
+     * Настройки хэширования паролей
+     *
+     * @var array
+     */
     public static $password_default_options = [
         "cost" => 12
     ];
 
+
+    /**
+     * Создание хэша пароля
+     *
+     * @param $password
+     * @return string
+     */
     public static function hashPassword($password): string{
 	    return password_hash($password, PASSWORD_BCRYPT, self::$password_default_options);
     }
 
+    /**
+     * Проверка пароля, сравнение пароля с его хэшем
+     *
+     * @param $password
+     * @param $hash
+     * @return bool
+     */
     public static function validatePassword($password, $hash): bool{
         return password_verify($password, $hash);
     }
 
+    /**
+     * Авторизован ли текущий пользователь
+     *
+     * @return bool
+     */
     public function isAuthorized(){
         return isset($this->id) && $this->id != 0;
     }

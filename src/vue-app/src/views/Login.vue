@@ -13,6 +13,10 @@
                 <b-form @submit.stop.prevent="passes(onSubmit)">
                     <b-form-row>
 
+                        <b-alert variant="danger" v-bind:show="graphql_errors.length > 0" v-if="graphql_errors.length > 0">
+                            {{graphql_errors[0].message}}
+                        </b-alert>
+
                         <validation-provider
                             style="width: 100%;"
 
@@ -53,6 +57,8 @@
                                 <b-form-invalid-feedback id="password-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                             </b-form-group>
                         </validation-provider>
+
+
 
                         <b-button class="theme" type="submit" block :disabled="is_sending_request">Войти</b-button>
 
@@ -102,7 +108,9 @@
                 username: null,
                 password: null,
 
-                is_sending_request: false
+                is_sending_request: false,
+
+                graphql_errors: []
             };
         },
         methods: {
@@ -112,6 +120,8 @@
             },
 
             onSubmit(){
+
+                this.graphql_errors = [];
 
                 const request = `
                     mutation(
@@ -136,9 +146,14 @@
 
                 this.$request(this.$request_endpoint, request, data).then(function(data){
                     _component.is_sending_request = false;
-                    console.log(data);
                 }).catch(function(e){
+                    let errors = e.response.errors;
+
                     _component.is_sending_request = false;
+                    if(errors != undefined){
+                        _component.graphql_errors = errors;
+                    }
+
                 });
 
             }
@@ -154,7 +169,7 @@
         padding: 30px 30px 10px 30px;
     }
 
-    .social-networks-list{
+    .social-networks-list, .alert{
         width: 100%;
     }
 
@@ -166,5 +181,7 @@
         margin: 10px 0 0 0;
         font-size: 10pt;
     }
+
+
 
 </style>

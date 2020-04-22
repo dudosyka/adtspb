@@ -59,6 +59,15 @@ class DataSource
 		return self::$pdo;
 	}
 
+    /**
+     * Вывод текущего времени в формате MySQL (гггг-мм-чч чч:мм:сс)
+     *
+     * @return false|string
+     */
+	public static function timeInMYSQLFormat(){
+	    return date("Y-m-d H:i:s");
+    }
+
 	/**
 	 * Нахождение сущности по ID
 	 * Пример использования:

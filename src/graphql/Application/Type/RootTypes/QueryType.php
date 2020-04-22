@@ -2,8 +2,10 @@
 namespace GraphQL\Application\Type;
 
 use GraphQL\Application\AppContext;
+use GraphQL\Application\Data\User;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Types;
+use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
@@ -68,16 +70,21 @@ class QueryType extends ObjectType
         return DataSource::find('User', $args['id']);
     }
 
-	/**
-	 * Текущий пользователь
-	 *
-	 * @param $rootValue
-	 * @param $args
-	 * @param AppContext $context
-	 * @return \GraphQL\Application\Data\User
-	 */
+    /**
+     * Текущий пользователь
+     *
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return \GraphQL\Application\Entity\User
+     * @throws RequestError
+     */
 	public function viewer($rootValue, $args, AppContext $context)
     {
+        if(!$context->viewer->isAuthorized()){
+            throw new RequestError("Требуется авторизация");
+        }
+
         return $context->viewer;
     }
 
