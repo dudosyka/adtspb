@@ -13,7 +13,6 @@
 
                 <b-form @submit.stop.prevent="passes(onSubmit)">
                     <b-form-row>
-
                         <div class="social-networks-list d-inline-flex justify-content-center">
                             <FacebookButton class="mr-3"></FacebookButton>
                             <GoogleButton></GoogleButton>
@@ -22,6 +21,10 @@
                         <CenteredCaption>
                             Или
                         </CenteredCaption>
+
+                        <b-alert variant="danger" v-bind:show="graphql_errors.length > 0" v-if="graphql_errors.length > 0" id="register_errors_container">
+                            {{graphql_errors[0].message}}
+                        </b-alert>
 
                         <validation-provider
                             style="width: 100%;"
@@ -343,7 +346,8 @@
                 registration_address: null,
                 residence_address: null,
 
-                is_sending_request: false
+                is_sending_request: false,
+                graphql_errors: []
             };
         },
 
@@ -354,8 +358,6 @@
             },
 
             onSubmit(){
-                //TODO: вывод ошибок graphql
-
                 const request = `
                     mutation(
                         $name: String!,
@@ -401,19 +403,27 @@
                 };
 
                 this.is_sending_request = true;
+                this.graphql_errors = [];
 
                 const _component = this;
 
-                console.log(request);
-                console.log(data);
-
                 this.$request(this.$request_endpoint, request, data).then(function(data){
                     _component.is_sending_request = false;
-                    console.log(data);
-                    //TODO: логика после успешной отправки формы
+                    // console.log(data);
+                    //TODO: логика после успешной отправки формы (сделать по ТЗ)
+
+
+
                 }).catch(function(e){
                     _component.is_sending_request = false;
-                    //TODO: вывод об ошибке запроса
+                    let errors = e.response.errors;
+                    if(errors != undefined){
+                        _component.graphql_errors = errors;
+                    }
+                    _component.$nextTick(function(){
+                        _component.$scrollTo("#register_errors_container");
+                    });
+
                 });
             }
         }
@@ -428,7 +438,7 @@
         padding: 70px 70px 70px 70px !important;
     }
 
-    .social-networks-list{
+    .social-networks-list, .alert{
         width: 100%;
     }
 

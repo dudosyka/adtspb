@@ -10,13 +10,9 @@ import { FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText } from '@fort
 import { fab, faGoogle } from '@fortawesome/free-brands-svg-icons'; //TODO: выяснить, почему не подключается сразу все (почему не работает с fab)
 import { dom } from '@fortawesome/fontawesome-svg-core'; //TODO import all icons
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
-import { request } from 'graphql-request';
-import {
-    ValidationObserver,
-    ValidationProvider,
-    extend,
-    localize
-} from "vee-validate";
+import {GraphQLClient, request} from 'graphql-request';
+import { ValidationObserver, ValidationProvider, extend, localize } from "vee-validate";
+import VueScrollTo from 'vue-scrollto';
 // import YmapPlugin from 'vue-yandex-maps'
 // import ymaps_settings from './ymaps'
 
@@ -34,9 +30,23 @@ Vue.use(BootstrapVue); // Install BootstrapVue
 Vue.use(IconsPlugin); // Optionally install the BootstrapVue icon components plugin // TODO: возможно стоит очистить bootstrap-icons
 Vue.use(VueParticles);
 Vue.use(_);
+Vue.use(VueScrollTo, {
+    container: "body",
+    duration: 500,
+    easing: "ease",
+    offset: -10,
+    force: true,
+    cancelable: true,
+    onStart: false,
+    onDone: false,
+    onCancel: false,
+    x: false,
+    y: true
+});
 
 
-//Vee-validate
+/* Vee-validate */
+//TODO: сделать подгрузку системы валидации в отдельном JS-файле (в директории globals)
 
 // Install VeeValidate rules and localization
 import * as vee_validate_rules from "vee-validate/dist/rules";
@@ -118,6 +128,55 @@ Vue.directive('scroll', {
 
 Vue.prototype.$request_endpoint = "http://localhost:8085/api.php";
 Vue.prototype.$request = request;
+
+/* Токены */
+//TODO: сделать подгрузку системы токенов в отдельном JS-файле (в директории globals)
+//TODO: доделать глобализацию системы токенов
+//https://stackoverflow.com/questions/58967829/how-watch-global-variable-in-component-vuejs
+
+const $token = Vue.observable({ $token: {} });
+
+Object.defineProperty(Vue.prototype, '$token', {
+    get () {
+        return $token.$token
+    },
+
+    set (value) {
+        $token.$token = value
+    }
+});
+
+Vue.mixin({
+    mounted(){
+        this.$token = localStorage.$token;
+        this.$recreateClient();
+    },
+    data(){
+        return{
+            $token: '',
+            $graphql_client: null
+        };
+    },
+    methods: {
+        $recreateClient(){
+            if(this.$token){
+                this.$graphql_client = new GraphQLClient(this.$request_endpoint, {
+                    headers: {
+                        authorization: 'Bearer '+this.$token,
+                    },
+                });
+            }
+        }
+    },
+
+    watch: {
+        $token(newToken) {
+            console.log("New token: "+newToken);
+            localStorage.$token = newToken;
+            this.$recreateClient();
+        }
+    },
+});
 
 new Vue({
     router,

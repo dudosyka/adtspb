@@ -32,7 +32,13 @@ const routes = [
         path: '/register/form',
         name: 'Register form',
         component: () => import('../views/RegisterForm.vue')
-    }
+    },
+    {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: () => import('../views/Dashboard.vue')
+    },
+
 ]
 
 const router = new VueRouter({

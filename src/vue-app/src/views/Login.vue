@@ -13,7 +13,7 @@
                 <b-form @submit.stop.prevent="passes(onSubmit)">
                     <b-form-row>
 
-                        <b-alert variant="danger" v-bind:show="graphql_errors.length > 0" v-if="graphql_errors.length > 0">
+                        <b-alert variant="danger" v-bind:show="graphql_errors.length > 0" v-if="graphql_errors.length > 0" id="login_errors_container">
                             {{graphql_errors[0].message}}
                         </b-alert>
 
@@ -146,14 +146,20 @@
 
                 this.$request(this.$request_endpoint, request, data).then(function(data){
                     _component.is_sending_request = false;
+                    _component.$token = data.login[0];
+                    _component.$nextTick(function(){
+                        this.$router.push({path: "/dashboard"});
+                    });
                 }).catch(function(e){
                     let errors = e.response.errors;
 
                     _component.is_sending_request = false;
                     if(errors != undefined){
                         _component.graphql_errors = errors;
+                        _component.$nextTick(function(){
+                            _component.$scrollTo("#login_errors_container");
+                        });
                     }
-
                 });
 
             }

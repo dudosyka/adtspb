@@ -130,6 +130,7 @@ class MutationType extends ObjectType
         //TODO: капча(?)
         //TODO: анти-DDOS авторизации
         //TODO: защита от распространенных атак
+        //TODO: привязывать ли сессию к IP-адресу?
 
         $found = DataSource::findOne("user", "email = :username OR phone_number = :username", [
             ':username' => $args['username']

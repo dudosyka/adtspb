@@ -69,7 +69,7 @@ class Application
         }
 
         header('Access-Control-Allow-Methods: GET,POST,OPTIONS');
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Bearer");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
         header("Access-Control-Allow-Credentials: true");
     }
 
@@ -254,10 +254,11 @@ class Application
         if(!isset($this->current_uid)){
             $uid = 0;
 
-            $bearer = $this->getRequestHeaderValue("Bearer");
+            $bearer = $this->getRequestHeaderValue("Authorization");
             if($bearer == null){
                 $uid = 0;
             } else {
+                $bearer = explode(" ", $bearer)[1];
                 try {
                     $uid = Bearer::getUserIDFromBearer($bearer);
                 } catch (Exception $e) {
