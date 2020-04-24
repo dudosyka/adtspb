@@ -4,6 +4,7 @@ namespace GraphQL\Application;
 use Exception;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\User;
+use InvalidArgumentException;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 
@@ -23,9 +24,29 @@ class Bearer
             ->canOnlyBeUsedAfter($time + $be_used_after) // Configures the time that the token can be used (nbf claim)
             ->expiresAt($time + $expires) // Configures the expiration time of the token (exp claim)
             ->withClaim('uid', $current_user->id) // Configures a new claim, called "uid"
+            ->withClaim('ip', $context->ip)
             ->getToken(); // Retrieves the generated token
 
         return $token;
+    }
+
+    /**
+     * @param $header
+     * @return string
+     * @throws Exception
+     */
+    public static function getBearerFromHeader($header){
+        $bearer = explode(" ", $header);
+        if($bearer[0] != "Bearer")
+            throw new \Exception("Неверный формат Authorization-заголовка (требуется наличие кодового слова Bearer)");
+
+        try {
+            self::parseBearer($bearer[1]);
+        } catch(InvalidArgumentException $e){
+            throw new \Exception("Неверный формат Authorization-заголовка (некорректный Bearer-токен)");
+        }
+
+        return (string)$bearer[1];
     }
 
     /**
@@ -54,8 +75,11 @@ class Bearer
             throw new Exception("Пользователь использовал неверный Bearer-токен: uid не найден в токене.");
         }
 
-        $data = DataSource::findOne("UserToken", "token = ? AND user_id = ?", [$bearer_token, $user_id]);
-        if($data){
+        $data = DataSource::findOne("UserToken", "token = :token AND user_id = :uid", [
+            "token" => $bearer_token,
+            "uid" => $user_id
+        ]);
+        if($data == null){
             throw new Exception("Пользователь использовал неверный Bearer-токен: токен не найден в системе с таким uid.");
         }
 

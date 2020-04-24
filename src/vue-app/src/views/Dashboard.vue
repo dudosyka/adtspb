@@ -12,20 +12,23 @@
         name: "Dashboard",
         methods: {
             logout(){
-                this.$request(this.$request_endpoint, `mutation{ logout() }`).then(function(data){
 
-                }).catch(function(e){
+                this.$graphql_client.request(`mutation{ logout }`)
+                    .then(this.clearToken)
+                    .catch(this.clearToken);
 
-                });
+            },
+            clearToken(){
+                this.$token = "";
+                this.$router.push({ path: '/login' });
             }
         },
-        updated() {
+        mounted() {
             this.$nextTick(function(){
                 //TODO: проверка на просроченный или неверный токен
                 if(this.$token == null || this.$token == "" || this.$token == undefined ||
                     this.$graphql_client == null || this.$graphql_client == undefined){
-                    this.$token = "";
-                    this.$router.push({ path: '/login' });
+                    this.clearToken();
                 }
             });
 

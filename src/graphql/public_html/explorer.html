@@ -25,7 +25,10 @@
         const graphQLFetcher = graphQLParams =>
             fetch('/api.php', {
                 method: 'post',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    // "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4Nzc2NjgzOCwibmJmIjoxNTg3NzcwNDM4LCJleHAiOjE1ODc4NTMyMzgsInVpZCI6OH0."
+                },
                 body: JSON.stringify(graphQLParams),
             })
                 .then(response => response.json())

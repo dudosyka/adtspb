@@ -134,28 +134,35 @@ Vue.prototype.$request = request;
 //TODO: доделать глобализацию системы токенов
 //https://stackoverflow.com/questions/58967829/how-watch-global-variable-in-component-vuejs
 
-const $token = Vue.observable({ $token: {} });
+const $globals = Vue.observable({
+    $token: {},
+    $graphql_client: {}
+});
 
 Object.defineProperty(Vue.prototype, '$token', {
     get () {
-        return $token.$token
+        return $globals.$token
     },
 
     set (value) {
-        $token.$token = value
+        $globals.$token = value
     }
 });
+
+Object.defineProperty(Vue.prototype, '$graphql_client', {
+    get () {
+        return $globals.$graphql_client
+    },
+
+    set (value) {
+        $globals.$graphql_client = value
+    }
+});
+
 
 Vue.mixin({
     mounted(){
         this.$token = localStorage.$token;
-        this.$recreateClient();
-    },
-    data(){
-        return{
-            $token: '',
-            $graphql_client: null
-        };
     },
     methods: {
         $recreateClient(){
@@ -171,7 +178,6 @@ Vue.mixin({
 
     watch: {
         $token(newToken) {
-            console.log("New token: "+newToken);
             localStorage.$token = newToken;
             this.$recreateClient();
         }

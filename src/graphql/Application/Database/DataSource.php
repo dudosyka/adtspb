@@ -194,6 +194,42 @@ class DataSource
         return true;
     }
 
+    public static function delete(string $class, int $id){
+        $bindings = ["id" => (string)$id];
+        return self::deleteOne($class, "id = :id", $bindings);
+    }
+
+    public static function deleteOne(string $class, string $query, array $bindings = []){
+        $result = self::deleteAll($class, $query." LIMIT 1", $bindings);
+        return $result;
+    }
+
+    public static function deleteAll(string $class, string $query, array $bindings = []): bool {
+
+        self::initInstance();
+
+        $class = "\\GraphQL\\Application\\Entity\\{$class}";
+        $assoc_table = (new $class(null))->__getTable();
+
+
+        $query = self::getPDO()->prepare("DELETE FROM `{$assoc_table}` WHERE {$query}");
+        foreach($bindings as $key => $value)
+        {
+            $query->bindValue($key, $value);
+        }
+
+
+        $isSuccessful = $query->execute();
+
+        if(!$isSuccessful)
+        {
+            $arr = print_r($query->errorInfo(), true);
+            throw new Error("Не удалось совершить удаление: ".$arr);
+        }
+
+        return true;
+    }
+
 
 
 }

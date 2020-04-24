@@ -1,7 +1,7 @@
 <?php
 namespace GraphQL\Application;
 
-use Bearer;
+use GraphQL\Application\Bearer;
 use ErrorException;
 use Exception;
 use GraphQL\Application\AppContext;
@@ -9,11 +9,11 @@ use GraphQL\Application\ConfigManager;
 use GraphQL\Application\Entity\User;
 use \GraphQL\Application\Types;
 use \GraphQL\Application\Database\DataSource;
+use GraphQL\Server\RequestError;
 use \GraphQL\Type\Schema;
 use \GraphQL\GraphQL;
 use \GraphQL\Error\FormattedError;
 use \GraphQL\Error\Debug;
-use Request;
 
 class Application
 {
@@ -174,8 +174,33 @@ class Application
         $appContext->rootUrl = 'http://localhost:8080'; //TODO: изменить rootUrl
         $appContext->request = $_REQUEST;
         $appContext->app = $this;
+        $appContext->ip = $this->getClientIP();
 
         return $appContext;
+    }
+
+    /**
+     * Получение IP клиента
+     * @return mixed
+     */
+    private function getClientIP(){
+        if (isset($_SERVER['HTTP_CLIENT_IP']))
+            $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+            $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED']))
+            $ip_address = $_SERVER['HTTP_X_FORWARDED'];
+        else if(isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP']))
+            $ip_address = $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'];
+        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+            $ip_address = $_SERVER['HTTP_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_FORWARDED']))
+            $ip_address = $_SERVER['HTTP_FORWARDED'];
+        else if(isset($_SERVER['REMOTE_ADDR']))
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+        else
+            $ip_address = '127.0.0.1';
+        return $ip_address;
     }
 
     /**
@@ -252,19 +277,13 @@ class Application
     public function getCurrentUserID(): int{
 
         if(!isset($this->current_uid)){
-            $uid = 0;
 
-            $bearer = $this->getRequestHeaderValue("Authorization");
-            if($bearer == null){
+            try{
+                $uid = Bearer::getUserIDFromBearer(Bearer::getBearerFromHeader($this->getRequestHeaderValue("Authorization")));
+            } catch(\Exception $e){
                 $uid = 0;
-            } else {
-                $bearer = explode(" ", $bearer)[1];
-                try {
-                    $uid = Bearer::getUserIDFromBearer($bearer);
-                } catch (Exception $e) {
-                    $uid = 0;
-                }
             }
+
         } else {
             $uid = $this->current_uid;
         }

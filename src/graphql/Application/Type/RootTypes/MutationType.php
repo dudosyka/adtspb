@@ -68,6 +68,12 @@ class MutationType extends ObjectType
                     ]
                 ],
 
+                'logout' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Выход из аккаунта',
+                    'args' => []
+                ],
+
 
             ],
             'resolveField' => function($val, $args, $context, ResolveInfo $info) {
@@ -152,4 +158,23 @@ class MutationType extends ObjectType
             'token' => $token
         ];
     }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws \Exception
+     */
+    public function logout($rootValue, $args, AppContext $context){
+        $bearer = $context->getBearerOrError();
+
+        $successful = DataSource::deleteOne("UserToken", "token = :bearer", [
+            ':bearer' => $bearer
+        ]);
+
+        return $successful;
+    }
+
+
 }
