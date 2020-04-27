@@ -15,6 +15,8 @@
         :state="state"
     />
 
+
+
     <!--        :input.required="is_required"-->
 <!--    {{is_required}}-->
     <!-- TODO: полная поддержка v-model (на перезапись значения) -->
@@ -24,8 +26,6 @@
 
 <script>
     import {loadYmap} from "vue-yandex-maps";
-
-    const API_URL = 'https://api-url-here.com?query=:query'
 
     export default {
         name: "AddressInput",

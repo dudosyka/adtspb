@@ -26,6 +26,11 @@
 
     .social-button:hover{
         background-color: #344e84 !important;
+        box-shadow: 0 0 4px rgba(0,0,0,0.5) !important;
+    }
+
+    .social-button:active{
+        box-shadow: 0 0 8px rgba(0,0,0,0.5) !important;
     }
 
 </style>
