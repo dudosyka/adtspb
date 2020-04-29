@@ -80,6 +80,7 @@ class MutationType extends ObjectType
                 return $this->{$info->fieldName}($val, $args, $context, $info);
             }
         ];
+        //
         parent::__construct($config);
     }
 

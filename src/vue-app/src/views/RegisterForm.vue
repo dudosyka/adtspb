@@ -343,7 +343,7 @@
                 job_position: null,
                 job_place: null,
 
-                registration_address: "qfdsfsdfsdfsdwf",
+                registration_address: null,
                 residence_address: null,
 
                 is_sending_request: false,

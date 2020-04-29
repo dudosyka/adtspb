@@ -4,10 +4,26 @@
         <b-button @click="logout">
             Выйти
         </b-button>
+
+        <p>
+            Форма для добавления ребенка:
+        </p>
+
+        <AddressInput placeholder="Фамилия"/>
+        <AddressInput placeholder="Имя"/>
+        <AddressInput placeholder="Отчество"/>
+        <AddressInput placeholder="Дата рождения"/>
+        <AddressInput placeholder="Школа"/>
+        <AddressInput placeholder="Класс"/>
+
+        <b-btn>Добавить</b-btn>
+
     </div>
 </template>
 
 <script>
+    import AddressInput from "../components/AddressInput";
+
     export default {
         name: "Dashboard",
         methods: {
@@ -32,6 +48,9 @@
                 }
             });
 
+        },
+        components: {
+            AddressInput
         }
     }
 </script>

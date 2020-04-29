@@ -38,7 +38,7 @@
             value: String
         },
         model: {
-            prop: 'input',
+            prop: 'value',
             event: 'input'
         },
         data() {
