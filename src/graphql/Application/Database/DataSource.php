@@ -4,6 +4,7 @@ namespace GraphQL\Application\Database;
 use Error;
 use GraphQL\Application\ConfigManager;
 use GraphQL\Application\Entity\EntityBase;
+use GraphQL\Server\RequestError;
 use PDO;
 use PDOException;
 
@@ -147,7 +148,11 @@ class DataSource
 		return $result;
 	}
 
-
+    /**
+     * @param EntityBase $instance
+     * @return bool
+     * @throws RequestError
+     */
 	public static function insert(EntityBase $instance){
 	    if(!method_exists($instance,'__getTable') || trim($instance->__getTable()) == ""){
 	        throw new Error("Отсутствует метод __getTable или возвращает неверные данные у сущности");
@@ -188,7 +193,7 @@ class DataSource
         if(!$isSuccessful)
         {
             $arr = print_r($query->errorInfo(), true);
-            throw new ErrorError("Не удалось совершить запрос (".$str."): ".$arr);
+            throw new Error("Не удалось совершить запрос (".$str."): ".$arr);
         }
 
         return true;

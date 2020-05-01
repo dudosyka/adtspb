@@ -170,6 +170,7 @@ Vue.mixin({
                 this.$graphql_client = new GraphQLClient(this.$request_endpoint, {
                     headers: {
                         authorization: 'Bearer '+this.$token,
+                        // "Content-Type": "multipart/form-data"
                     },
                 });
             }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Апр 18 2020 г., 00:39
+-- Время создания: Май 02 2020 г., 00:22
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -430,6 +430,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`, `password`) VALUES
+(0, '1970-01-01 12:00:00', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', '0', 'г. Москва', 'г. Москва', 'г. Москва', 'Аноним', 1, '', '', '1970-01-01', ''),
 (1, '2020-02-22 23:59:37', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 1, '', '', '1982-10-10', ''),
 (2, '2020-02-22 23:59:37', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 2, 'Школа №1', '8Б', '1982-10-10', ''),
 (3, '2020-03-21 17:10:08', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 2, 'Школа №2', '3А', '2018-11-06', ''),
@@ -538,7 +539,16 @@ CREATE TABLE `user_token` (
 
 INSERT INTO `user_token` (`id`, `token`, `date_created`, `user_id`) VALUES
 (1, '$2y$12$dloL3rACzw.6Oldj5EJqQ.krYl3FnpVl4/62VCtBdWR5RGZyJ0rOu', '2020-04-17 21:35:47', 2),
-(2, '$2y$12$ijpXPpnBI2S5hS2oyfuqG.aWduQr9D8u/KJUvOd0nB9HcGRcwhOfu', '2020-04-17 21:38:26', 8);
+(2, '$2y$12$ijpXPpnBI2S5hS2oyfuqG.aWduQr9D8u/KJUvOd0nB9HcGRcwhOfu', '2020-04-17 21:38:26', 8),
+(42, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4Nzc2Njg1NCwibmJmIjoxNTg3NzcwNDU0LCJleHAiOjE1ODc4NTMyNTQsInVpZCI6OH0.', '2020-04-24 22:20:54', 8),
+(43, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4Nzc2NzM0MywibmJmIjoxNTg3NzcwOTQzLCJleHAiOjE1ODc4NTM3NDMsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-24 22:29:03', 8),
+(44, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4Nzc2NzQyMCwibmJmIjoxNTg3NzcxMDIwLCJleHAiOjE1ODc4NTM4MjAsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-24 22:30:20', 8),
+(45, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4Nzc2NzQ2OCwibmJmIjoxNTg3NzcxMDY4LCJleHAiOjE1ODc4NTM4NjgsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-24 22:31:08', 8),
+(46, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4Nzc2NzUxMCwibmJmIjoxNTg3NzcxMTEwLCJleHAiOjE1ODc4NTM5MTAsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-24 22:31:50', 8),
+(47, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4Nzc2NzUzOCwibmJmIjoxNTg3NzcxMTM4LCJleHAiOjE1ODc4NTM5MzgsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-24 22:32:18', 8),
+(49, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODA5ODI3MiwibmJmIjoxNTg4MTAxODcyLCJleHAiOjE1ODgxODQ2NzIsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-28 18:24:32', 8),
+(50, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODM2MzU3OCwibmJmIjoxNTg4MzY3MTc4LCJleHAiOjE1ODg0NDk5NzgsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-01 20:06:19', 8),
+(51, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODM2NDIyOSwibmJmIjoxNTg4MzY3ODI5LCJleHAiOjE1ODg0NTA2MjksInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-01 20:17:09', 8);
 
 --
 -- Индексы сохранённых таблиц
@@ -866,7 +876,7 @@ ALTER TABLE `user_role`
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

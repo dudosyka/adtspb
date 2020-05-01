@@ -33,6 +33,7 @@ class User extends EntityBase
     public $status_email;
     public $verification_key_email;
 
+    //TODO: заносить данные в сущность через __construct
 	public function __construct(array $data = null)
 	{
 		parent::__construct($data);
@@ -91,5 +92,41 @@ class User extends EntityBase
     public function isAuthorized(){
         return isset($this->id) && $this->id != 0;
     }
+
+    /*
+     * //TODO реализовать проверку на доступ к правам (https://habr.com/ru/post/51327/)
+    function include_right($grp){
+        $clone=clone $this;
+        $clone->group[]=$grp;
+
+        $result=mysql_query("SELECT * FROM `action_rights` WHERE `action_rights`.groupID IN ({$this->usrID}) AND `action_rights`.rightsID IN (".implode(",",$clone->group).")");
+        $tmp=array();
+        while ($t=mysql_fetch_assoc($result)){
+            $tmp[]=$t;
+        }
+        mysql_free_result($result);
+
+        $clone->temptable=$tmp;
+
+        return $clone;
+    }
+
+    function check($action){
+        $tmp=array();
+        foreach ($this->temptable as $t){
+            if ($t['action']==$action){
+                if (!isset($tmp[$t['groupID']]))
+                    $tmp[$t['groupID']]=$t['sign'];
+                else
+                    $tmp[$t['groupID']]|=$t['sign'];
+            }
+        }
+
+        if ($tmp){
+            return (array_search(0,$tmp)!==FALSE);
+        }
+        return false;
+    }
+    */
 
 }

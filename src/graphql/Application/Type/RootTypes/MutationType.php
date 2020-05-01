@@ -1,9 +1,11 @@
 <?php
 namespace GraphQL\Application\Type;
 
+use GraphQL\Application\Application;
 use GraphQL\Application\Bearer;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
+use GraphQL\Application\Entity\Upload;
 use GraphQL\Application\Entity\User;
 use GraphQL\Application\Entity\UserToken;
 use GraphQL\Application\Types;
@@ -11,7 +13,7 @@ use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use mysql_xdevapi\Exception;
+use Psr\Http\Message\UploadedFileInterface;
 
 /**
  * Class QueryType
@@ -26,7 +28,7 @@ class MutationType extends ObjectType
     {
         $config = [
             'name' => 'Mutation',
-            'description' => 'Список мутаций (действий)',
+            'description' => 'Действия',
             'fields' => [
 
                 // Не забывайте писать документацию методов и полей GraphQL, иначе они не будут зарегистрированы.
@@ -74,6 +76,13 @@ class MutationType extends ObjectType
                     'args' => []
                 ],
 
+                'getUploadServer' => [
+                    'type' => Types::string(),
+                    'description' => 'Получить ссылку на загрузку файла',
+                    'args' => [
+                        "type" => Types::nonNull(Types::string())
+                    ]
+                ],
 
             ],
             'resolveField' => function($val, $args, $context, ResolveInfo $info) {
@@ -175,6 +184,53 @@ class MutationType extends ObjectType
         ]);
 
         return $successful;
+    }
+
+
+    /**
+     * Получение ссылки на загрузки файла
+     *
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     * @throws \Exception
+     */
+    public function getUploadServer($rootValue, $args, AppContext $context){
+
+        //TODO: защита от переполнения бд
+
+        $type = $args["type"];
+        $status = "pending";
+
+        $url_id = "";
+
+        switch($type){
+            case "teachersList":
+
+                $url_id = Application::getRandomString();
+
+                $upload = new Upload([
+                    "type" => $type,
+                    "status" => $status,
+                    "url" => $url_id,
+                    "file" => "-",
+                    "ip" => $context->ip
+                ]);
+
+                DataSource::insert($upload);
+
+                break;
+
+            default:
+                throw new RequestError("Неверный тип файла");
+                break;
+        }
+
+
+
+        return $context->rootUrl."/api.php/upload/".$url_id;
     }
 
 

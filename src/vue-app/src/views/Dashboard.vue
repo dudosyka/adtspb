@@ -18,6 +18,12 @@
 
         <b-btn>Добавить</b-btn>
 
+        <p>
+            Загрузка списка педагогов:
+        </p>
+
+        <input type="file" accept="image/*" @change="uploadTeachersList">
+
     </div>
 </template>
 
@@ -37,6 +43,16 @@
             clearToken(){
                 this.$token = "";
                 this.$router.push({ path: '/login' });
+            },
+            uploadTeachersList({ target }){
+                console.log(target);
+                // target.files[0]
+
+                this.$graphql_client.request(`mutation($file: Upload!){ uploadTeachersList(file: $file) }`, data).then(function(data){
+                    console.log(data);
+                }).catch(function(e){
+                    console.log(e);
+                });
             }
         },
         mounted() {

@@ -106,7 +106,6 @@ class Application
             $appContext = $this->generateAppContext();
             $data = $this->parseData();
 
-
             // Генерация GraphQL-схемы
             $schema = new Schema([
                 'query' => Types::query(),
@@ -171,7 +170,7 @@ class Application
         // Объявление контекста
         $appContext = new AppContext();
         $appContext->viewer = $current_user;
-        $appContext->rootUrl = 'http://localhost:8080'; //TODO: изменить rootUrl
+        $appContext->rootUrl = 'http://localhost:8085'; //TODO: изменить rootUrl
         $appContext->request = $_REQUEST;
         $appContext->app = $this;
         $appContext->ip = $this->getClientIP();
@@ -221,7 +220,7 @@ class Application
         $data += ['query' => null, 'variables' => null];
 
         if (null === $data['query'] || trim($data["query"]) == ""){
-            throw new \Exception("Задан пустой запрос");
+            throw new RequestError("Задан пустой запрос");
         }
 
         return $data;
@@ -291,7 +290,13 @@ class Application
         return $uid;
     }
 
-
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public static function getRandomString(){
+        return md5(serialize(bin2hex(random_bytes(16))));
+    }
 
 
 
