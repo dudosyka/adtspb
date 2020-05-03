@@ -2,7 +2,8 @@
     "require": {
         "webonyx/graphql-php": "^0.13.8",
         "phing/phing": "2.*",
-        "lcobucci/jwt": "^3.3"
+        "lcobucci/jwt": "^3.3",
+        "ecodev/graphql-upload": "^4.1"
     },
     "autoload": {
         "psr-0": {"": "src/"}

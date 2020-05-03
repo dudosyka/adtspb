@@ -1,5 +1,8 @@
 <template>
     <div class="dashboard">
+
+        <vue-headful title="Панель управления | Личный кабинет"/>
+
         Вы авторизованы
         <b-button @click="logout">
             Выйти

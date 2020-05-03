@@ -45,7 +45,7 @@ class Application
 
         require_once __DIR__ . '/Entity/EntityBase.php';
 
-        foreach (["Database", "Entity", "Type", "Type/RootTypes", "Type/Scalar"] as $value){
+        foreach (["Database", "Entity", "Type", "Type/RootTypes", "Type/Scalar", "Log"] as $value){
             $dir_content = scandir(__DIR__ . '/' . $value . '/');
 
             foreach($dir_content as $key => $file) {
@@ -61,7 +61,7 @@ class Application
      */
 
     public function echoHeaders(){
-        $http_origin = $_SERVER['HTTP_ORIGIN'];
+        $http_origin = $_SERVER['HTTP_ORIGIN'] ?? "error";
         if ($http_origin == "https://lk.adtspb.ru/") {
             header("Access-Control-Allow-Origin: ".$http_origin);
         } elseif(ConfigManager::getField("debug")){
@@ -153,9 +153,7 @@ class Application
      * @return \GraphQL\Application\AppContext
      * @throws Exception
      */
-    private function generateAppContext(): AppContext{
-
-        //TODO: вывод Exception пользователю (не как Internal Server Error)
+    private function generateAppContext(): AppContext {
 
         // Инициализация текущего пользователя
         $uid = $this->getCurrentUserID();
@@ -291,14 +289,29 @@ class Application
     }
 
     /**
+     * Путь к папке с хранилищем данных
+     *
+     * @var string
+     */
+    private string $storagePath = __DIR__ . "/storage/";
+
+    /**
+     * Получение пути к папке с хранилищем всех данных
+     *
+     * @return string
+     */
+    public function getStoragePath(){
+        return $this->storagePath;
+    }
+
+
+    /**
      * @return string
      * @throws Exception
      */
     public static function getRandomString(){
         return md5(serialize(bin2hex(random_bytes(16))));
     }
-
-
 
 
 

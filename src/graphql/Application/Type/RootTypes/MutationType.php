@@ -13,6 +13,7 @@ use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Upload\UploadType;
 use Psr\Http\Message\UploadedFileInterface;
 
 /**
@@ -76,12 +77,10 @@ class MutationType extends ObjectType
                     'args' => []
                 ],
 
-                'getUploadServer' => [
+                'adminUploadTeachersList' => [
                     'type' => Types::string(),
-                    'description' => 'Получить ссылку на загрузку файла',
-                    'args' => [
-                        "type" => Types::nonNull(Types::string())
-                    ]
+                    'description' => 'Загрузить список педагогов на сервер (файл должен быть загружен в поле file0 POST-запроса)',
+                    'args' => []
                 ],
 
             ],
@@ -197,40 +196,17 @@ class MutationType extends ObjectType
      * @throws RequestError
      * @throws \Exception
      */
-    public function getUploadServer($rootValue, $args, AppContext $context){
+    public function adminUploadTeachersList($rootValue, $args, AppContext $context){
+        //TODO: проверка на права администратора
 
-        //TODO: защита от переполнения бд
+        $file = $context->getFileOrError("file0");
+        $tmp_name = $file["tmp_name"];
 
-        $type = $args["type"];
-        $status = "pending";
+        move_uploaded_file($tmp_name, $context->app->getStoragePath()."/t_list.csv");
 
-        $url_id = "";
+        // TODO: обработка файла, регистрация списка в базе данных
 
-        switch($type){
-            case "teachersList":
-
-                $url_id = Application::getRandomString();
-
-                $upload = new Upload([
-                    "type" => $type,
-                    "status" => $status,
-                    "url" => $url_id,
-                    "file" => "-",
-                    "ip" => $context->ip
-                ]);
-
-                DataSource::insert($upload);
-
-                break;
-
-            default:
-                throw new RequestError("Неверный тип файла");
-                break;
-        }
-
-
-
-        return $context->rootUrl."/api.php/upload/".$url_id;
+        return 'Получен файл: '.print_r($file, true);
     }
 
 

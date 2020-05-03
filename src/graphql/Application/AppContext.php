@@ -79,4 +79,21 @@ class AppContext
         return $bearer;
     }
 
+    /**
+     * Получение файла (если его нет - выдача ошибки пользователю).
+     *
+     * @param string $fileField
+     * @return mixed
+     * @throws RequestError
+     */
+    public function getFileOrError(string $fileField){
+
+        // TODO: проверка типа файла по его расширению + mime типу
+
+        if(!isset($_FILES[$fileField]) or $_FILES[$fileField] == null or strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false)
+            throw new RequestError("Файл не прикреплён к запросу.");
+
+        return $_FILES[$fileField];
+    }
+
 }
