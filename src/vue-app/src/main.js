@@ -136,7 +136,8 @@ Vue.prototype.$request = request;
 
 const $globals = Vue.observable({
     $token: {},
-    $graphql_client: {}
+    $graphql_client: {},
+    $graphql_upload_client: {}
 });
 
 Object.defineProperty(Vue.prototype, '$token', {
@@ -156,6 +157,16 @@ Object.defineProperty(Vue.prototype, '$graphql_client', {
 
     set (value) {
         $globals.$graphql_client = value
+    }
+});
+
+Object.defineProperty(Vue.prototype, '$graphql_upload_client', {
+    get () {
+        return $globals.$graphql_upload_client
+    },
+
+    set (value) {
+        $globals.$graphql_upload_client = value
     }
 });
 

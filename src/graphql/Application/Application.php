@@ -45,7 +45,7 @@ class Application
 
         require_once __DIR__ . '/Entity/EntityBase.php';
 
-        foreach (["Database", "Entity", "Type", "Type/RootTypes", "Type/Scalar", "Log"] as $value){
+        foreach (["Database", "Entity", "Type", "Type/RootTypes", "Type/Scalar", "Log", "File"] as $value){
             $dir_content = scandir(__DIR__ . '/' . $value . '/');
 
             foreach($dir_content as $key => $file) {
@@ -287,23 +287,6 @@ class Application
 
         return $uid;
     }
-
-    /**
-     * Путь к папке с хранилищем данных
-     *
-     * @var string
-     */
-    private string $storagePath = __DIR__ . "/storage/";
-
-    /**
-     * Получение пути к папке с хранилищем всех данных
-     *
-     * @return string
-     */
-    public function getStoragePath(){
-        return $this->storagePath;
-    }
-
 
     /**
      * @return string

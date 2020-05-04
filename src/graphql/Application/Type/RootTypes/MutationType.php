@@ -8,6 +8,8 @@ use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\Upload;
 use GraphQL\Application\Entity\User;
 use GraphQL\Application\Entity\UserToken;
+use GraphQL\Application\File\CSVFileHandler;
+use GraphQL\Application\File\FileStorage;
 use GraphQL\Application\Types;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ObjectType;
@@ -202,9 +204,10 @@ class MutationType extends ObjectType
         $file = $context->getFileOrError("file0");
         $tmp_name = $file["tmp_name"];
 
-        move_uploaded_file($tmp_name, $context->app->getStoragePath()."/t_list.csv");
+        move_uploaded_file($tmp_name, FileStorage::getStoragePath()."/t_list.csv");
 
         // TODO: обработка файла, регистрация списка в базе данных
+//        CSVFileHandler::scanFileByRow();
 
         return 'Получен файл: '.print_r($file, true);
     }
