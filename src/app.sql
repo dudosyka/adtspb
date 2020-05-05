@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Май 02 2020 г., 00:22
+-- Время создания: Май 05 2020 г., 23:34
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -399,6 +399,20 @@ INSERT INTO `settings_timetablestatus` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `upload`
+--
+
+DROP TABLE IF EXISTS `upload`;
+CREATE TABLE `upload` (
+  `id` bigint(20) NOT NULL,
+  `type` text NOT NULL,
+  `file` text NOT NULL,
+  `ip` text NOT NULL COMMENT 'Для определенного IP'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Список загруженных файлов в хранилище приложения';
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `user`
 --
 
@@ -548,7 +562,8 @@ INSERT INTO `user_token` (`id`, `token`, `date_created`, `user_id`) VALUES
 (47, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4Nzc2NzUzOCwibmJmIjoxNTg3NzcxMTM4LCJleHAiOjE1ODc4NTM5MzgsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-24 22:32:18', 8),
 (49, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODA5ODI3MiwibmJmIjoxNTg4MTAxODcyLCJleHAiOjE1ODgxODQ2NzIsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-28 18:24:32', 8),
 (50, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODM2MzU3OCwibmJmIjoxNTg4MzY3MTc4LCJleHAiOjE1ODg0NDk5NzgsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-01 20:06:19', 8),
-(51, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODM2NDIyOSwibmJmIjoxNTg4MzY3ODI5LCJleHAiOjE1ODg0NTA2MjksInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-01 20:17:09', 8);
+(51, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODM2NDIyOSwibmJmIjoxNTg4MzY3ODI5LCJleHAiOjE1ODg0NTA2MjksInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-01 20:17:09', 8),
+(53, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU4ODU0MTkwNywibmJmIjoxNTg4NTQ1NTA3LCJleHAiOjE1ODg2MjgzMDcsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-03 21:38:27', 8);
 
 --
 -- Индексы сохранённых таблиц
@@ -682,6 +697,12 @@ ALTER TABLE `settings_relationship`
 -- Индексы таблицы `settings_timetablestatus`
 --
 ALTER TABLE `settings_timetablestatus`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `upload`
+--
+ALTER TABLE `upload`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -843,6 +864,12 @@ ALTER TABLE `settings_timetablestatus`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT для таблицы `upload`
+--
+ALTER TABLE `upload`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
@@ -876,7 +903,7 @@ ALTER TABLE `user_role`
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
