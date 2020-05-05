@@ -3,6 +3,7 @@ namespace GraphQL\Application;
 
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\User;
+use GraphQL\Application\File\File;
 use GraphQL\Server\RequestError;
 
 /**
@@ -83,7 +84,7 @@ class AppContext
      * Получение файла (если его нет - выдача ошибки пользователю).
      *
      * @param string $fileField
-     * @return mixed
+     * @return File
      * @throws RequestError
      */
     public function getFileOrError(string $fileField){
@@ -93,7 +94,7 @@ class AppContext
         if(!isset($_FILES[$fileField]) or $_FILES[$fileField] == null or strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false)
             throw new RequestError("Файл не прикреплён к запросу.");
 
-        return $_FILES[$fileField];
+        return new File($_FILES[$fileField]["tmp_name"]);
     }
 
 }

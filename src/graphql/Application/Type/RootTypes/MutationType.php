@@ -5,9 +5,11 @@ use GraphQL\Application\Application;
 use GraphQL\Application\Bearer;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
+use GraphQL\Application\Entity\Association;
 use GraphQL\Application\Entity\Upload;
 use GraphQL\Application\Entity\User;
 use GraphQL\Application\Entity\UserToken;
+use GraphQL\Application\Entity\Group;
 use GraphQL\Application\File\CSVFileHandler;
 use GraphQL\Application\File\FileStorage;
 use GraphQL\Application\Types;
@@ -79,9 +81,9 @@ class MutationType extends ObjectType
                     'args' => []
                 ],
 
-                'adminUploadTeachersList' => [
+                'adminUploadAssociations' => [
                     'type' => Types::string(),
-                    'description' => 'Загрузить список педагогов на сервер (файл должен быть загружен в поле file0 POST-запроса)',
+                    'description' => 'Загрузить список объединений на сервер (файл должен быть загружен в поле file0 POST-запроса)',
                     'args' => []
                 ],
 
@@ -101,6 +103,7 @@ class MutationType extends ObjectType
      * @param $args
      * @param AppContext $context
      * @return bool
+     * @throws RequestError
      */
     public function register($rootValue, $args, AppContext $context){
 
@@ -129,7 +132,7 @@ class MutationType extends ObjectType
             'status_email' => 'ожидание'
         ]);
 
-        return DataSource::insert($instance);
+        return DataSource::registerUser($instance);
     }
 
     /**
@@ -189,7 +192,7 @@ class MutationType extends ObjectType
 
 
     /**
-     * Получение ссылки на загрузки файла
+     * Загрузка списка объединений в базу данных
      *
      * @param $rootValue
      * @param $args
@@ -198,18 +201,83 @@ class MutationType extends ObjectType
      * @throws RequestError
      * @throws \Exception
      */
-    public function adminUploadTeachersList($rootValue, $args, AppContext $context){
+    public function adminUploadAssociations($rootValue, $args, AppContext $context){
         //TODO: проверка на права администратора
 
         $file = $context->getFileOrError("file0");
-        $tmp_name = $file["tmp_name"];
 
-        move_uploaded_file($tmp_name, FileStorage::getStoragePath()."/t_list.csv");
+        CSVFileHandler::scanFileByRow($file, function($line_index, $data){
 
-        // TODO: обработка файла, регистрация списка в базе данных
-//        CSVFileHandler::scanFileByRow();
+            if (
+                (count($data) < 6) or
+                (!isset($data[0]) || !isset($data[1]) || !isset($data[2]) || !isset($data[3]) || !isset($data[4]) || !isset($data[5])) // or
+                // TODO: проверка на значения (парсятся ли они)
+//                (!is_string($data[0]) || !is_int($data[1]) || !is_int($data[2]) || !is_int($data[3]) || !is_int($data[4]) || !is_string($data[5]))
+            )
+                throw new RequestError("Файл имеет неверный формат");
 
-        return 'Получен файл: '.print_r($file, true);
+            $association_name = $data[0];
+            $min_age = $data[1];
+            $max_age = $data[2];
+            $years_study = $data[3];
+            $hours_per_year = $data[4];
+            $study_hours_week = 0; // TODO: реализация подсчета часов обучения в неделю
+
+            $association = new Association([
+                "name" => $association_name,
+                "min_age" => $min_age,
+                "max_age" => $max_age,
+                "study_years" => $years_study,
+                "study_hours" => $hours_per_year,
+                "study_hours_week" => $study_hours_week
+            ]);
+
+            DataSource::insert($association);
+
+
+            // TODO: не применять изменения, если произошла ошибка
+            // TODO: DataSource::insert вывод id?
+            // TODO: оптимизировать
+            $association = DataSource::findOne("Association",
+                "name = :name AND min_age = :min_age AND max_age = :max_age AND study_years = :study_years AND study_hours = :study_hours AND study_hours_week = :study_hours_week",
+                [
+                    "name" => $association_name,
+                    "min_age" => $min_age,
+                    "max_age" => $max_age,
+                    "study_years" => $years_study,
+                    "study_hours" => $hours_per_year,
+                    "study_hours_week" => $study_hours_week
+                ]
+            );
+
+            for($i = 5; $i < count($data); $i++){
+
+                $full_name_data = explode(" ", $data[$i]);
+
+                $surname = $full_name_data[0];
+                $name = $full_name_data[1];
+                $midname = $full_name_data[2];
+
+                $user = DataSource::findOne("User", "name = :name AND surname = :surname AND midname = :midname", [
+                    "name" => $name,
+                    "surname" => $surname,
+                    "midname" => $midname
+                ]);
+
+                if($user == null)
+                    // TODO: безопасный вовод?
+                    throw new RequestError("Педагог '{$surname} {$name} {$midname}' не найден в базе данных");
+
+                $group = new Group([
+                    "association_id" => $association->id,
+                    "teacher_id" => $user->id
+                ]);
+
+                DataSource::insert($group);
+            }
+        });
+
+        return true;
     }
 
 

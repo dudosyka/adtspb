@@ -35,7 +35,7 @@ class Application
     /**
      * Инициализация и подгрузка модулей
      */
-    public function requireModules(){
+    private function requireModules(){
         require_once __DIR__ . '/../vendor/autoload.php';
 
         require_once __DIR__ . '/AppContext.php';
@@ -44,6 +44,8 @@ class Application
         require_once __DIR__ . '/Types.php';
 
         require_once __DIR__ . '/Entity/EntityBase.php';
+
+        require_once __DIR__ . '/File/FileHandler.php'; // Во избежание ошибок импорта
 
         foreach (["Database", "Entity", "Type", "Type/RootTypes", "Type/Scalar", "Log", "File"] as $value){
             $dir_content = scandir(__DIR__ . '/' . $value . '/');
@@ -60,7 +62,7 @@ class Application
      * Вывод заголовков ответа
      */
 
-    public function echoHeaders(){
+    private function echoHeaders(){
         $http_origin = $_SERVER['HTTP_ORIGIN'] ?? "error";
         if ($http_origin == "https://lk.adtspb.ru/") {
             header("Access-Control-Allow-Origin: ".$http_origin);
@@ -77,7 +79,7 @@ class Application
      * Инициализация модуля отладки
      *
      */
-    public function initDebug(){
+    private function initDebug(){
         // Disable default PHP error reporting - we have better one for debug mode (see bellow)
         ini_set('display_errors', 0);
 
@@ -94,12 +96,16 @@ class Application
         }
     }
 
+
+
+
+
     /**
      * Обработка запроса, вывод схемы пользователю, мониторинг ошибок
      *
      * @throws \Throwable
      */
-    public function handleRequest(){
+    private function handleRequest(){
         try {
             $this->echoHeaders();
 

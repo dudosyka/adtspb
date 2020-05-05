@@ -20,6 +20,12 @@ class FileStorage {
         return realpath(self::$storagePath);
     }
 
+    /*
+    public static function getTeachersListFolder(){
+        return self::getStoragePath() . "/" . "Загруженные списки педагогов";
+    }
+    */
+
     public static function createNewFile(File $file){
 
     }

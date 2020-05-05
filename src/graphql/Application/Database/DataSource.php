@@ -4,6 +4,7 @@ namespace GraphQL\Application\Database;
 use Error;
 use GraphQL\Application\ConfigManager;
 use GraphQL\Application\Entity\EntityBase;
+use GraphQL\Application\Entity\User;
 use GraphQL\Server\RequestError;
 use PDO;
 use PDOException;
@@ -234,6 +235,21 @@ class DataSource
 
         return true;
     }
+
+
+    /**
+     * Регистрация нового пользователя в системе
+     *
+     * @param User $user
+     * @return bool
+     * @throws RequestError
+     */
+    public static function registerUser(User $user){
+        // TODO: регистрация прав пользователя (для разных типов пользователей: родитель, ребенок, учитель, супермодератор, ...)
+
+        return self::insert($user);
+    }
+
 
 
 
