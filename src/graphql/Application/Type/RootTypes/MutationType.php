@@ -87,6 +87,12 @@ class MutationType extends ObjectType
                     'args' => []
                 ],
 
+                'adminUploadTeachersList' => [
+                    'type' => Types::string(),
+                    'description' => 'Загрузить список педагогов на сервер (файл должен быть загружен в поле file0 POST-запроса)',
+                    'args' => []
+                ],
+
             ],
             'resolveField' => function($val, $args, $context, ResolveInfo $info) {
                 return $this->{$info->fieldName}($val, $args, $context, $info);
@@ -112,6 +118,8 @@ class MutationType extends ObjectType
         //TODO: анти-DDOS регистрации
         //TODO: защита от распространенных атак
         //TODO: запрет на регистрацию кириллического пароля
+        //TODO: генерация логина
+
 
         $instance = new User([
             'name' => $args['name'],
@@ -206,7 +214,12 @@ class MutationType extends ObjectType
 
         $file = $context->getFileOrError("file0");
 
+        if(!$file->isUTF8())
+            throw new RequestError("Неверная кодировка файла: файл должен иметь кодировку UTF-8.");
+
         CSVFileHandler::scanFileByRow($file, function($line_index, $data){
+            // Игнорируем пустые линии
+            if(count($data) <= 1 && trim($data[0]) == "") return; //TODO: игнорирование пустых строк в классе обработчика CSV?
 
             if (
                 (count($data) < 6) or
@@ -258,6 +271,8 @@ class MutationType extends ObjectType
                 $name = $full_name_data[1];
                 $midname = $full_name_data[2];
 
+                // TODO: фикс проверки в бд
+
                 $user = DataSource::findOne("User", "name = :name AND surname = :surname AND midname = :midname", [
                     "name" => $name,
                     "surname" => $surname,
@@ -278,6 +293,78 @@ class MutationType extends ObjectType
         });
 
         return true;
+    }
+
+
+    /**
+     * Загрузка списка педагогов в базу данных
+     *
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     * @throws \Exception
+     */
+    public function adminUploadTeachersList($rootValue, $args, AppContext $context){
+        //TODO: проверка на права администратора
+
+        $file = $context->getFileOrError("file0");
+
+        if(!$file->isUTF8())
+            throw new RequestError("Неверная кодировка файла: файл должен иметь кодировку UTF-8.");
+
+        $registered = [];
+
+        CSVFileHandler::scanFileByRow($file, function($line_index, $data) use(&$registered){
+
+            // Игнорируем пустые линии
+            if(count($data) <= 1 && trim($data[0]) == "") return; //TODO: игнорирование пустых строк в классе обработчика CSV?
+
+            if (
+                (count($data) != 3) or
+                (!isset($data[0]) || !isset($data[1]) || !isset($data[2])) // or
+                // TODO: проверка на значения (парсятся ли они)
+//                (!is_string($data[0]) || !is_string($data[1]) || !is_string($data[2]))
+            )
+                throw new RequestError("Файл имеет неверный формат");
+
+
+            $_ = explode(" ", $data[0]);
+
+            $name = $_[0];
+            $surname = $_[1];
+            $midname = $_[2];
+
+            $password = Application::getRandomString();
+
+            // TODO: регистрация прав у педагога
+
+            $instance = new User([
+                'name' => $name,
+                'surname' => $surname,
+                'midname' => $midname,
+                'email' => $data[2],
+                'password' => User::hashPassword($password),
+                'phone_number' => "", // TODO: регистрация номера телефона у педагога
+                'sex' => "м",  // Временно! // TODO: регистрация пола у педагога
+                'job_position' => $data[2],
+                'job_place' => "", // TODO: регистрация места работы у педагога
+                'registration_address' => "", // TODO: регистрация адреса регистрации у педагога
+                'residence_address' => "", // TODO: регистрация адреса проживания у педагога
+                'relationship_id' => 1, // TODO: регистрация роли у педагога
+                'study_place' => '',
+                'study_class' => '',
+                'date_registered' => DataSource::timeInMYSQLFormat(),
+                'status_email' => 'подтвержден'
+            ]);
+
+            DataSource::registerUser($instance);
+
+            $registered[] = "Педагог {$name} {$surname} {$midname} зарегистрирован. Пароль: {$password}";
+        });
+
+        return implode("\n", $registered);
     }
 
 
