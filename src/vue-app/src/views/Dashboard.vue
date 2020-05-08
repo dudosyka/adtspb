@@ -25,7 +25,17 @@
             Загрузка списка педагогов:
         </p>
 
-        <input type="file" accept="image/*" @change="uploadTeachersList">
+        <input type="file" @change="uploadTeachersList">
+
+        <p>{{last_upload_status_uploadTeachersList}}</p>
+
+        <p>
+            Загрузка списка объедений:
+        </p>
+
+        <input type="file" @change="adminUploadAssociations">
+
+        <p>{{last_upload_status_adminUploadAssociations}}</p>
 
     </div>
 </template>
@@ -35,6 +45,14 @@
 
     export default {
         name: "Dashboard",
+
+        data: function(){
+            return {
+                last_upload_status_uploadTeachersList: "",
+                last_upload_status_adminUploadAssociations: "",
+            };
+        },
+
         methods: {
             logout(){
 
@@ -48,14 +66,44 @@
                 this.$router.push({ path: '/login' });
             },
             uploadTeachersList({ target }){
-                console.log(target);
-                // target.files[0]
 
-                this.$graphql_client.request(`mutation($file: Upload!){ uploadTeachersList(file: $file) }`, data).then(function(data){
-                    console.log(data);
-                }).catch(function(e){
-                    console.log(e);
-                });
+                this.last_upload_status_uploadTeachersList = "";
+
+                var _ = this;
+
+                this.$file_upload(`mutation{ adminUploadTeachersList }`, "", [target.files[0]])
+                    // В текст
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    // в данные
+                    .then(function(data){
+                        _.last_upload_status_uploadTeachersList = data.data.adminUploadTeachersList;
+                    })
+
+                    .catch(function(e){
+                        console.log(e);
+                    });
+            },
+            adminUploadAssociations({target}){
+
+                this.last_upload_status_adminUploadAssociations = "";
+
+                var _ = this;
+
+                this.$file_upload(`mutation{ adminUploadAssociations }`, "", [target.files[0]])
+                // В текст
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    // в данные
+                    .then(function(data){
+                        _.last_upload_status_adminUploadAssociations = data.data.adminUploadAssociations;
+                    })
+
+                    .catch(function(e){
+                        console.log(e);
+                    });
             }
         },
         mounted() {

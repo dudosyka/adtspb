@@ -137,7 +137,7 @@ Vue.prototype.$request = request;
 const $globals = Vue.observable({
     $token: {},
     $graphql_client: {},
-    $graphql_upload_client: {}
+    $file_upload: {}
 });
 
 Object.defineProperty(Vue.prototype, '$token', {
@@ -160,13 +160,13 @@ Object.defineProperty(Vue.prototype, '$graphql_client', {
     }
 });
 
-Object.defineProperty(Vue.prototype, '$graphql_upload_client', {
+Object.defineProperty(Vue.prototype, '$file_upload', {
     get () {
-        return $globals.$graphql_upload_client
+        return $globals.$file_upload
     },
 
     set (value) {
-        $globals.$graphql_upload_client = value
+        $globals.$file_upload = value
     }
 });
 
@@ -184,6 +184,27 @@ Vue.mixin({
                         // "Content-Type": "multipart/form-data"
                     },
                 });
+                this.$file_upload = async function(query, variables, files){
+
+                    let h = {
+                        "Authorization": 'Bearer '+this.$token,
+                    };
+
+                    let b = new FormData();
+                    b.append("variables", variables);
+                    b.append("query", query);
+
+                    for(let i in files){
+                        b.append("file"+i, files[i]);
+                    }
+
+
+                    return fetch(this.$request_endpoint, {
+                        method: 'POST',
+                        headers: h,
+                        body: b
+                    });
+                };
             }
         }
     },

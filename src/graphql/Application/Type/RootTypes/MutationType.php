@@ -265,11 +265,13 @@ class MutationType extends ObjectType
 
             for($i = 5; $i < count($data); $i++){
 
+                if(trim($data[$i]) == "") continue;
+
                 $full_name_data = explode(" ", $data[$i]);
 
-                $surname = $full_name_data[0];
-                $name = $full_name_data[1];
-                $midname = $full_name_data[2];
+                $surname = trim($full_name_data[0], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
+                $name = trim($full_name_data[1], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
+                $midname = trim($full_name_data[2], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
 
                 // TODO: фикс проверки в бд
 
@@ -280,7 +282,7 @@ class MutationType extends ObjectType
                 ]);
 
                 if($user == null)
-                    // TODO: безопасный вовод?
+                    // TODO: безопасный вывод?
                     throw new RequestError("Педагог '{$surname} {$name} {$midname}' не найден в базе данных");
 
                 $group = new Group([
@@ -332,9 +334,9 @@ class MutationType extends ObjectType
 
             $_ = explode(" ", $data[0]);
 
-            $name = $_[0];
-            $surname = $_[1];
-            $midname = $_[2];
+            $surname = trim($_[0], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
+            $name = trim($_[1], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
+            $midname = trim($_[2], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
 
             $password = Application::getRandomString();
 
