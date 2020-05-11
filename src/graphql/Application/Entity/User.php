@@ -1,6 +1,8 @@
 <?php
 namespace GraphQL\Application\Entity;
 
+use GraphQL\Application\Database\DataSource;
+use GraphQL\Server\RequestError;
 use GraphQL\Utils\Utils;
 
 /**
@@ -95,38 +97,45 @@ class User extends EntityBase
 
     /*
      * //TODO реализовать проверку на доступ к правам (https://habr.com/ru/post/51327/)
-    function include_right($grp){
-        $clone=clone $this;
-        $clone->group[]=$grp;
+     * */
 
-        $result=mysql_query("SELECT * FROM `action_rights` WHERE `action_rights`.groupID IN ({$this->usrID}) AND `action_rights`.rightsID IN (".implode(",",$clone->group).")");
-        $tmp=array();
-        while ($t=mysql_fetch_assoc($result)){
-            $tmp[]=$t;
-        }
-        mysql_free_result($result);
+    /**
+     * @param int $action_id
+     * @param string $list_id
+     * @return bool
+     */
+    public function hasAccess(int $action_id, string $list_id = "1"): bool{
 
-        $clone->temptable=$tmp;
+        /** @var array $user_role */
+        $user_role = DataSource::findAll("UserRole", "user_id = :uid", ["uid" => $this->id]);
+        foreach ($user_role as $i){
+            /** @var UserRole $i */
 
-        return $clone;
-    }
+            /** @var ActionList $action_data */
+            $action_data = DataSource::findOne("ActionList", "role_id = :rid AND action_id = :aid AND list_id = :lid", [
+                "rid" => $i->role_id,
+                "aid" => $action_id,
+                "lid" => $list_id
+            ]);
 
-    function check($action){
-        $tmp=array();
-        foreach ($this->temptable as $t){
-            if ($t['action']==$action){
-                if (!isset($tmp[$t['groupID']]))
-                    $tmp[$t['groupID']]=$t['sign'];
-                else
-                    $tmp[$t['groupID']]|=$t['sign'];
-            }
+            if($action_data != null AND $action_data->sign == "+")
+                return true;
         }
 
-        if ($tmp){
-            return (array_search(0,$tmp)!==FALSE);
-        }
         return false;
     }
-    */
+
+    /**
+     * @param int $action_id
+     * @param string $list_id
+     * @return bool
+     * @throws RequestError
+     */
+    public function hasAccessOrError(int $action_id, string $list_id = "1"){
+        if(!$this->hasAccess($action_id, $list_id))
+            throw new RequestError("Ошибка: нет доступа к функции");
+
+        return true;
+    }
 
 }

@@ -210,8 +210,7 @@ class MutationType extends ObjectType
      * @throws \Exception
      */
     public function adminUploadAssociations($rootValue, $args, AppContext $context){
-        //TODO: проверка на права администратора
-
+        $context->viewer->hasAccessOrError(1);
         $file = $context->getFileOrError("file0");
 
         if(!$file->isUTF8())
@@ -309,8 +308,7 @@ class MutationType extends ObjectType
      * @throws \Exception
      */
     public function adminUploadTeachersList($rootValue, $args, AppContext $context){
-        //TODO: проверка на права администратора
-
+        $context->viewer->hasAccessOrError(2);
         $file = $context->getFileOrError("file0");
 
         if(!$file->isUTF8())

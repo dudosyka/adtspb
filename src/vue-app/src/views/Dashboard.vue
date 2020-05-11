@@ -69,7 +69,7 @@
 
                 this.last_upload_status_uploadTeachersList = "";
 
-                var _ = this;
+                const _ = this;
 
                 this.$file_upload(`mutation{ adminUploadTeachersList }`, "", [target.files[0]])
                     // В текст
@@ -89,7 +89,7 @@
 
                 this.last_upload_status_adminUploadAssociations = "";
 
-                var _ = this;
+                const _ = this;
 
                 this.$file_upload(`mutation{ adminUploadAssociations }`, "", [target.files[0]])
                 // В текст

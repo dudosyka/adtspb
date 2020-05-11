@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Май 05 2020 г., 23:34
+-- Время создания: Май 12 2020 г., 00:50
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -42,8 +42,9 @@ CREATE TABLE `action` (
 --
 
 INSERT INTO `action` (`id`, `name`, `description`) VALUES
-(1, 'Просмотр расписания', 'Тестовая функция. Данная функция отвечает за это и за то.'),
-(2, 'Редактирование расписание', 'Тестовая функция. Данная функция отвечает за это и за то.');
+(1, 'Загрузка списка объединений', 'Позволяет загружать списки объединений на сервер.'),
+(2, 'Загрузка списка педагогов', 'Позволяет загружать списки педагогов на сервер.'),
+(3, 'Загрузка списка административных сотрудников', 'Позволяет загружать списки административных сотрудников на сервер.');
 
 -- --------------------------------------------------------
 
@@ -67,7 +68,10 @@ CREATE TABLE `action_list` (
 INSERT INTO `action_list` (`id`, `list_id`, `role_id`, `action_id`, `sign`) VALUES
 (1, 1, 1, 1, '+'),
 (2, 1, 2, 2, '+'),
-(3, 1, 1, 2, '-');
+(3, 1, 1, 2, '-'),
+(4, 1, 5, 1, '+'),
+(5, 1, 5, 3, '+'),
+(6, 1, 5, 2, '+');
 
 -- --------------------------------------------------------
 
@@ -91,7 +95,25 @@ CREATE TABLE `association` (
 --
 
 INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`, `study_years`, `study_hours`, `study_hours_week`) VALUES
-(1, 'Робототехника', 12, 16, 1, 0, 0);
+(6, 'Робототехника', 12, 17, 1, 200, 0),
+(7, 'Робототехника', 12, 17, 1, 200, 0),
+(8, 'Веб-разработка', 11, 16, 2, 180, 0),
+(9, 'Робототехника', 12, 17, 1, 200, 0),
+(10, 'Веб-разработка', 11, 16, 2, 180, 0),
+(11, 'Разработка игр', 15, 18, 1, 194, 0),
+(12, 'Искусственный интеллект', 14, 16, 1, 210, 0),
+(13, 'Робототехника', 12, 17, 1, 200, 0),
+(14, 'Веб-разработка', 11, 16, 2, 180, 0),
+(15, 'Разработка игр', 15, 18, 1, 194, 0),
+(16, 'Искусственный интеллект', 14, 16, 1, 210, 0),
+(17, 'Робототехника', 12, 17, 1, 200, 0),
+(18, 'Веб-разработка', 11, 16, 2, 180, 0),
+(19, 'Разработка игр', 15, 18, 1, 194, 0),
+(20, 'Искусственный интеллект', 14, 16, 1, 210, 0),
+(21, 'Робототехника', 12, 17, 1, 200, 0),
+(22, 'Веб-разработка', 11, 16, 2, 180, 0),
+(23, 'Разработка игр', 15, 18, 1, 194, 0),
+(24, 'Искусственный интеллект', 14, 16, 1, 210, 0);
 
 -- --------------------------------------------------------
 
@@ -203,6 +225,39 @@ CREATE TABLE `group` (
   `teacher_id` bigint(20) NOT NULL COMMENT 'ID учителя'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Сформированные группы';
 
+--
+-- Дамп данных таблицы `group`
+--
+
+INSERT INTO `group` (`id`, `association_id`, `teacher_id`) VALUES
+(16, 6, 90),
+(25, 6, 90),
+(34, 6, 90),
+(17, 6, 91),
+(26, 6, 91),
+(35, 6, 91),
+(18, 8, 92),
+(27, 8, 92),
+(36, 8, 92),
+(19, 8, 93),
+(28, 8, 93),
+(37, 8, 93),
+(20, 8, 94),
+(23, 12, 94),
+(29, 8, 94),
+(32, 12, 94),
+(38, 8, 94),
+(41, 12, 94),
+(21, 11, 95),
+(30, 11, 95),
+(39, 11, 95),
+(22, 11, 96),
+(31, 11, 96),
+(40, 11, 96),
+(24, 12, 98),
+(33, 12, 98),
+(42, 12, 98);
+
 -- --------------------------------------------------------
 
 --
@@ -283,13 +338,6 @@ CREATE TABLE `proposal` (
   `status_teacher_id` bigint(20) NOT NULL COMMENT 'Ответ от учителя'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Дамп данных таблицы `proposal`
---
-
-INSERT INTO `proposal` (`id`, `timestamp`, `child_id`, `parent_id`, `association_id`, `status_admin_id`, `status_parent_id`, `status_teacher_id`) VALUES
-(1, '2020-03-21 17:05:29', 2, 1, 1, 1, 1, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -311,7 +359,7 @@ INSERT INTO `role` (`id`, `name`) VALUES
 (2, 'Родитель'),
 (3, 'Модератор'),
 (4, 'Администратор'),
-(5, 'Суперадминистратор');
+(5, 'Супермодератор');
 
 -- --------------------------------------------------------
 
@@ -420,6 +468,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` bigint(20) NOT NULL COMMENT 'Уникальный ID',
   `date_registered` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Дата регистрации',
+  `login` text NOT NULL COMMENT 'Логин пользователя в формате фамилияИО№',
   `surname` text NOT NULL COMMENT 'Фамилия',
   `name` text NOT NULL COMMENT 'Имя',
   `midname` text NOT NULL COMMENT 'Отчество',
@@ -443,16 +492,70 @@ CREATE TABLE `user` (
 -- Дамп данных таблицы `user`
 --
 
-INSERT INTO `user` (`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`, `password`) VALUES
-(0, '1970-01-01 12:00:00', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', '0', 'г. Москва', 'г. Москва', 'г. Москва', 'Аноним', 1, '', '', '1970-01-01', ''),
-(1, '2020-02-22 23:59:37', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 1, '', '', '1982-10-10', ''),
-(2, '2020-02-22 23:59:37', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 2, 'Школа №1', '8Б', '1982-10-10', ''),
-(3, '2020-03-21 17:10:08', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 2, 'Школа №2', '3А', '2018-11-06', ''),
-(4, '2020-04-10 19:23:03', 'Тестов', 'Тест', 'Тесович', 'м', '+7 (123) 123-12-12', 'admin@localh.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwf'),
-(5, '2020-04-10 19:34:01', 'Тестов', 'Тест', 'Тесович', 'м', '+7 (123) 123-12-12', 'admin@localh.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwf'),
-(6, '2020-04-10 20:32:14', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwБMf'),
-(7, '2020-04-15 19:55:50', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwБMf'),
-(8, '2020-04-17 21:33:00', '123@123.ru', '123@123.ru', '123@123.ru', 'ж', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '123@123.ru', '123@123.ru', '123@123.ru', '123@123.ru', 1, '', '', NULL, '$2y$12$GggrDCuzFCm.dGnX7TRpjOI9W5WfM6Ia3QDkFA.aLM7rbMrquevgC');
+INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`, `password`) VALUES
+(0, '1970-01-01 12:00:00', '', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', '0', 'г. Москва', 'г. Москва', 'г. Москва', 'Аноним', 1, '', '', '1970-01-01', ''),
+(1, '2020-02-22 23:59:37', '', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 1, '', '', '1982-10-10', ''),
+(2, '2020-02-22 23:59:37', '', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 2, 'Школа №1', '8Б', '1982-10-10', ''),
+(3, '2020-03-21 17:10:08', '', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 2, 'Школа №2', '3А', '2018-11-06', ''),
+(4, '2020-04-10 19:23:03', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7 (123) 123-12-12', 'admin@localh.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwf'),
+(5, '2020-04-10 19:34:01', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7 (123) 123-12-12', 'admin@localh.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwf'),
+(6, '2020-04-10 20:32:14', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwБMf'),
+(7, '2020-04-15 19:55:50', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwБMf'),
+(8, '2020-04-17 21:33:00', '', '123@123.ru', '123@123.ru', '123@123.ru', 'ж', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '123@123.ru', '123@123.ru', '123@123.ru', '123@123.ru', 1, '', '', NULL, '$2y$12$GggrDCuzFCm.dGnX7TRpjOI9W5WfM6Ia3QDkFA.aLM7rbMrquevgC'),
+(90, '2020-05-07 21:58:25', '', 'Волконский', 'Гектор', 'Климович', 'м', '', 'user1@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user1@adtspb.ru\r', 1, '', '', NULL, '$2y$12$BKK2x5x9B4F4DHU1EcuftOjo54dmPkN9iWBz8D2ndBMKSIw1hx1jG'),
+(91, '2020-05-07 21:58:25', '', 'Магалов', 'Виталий', 'Тимофеевич', 'м', '', 'user2@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user2@adtspb.ru\r', 1, '', '', NULL, '$2y$12$VoA5HZYGD4z.nx47dDdQwedFm3gi1QHpt0A.ii3zFIBC85P7lgtei'),
+(92, '2020-05-07 21:58:26', '', 'Клокачев', 'Федул', 'Протасьевич', 'м', '', 'user3@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user3@adtspb.ru\r', 1, '', '', NULL, '$2y$12$L6/6sL6OUw1HM.b7XSiYhO/iTKJA/i6nGxnFOjIST7gixTiQpOZAq'),
+(93, '2020-05-07 21:58:26', '', 'Иловайский', 'Гермоген', 'Галактионович', 'м', '', 'user4@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user4@adtspb.ru\r', 1, '', '', NULL, '$2y$12$t5hlij3WQ1eiKAXYexxoFu4klIRFKV3hGcuTNo3bPmfcW4kyqMWjq'),
+(94, '2020-05-07 21:58:26', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user5@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user5@adtspb.ru\r', 1, '', '', NULL, '$2y$12$3sjojfszzN0/aAP4NvzLr.ZuhEbfzYyMJIDdp8Xmk7TlpdRKjLt7K'),
+(95, '2020-05-07 21:58:27', '', 'Карбышев', 'Герберт', 'Лаврович', 'м', '', 'user6@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user6@adtspb.ru\r', 1, '', '', NULL, '$2y$12$8VnAflhYZwUAVE5XurTEGuZQP6pRxMKOp9RPPyUMNXQdf4RDWXe.q'),
+(96, '2020-05-07 21:58:27', '', 'Деменков', 'Иуст', 'Лукьянович', 'м', '', 'user7@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user7@adtspb.ru\r', 1, '', '', NULL, '$2y$12$DItJpAimsdDLrx7ZxfKCvuKOiGM8alCpZcNYMxntDnW6bchwodbD6'),
+(97, '2020-05-07 21:58:28', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user8@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user8@adtspb.ru\r', 1, '', '', NULL, '$2y$12$kXLQnQsLw9eIs55bdn57GOneRNtGoFbDc5WLVCEzH/g6.eWgxkAY6'),
+(98, '2020-05-07 21:58:28', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$djQf4P3ZVrHFd4NZG0W/U.5OyL.Ti/hW7rPaEDaMuTlpoEN9OSG9S'),
+(99, '2020-05-08 22:19:37', '', 'Волконский', 'Гектор', 'Климович', 'м', '', 'user1@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user1@adtspb.ru\r', 1, '', '', NULL, '$2y$12$lCR0yg1un8fVLBjca7z4kuEoo.iPTF82gANyzjvZRyr5mUV7iFMXS'),
+(100, '2020-05-08 22:19:38', '', 'Магалов', 'Виталий', 'Тимофеевич', 'м', '', 'user2@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user2@adtspb.ru\r', 1, '', '', NULL, '$2y$12$eiHQnLvX7rKUT2HEaQ8ltO7HQtjcO33YBmpCDBsMYq22B8TxOEVtC'),
+(101, '2020-05-08 22:19:38', '', 'Клокачев', 'Федул', 'Протасьевич', 'м', '', 'user3@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user3@adtspb.ru\r', 1, '', '', NULL, '$2y$12$5Hk.4iCqBnijMHNaWwhXke.bKP9c447c7bY83Cx2qJFdNo5KqyfnW'),
+(102, '2020-05-08 22:19:38', '', 'Иловайский', 'Гермоген', 'Галактионович', 'м', '', 'user4@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user4@adtspb.ru\r', 1, '', '', NULL, '$2y$12$niVJO7r/WX3s3z1KEMYFruokKgW5lrwv.ClVuN4GJiUMZ/zCP9k2q'),
+(103, '2020-05-08 22:19:39', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user5@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user5@adtspb.ru\r', 1, '', '', NULL, '$2y$12$JkD7ntLgLekscpc9kPkGDeTHqqLZUigBsIa5pTPZoCuAoTEXluY6i'),
+(104, '2020-05-08 22:19:39', '', 'Карбышев', 'Герберт', 'Лаврович', 'м', '', 'user6@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user6@adtspb.ru\r', 1, '', '', NULL, '$2y$12$/oJo7OrrjP6ABy5xQLxEFeClWdsKU6FD8v8uOddSjqq62P78L4TG.'),
+(105, '2020-05-08 22:19:40', '', 'Деменков', 'Иуст', 'Лукьянович', 'м', '', 'user7@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user7@adtspb.ru\r', 1, '', '', NULL, '$2y$12$uMg05vMpgGpcnB7K9JEZMupQUqUQOycol8q0aQsOFSWNX2Mu1vZua'),
+(106, '2020-05-08 22:19:40', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user8@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user8@adtspb.ru\r', 1, '', '', NULL, '$2y$12$.keZzBEdlD9GUhrHf644o.XUgrDiUYxljLE2D6kXv4L/8gWHF49ry'),
+(107, '2020-05-08 22:19:40', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$wfeTfMV.427wc3QPhyyeCuD6x0VA1SCmL8j5VwJDBLOlt1RMbLJrS'),
+(108, '2020-05-08 22:22:26', '', 'Волконский', 'Гектор', 'Климович', 'м', '', 'user1@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user1@adtspb.ru\r', 1, '', '', NULL, '$2y$12$ZERXKJLhaH79vrnKbBCb2O1PbmEHGSdhLRXjKS0cZdkpFZpSk8pEK'),
+(109, '2020-05-08 22:22:26', '', 'Магалов', 'Виталий', 'Тимофеевич', 'м', '', 'user2@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user2@adtspb.ru\r', 1, '', '', NULL, '$2y$12$/kV7TEfu3fQNACvR7o8xsuZ4TG/SpVJu05bM08IJJo6aLELHb7IdS'),
+(110, '2020-05-08 22:22:26', '', 'Клокачев', 'Федул', 'Протасьевич', 'м', '', 'user3@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user3@adtspb.ru\r', 1, '', '', NULL, '$2y$12$F6drJO3.N3S6O3.K6i0X4utAAuzSs1Lgx/9Ici5qaJ.Xuw46QJI8K'),
+(111, '2020-05-08 22:22:27', '', 'Иловайский', 'Гермоген', 'Галактионович', 'м', '', 'user4@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user4@adtspb.ru\r', 1, '', '', NULL, '$2y$12$k5V.FaEwH3BT.ZniEgPwHOyPitgvrzLZCMBR5le2NqAFyxaeB2iaS'),
+(112, '2020-05-08 22:22:27', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user5@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user5@adtspb.ru\r', 1, '', '', NULL, '$2y$12$Ujdj.GwxIt5KpkSOauTbEecAOY1D.ABKwZeYoqB97BtO7JOUcwH.S'),
+(113, '2020-05-08 22:22:28', '', 'Карбышев', 'Герберт', 'Лаврович', 'м', '', 'user6@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user6@adtspb.ru\r', 1, '', '', NULL, '$2y$12$xxDOOBe6wT5vKJzaEV9eLeoVkV4sFtHVopidOsKpjHTQdxLQoFZea'),
+(114, '2020-05-08 22:22:28', '', 'Деменков', 'Иуст', 'Лукьянович', 'м', '', 'user7@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user7@adtspb.ru\r', 1, '', '', NULL, '$2y$12$Zsb2zYdxomtU713WERCkPOKvmHuUpAMa2uRRNCzsp8QYwalAO9LKm'),
+(115, '2020-05-08 22:22:29', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user8@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user8@adtspb.ru\r', 1, '', '', NULL, '$2y$12$50ltFVbqLSn3ZijfpasRP.M1Vi144E.68bt2UEJmd81eXwwb0agRu'),
+(116, '2020-05-08 22:22:29', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$aPCl.4CLVrLaSYUH3qDt0eXLvYerVAlcUDJ9ogI9DEN5RDKfS9Y4K'),
+(117, '2020-05-08 22:24:36', '', 'Волконский', 'Гектор', 'Климович', 'м', '', 'user1@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user1@adtspb.ru\r', 1, '', '', NULL, '$2y$12$fdK.TtBEsPYJeAWoqRZvm.gvFxQZdJWl.6DV263q1d7NJ04fzEy2K'),
+(118, '2020-05-08 22:24:36', '', 'Магалов', 'Виталий', 'Тимофеевич', 'м', '', 'user2@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user2@adtspb.ru\r', 1, '', '', NULL, '$2y$12$dJtKe23JS6HUtdJkd7zodeieydSuPULkFOw2uiCoqQl33LMzJbhP6'),
+(119, '2020-05-08 22:24:37', '', 'Клокачев', 'Федул', 'Протасьевич', 'м', '', 'user3@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user3@adtspb.ru\r', 1, '', '', NULL, '$2y$12$VhaBujsNKAEKBiugxgoVduOGWu8dZ8ZJYoYDdDdbnYHFsjtGRjv/m'),
+(120, '2020-05-08 22:24:37', '', 'Иловайский', 'Гермоген', 'Галактионович', 'м', '', 'user4@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user4@adtspb.ru\r', 1, '', '', NULL, '$2y$12$D8QVPcCgNyydKIrymH2dPObkamV3a3qAtj..TIenPRPz89ODeQZT.'),
+(121, '2020-05-08 22:24:37', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user5@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user5@adtspb.ru\r', 1, '', '', NULL, '$2y$12$SzATOBbaytQWDXB0uggPTOKUSeAkUj7hmO5.rdFc0IRXgV3xQ1I9S'),
+(122, '2020-05-08 22:24:38', '', 'Карбышев', 'Герберт', 'Лаврович', 'м', '', 'user6@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user6@adtspb.ru\r', 1, '', '', NULL, '$2y$12$Natik6BI51jQrbrorh70Z.ZIqjGxd5j62SdDha5clNt05IYR8Bo96'),
+(123, '2020-05-08 22:24:38', '', 'Деменков', 'Иуст', 'Лукьянович', 'м', '', 'user7@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user7@adtspb.ru\r', 1, '', '', NULL, '$2y$12$84KteCmkwmjhKDSKQAN0NOJwqarljj23pO4u.it8A.4B4vHR2xhsm'),
+(124, '2020-05-08 22:24:39', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user8@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user8@adtspb.ru\r', 1, '', '', NULL, '$2y$12$LfkOefkDgGcqn/zYA7jegeYbAIKgmWPH/AgvLq9OYpZayMMjCL7VS'),
+(125, '2020-05-08 22:24:39', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$RHe7wv27UEqH0/Y/OwZtm./NCwMWNkFWWSTEX3yFYHvNgW1tzRJrG'),
+(126, '2020-05-08 22:28:38', '', 'Волконский', 'Гектор', 'Климович', 'м', '', 'user1@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user1@adtspb.ru\r', 1, '', '', NULL, '$2y$12$yJi9Xo2sycJJQGXupDSN2uDqYsodaO4Ok3gf.AyGi49hvl04pz2RC'),
+(127, '2020-05-08 22:28:39', '', 'Магалов', 'Виталий', 'Тимофеевич', 'м', '', 'user2@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user2@adtspb.ru\r', 1, '', '', NULL, '$2y$12$rsxG7uvsox84gM1cCuFmH.WLzkIDBw4Ny1kwFaNbgeBctBX1kMSaK'),
+(128, '2020-05-08 22:28:39', '', 'Клокачев', 'Федул', 'Протасьевич', 'м', '', 'user3@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user3@adtspb.ru\r', 1, '', '', NULL, '$2y$12$gp6Dk.NS.94OkkWvHZq1Xut0lXp9NQA7RqSidjKq5RjKrxnupIrPu'),
+(129, '2020-05-08 22:28:39', '', 'Иловайский', 'Гермоген', 'Галактионович', 'м', '', 'user4@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user4@adtspb.ru\r', 1, '', '', NULL, '$2y$12$WLwQDJGN8a/I/wwLzPPb5O7S6pKh1y4.9Yb2yUE6iraB2YZkGkKQu'),
+(130, '2020-05-08 22:28:40', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user5@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user5@adtspb.ru\r', 1, '', '', NULL, '$2y$12$itU9TJw/adiCO55bx5mAfu.IWAmt7sFfRkd1e6vdASCBX6EP.u0B6'),
+(131, '2020-05-08 22:28:40', '', 'Карбышев', 'Герберт', 'Лаврович', 'м', '', 'user6@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user6@adtspb.ru\r', 1, '', '', NULL, '$2y$12$tDoHnXQ/92T9BVHxTNlYY.rjCfUGZ0uJbLhqSrDpyMEFDfO/CdGae'),
+(132, '2020-05-08 22:28:41', '', 'Деменков', 'Иуст', 'Лукьянович', 'м', '', 'user7@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user7@adtspb.ru\r', 1, '', '', NULL, '$2y$12$Y/27p/BDtSSKPqwROqAYjOxebMtyTxSWG.Cb/epWwE8FgzH02JQ.q'),
+(133, '2020-05-08 22:28:41', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user8@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user8@adtspb.ru\r', 1, '', '', NULL, '$2y$12$3o0mSIZFFGaEmvaNCwksf.COz7wZByLXFyEMafyBP7tS4JBDCQLyW'),
+(134, '2020-05-08 22:28:41', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$9fc6owAXH4fWpR.I4ZwgOOvtTRCdpEe6pjdkhKhFg2IXH2CghFWca'),
+(135, '2020-05-08 22:28:52', '', 'Волконский', 'Гектор', 'Климович', 'м', '', 'user1@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user1@adtspb.ru\r', 1, '', '', NULL, '$2y$12$JzlF9g0QzKiiGnSBON9UuuTKKR47UbDGFjw244AIqcyXUtgoL299S'),
+(136, '2020-05-08 22:28:52', '', 'Магалов', 'Виталий', 'Тимофеевич', 'м', '', 'user2@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user2@adtspb.ru\r', 1, '', '', NULL, '$2y$12$jZOraWmGeMO6lTpTNZWE.u1bqIKDgUJBW9vatMn2ffllXrqucmb3q'),
+(137, '2020-05-08 22:28:53', '', 'Клокачев', 'Федул', 'Протасьевич', 'м', '', 'user3@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user3@adtspb.ru\r', 1, '', '', NULL, '$2y$12$/KMniMa8BnwNcUhULUXcDu7DESbn.A3arNfVlC74d6drsdeYlwhSi'),
+(138, '2020-05-08 22:28:53', '', 'Иловайский', 'Гермоген', 'Галактионович', 'м', '', 'user4@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user4@adtspb.ru\r', 1, '', '', NULL, '$2y$12$u/Ba4rgIcJZhQbDF8SxLSODfkYSi6VdAOujYxy8TTtsERYGYTNb3W'),
+(139, '2020-05-08 22:28:54', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user5@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user5@adtspb.ru\r', 1, '', '', NULL, '$2y$12$ZZV59P7yAUcVRKw82IFQAOkaLRN6p7r4.rTLce6YxcROu6D500VxS'),
+(140, '2020-05-08 22:28:54', '', 'Карбышев', 'Герберт', 'Лаврович', 'м', '', 'user6@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user6@adtspb.ru\r', 1, '', '', NULL, '$2y$12$N5EVKYxjntJGE9mrBPA8U.fL4ltiGAZjPoDms5XRIbbv9dEynp.HS'),
+(141, '2020-05-08 22:28:54', '', 'Деменков', 'Иуст', 'Лукьянович', 'м', '', 'user7@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user7@adtspb.ru\r', 1, '', '', NULL, '$2y$12$y2mggQGp6e4lQKlJo0Sl5u2Kr5wXprg/OBjegM4Pk7ABOZZdvlmQK'),
+(142, '2020-05-08 22:28:55', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user8@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user8@adtspb.ru\r', 1, '', '', NULL, '$2y$12$XNVWeS.fx0DH7A8SdJrjWuwbNxUoo9hYXZgqft5sfmXRGVpMaHs2q'),
+(143, '2020-05-08 22:28:55', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$yFybzYqGk68D1DCCRm3Iq.54a003JyP.CGh0sp6MdNnc5x4YNxlmK');
 
 -- --------------------------------------------------------
 
@@ -531,7 +634,8 @@ CREATE TABLE `user_role` (
 INSERT INTO `user_role` (`id`, `role_id`, `user_id`) VALUES
 (1, 2, 1),
 (2, 1, 2),
-(3, 1, 3);
+(3, 1, 3),
+(4, 5, 5);
 
 -- --------------------------------------------------------
 
@@ -563,7 +667,9 @@ INSERT INTO `user_token` (`id`, `token`, `date_created`, `user_id`) VALUES
 (49, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODA5ODI3MiwibmJmIjoxNTg4MTAxODcyLCJleHAiOjE1ODgxODQ2NzIsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-04-28 18:24:32', 8),
 (50, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODM2MzU3OCwibmJmIjoxNTg4MzY3MTc4LCJleHAiOjE1ODg0NDk5NzgsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-01 20:06:19', 8),
 (51, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwIiwianRpIjoidWlkOCIsImlhdCI6MTU4ODM2NDIyOSwibmJmIjoxNTg4MzY3ODI5LCJleHAiOjE1ODg0NTA2MjksInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-01 20:17:09', 8),
-(53, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU4ODU0MTkwNywibmJmIjoxNTg4NTQ1NTA3LCJleHAiOjE1ODg2MjgzMDcsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-03 21:38:27', 8);
+(53, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU4ODU0MTkwNywibmJmIjoxNTg4NTQ1NTA3LCJleHAiOjE1ODg2MjgzMDcsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-03 21:38:27', 8),
+(54, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU4ODk3NTg5MiwibmJmIjoxNTg4OTc5NDkyLCJleHAiOjE1ODkwNjIyOTIsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-08 22:11:33', 8),
+(55, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU4OTIzMzI5NiwibmJmIjoxNTg5MjM2ODk2LCJleHAiOjE1ODkzMTk2OTYsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-11 21:41:37', 8);
 
 --
 -- Индексы сохранённых таблиц
@@ -759,19 +865,19 @@ ALTER TABLE `user_token`
 -- AUTO_INCREMENT для таблицы `action`
 --
 ALTER TABLE `action`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `action_list`
 --
 ALTER TABLE `action_list`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `association`
 --
 ALTER TABLE `association`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT для таблицы `association_requiredassociation`
@@ -807,7 +913,7 @@ ALTER TABLE `event_speaker`
 -- AUTO_INCREMENT для таблицы `group`
 --
 ALTER TABLE `group`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT для таблицы `group_timetable`
@@ -831,7 +937,7 @@ ALTER TABLE `mailing`
 -- AUTO_INCREMENT для таблицы `proposal`
 --
 ALTER TABLE `proposal`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `role`
@@ -867,13 +973,13 @@ ALTER TABLE `settings_timetablestatus`
 -- AUTO_INCREMENT для таблицы `upload`
 --
 ALTER TABLE `upload`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=144;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
@@ -897,13 +1003,13 @@ ALTER TABLE `user_group`
 -- AUTO_INCREMENT для таблицы `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
