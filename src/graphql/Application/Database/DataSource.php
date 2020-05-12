@@ -150,6 +150,8 @@ class DataSource
 	}
 
     /**
+     * Добавить сущность в таблицу
+     *
      * @param EntityBase $instance
      * @return bool
      * @throws RequestError
@@ -200,16 +202,41 @@ class DataSource
         return true;
     }
 
+
+    /**
+     * Удаление сущности по ID
+     *
+     * @param string $class
+     * @param int $id
+     * @return bool
+     */
     public static function delete(string $class, int $id){
         $bindings = ["id" => (string)$id];
         return self::deleteOne($class, "id = :id", $bindings);
     }
 
+    /**
+     * Удаление сущности
+     *
+     * @param string $class
+     * @param string $query
+     * @param array $bindings
+     * @return bool
+     */
     public static function deleteOne(string $class, string $query, array $bindings = []){
         $result = self::deleteAll($class, $query." LIMIT 1", $bindings);
         return $result;
     }
 
+
+    /**
+     * Удаление нескольких сущностей
+     *
+     * @param string $class
+     * @param string $query
+     * @param array $bindings
+     * @return bool
+     */
     public static function deleteAll(string $class, string $query, array $bindings = []): bool {
 
         self::initInstance();
@@ -246,6 +273,23 @@ class DataSource
      */
     public static function registerUser(User $user){
         // TODO: регистрация прав пользователя (для разных типов пользователей: родитель, ребенок, учитель, супермодератор, ...)
+
+        // Генерируем ID пользователя, ищем, сколько таких же пользователей с одинаковыми ФИО
+        // TODO: Проверить работоспособность!
+        // TODO: сделать через цепочку mysql запросов (?)
+        $req = self::getPDO()->prepare("SELECT COUNT(id) FROM `user` WHERE surname = :sname AND name = :name AND midname = :midname");
+
+        $req->bindValue("sname", $user->surname);
+        $req->bindValue("name", $user->name);
+        $req->bindValue("midname", $user->midname);
+
+        // TODO: выбрасывать ошибку при неудачи запроса
+        $req->execute();
+
+        $id = (int)$req->fetchAll()[0] + 1;
+
+        // TODO: генерация логина на латыни
+        $user->login = $user->surname + $user->name[0] + $user->midname[0] + $id;
 
         return self::insert($user);
     }

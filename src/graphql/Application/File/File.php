@@ -7,26 +7,36 @@ namespace GraphQL\Application\File;
 class File {
 
     /**
+     * Папка файла
+     *
      * @var string
      */
     private string $path;
 
     /**
+     * Имя файла
+     *
      * @var string
      */
     private string $basename;
 
     /**
+     * Размер файла в байтах
+     *
      * @var false|int
      */
     private int $size;
 
     /**
+     * Тип файла
+     *
      * @var string
      */
     private string $mime_type;
 
     /**
+     * Расширение файла
+     *
      * @var string
      */
     private string $extension;
@@ -47,6 +57,8 @@ class File {
     }
 
     /**
+     * Получение полного имени
+     *
      * @return string
      */
     public function getFullName(): string{
@@ -54,6 +66,8 @@ class File {
     }
 
     /**
+     * Получение папки файла
+     *
      * @return string
      */
     public function getPath(): string {
@@ -61,6 +75,8 @@ class File {
     }
 
     /**
+     * Получение имени файла
+     *
      * @return string
      */
     public function getBasename(): string {
@@ -68,6 +84,8 @@ class File {
     }
 
     /**
+     * Получение размера файла
+     *
      * @return int
      */
     public function getSize(): int {
@@ -75,6 +93,8 @@ class File {
     }
 
     /**
+     * Получение mime-типа файла
+     *
      * @return string
      */
     public function getMimeType(): string {
@@ -82,6 +102,8 @@ class File {
     }
 
     /**
+     * Проверка кодировки файла
+     *
      * @return false|int
      */
     public function isUTF8(){
@@ -97,6 +119,8 @@ class File {
     }
 
     /**
+     * Получение содержания файла
+     *
      * @param bool $newLineReplacementToUtf8
      * @param bool $convertFromWindowsEncoding
      * @return string

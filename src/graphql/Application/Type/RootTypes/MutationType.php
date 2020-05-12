@@ -211,7 +211,7 @@ class MutationType extends ObjectType
      */
     public function adminUploadAssociations($rootValue, $args, AppContext $context){
         $context->viewer->hasAccessOrError(1);
-        $file = $context->getFileOrError("file0");
+        $file = $context->getFileOrError("file0"); //TODO: биндинг файла через graphql
 
         if(!$file->isUTF8())
             throw new RequestError("Неверная кодировка файла: файл должен иметь кодировку UTF-8.");
@@ -309,7 +309,7 @@ class MutationType extends ObjectType
      */
     public function adminUploadTeachersList($rootValue, $args, AppContext $context){
         $context->viewer->hasAccessOrError(2);
-        $file = $context->getFileOrError("file0");
+        $file = $context->getFileOrError("file0"); //TODO: биндинг файла через graphql
 
         if(!$file->isUTF8())
             throw new RequestError("Неверная кодировка файла: файл должен иметь кодировку UTF-8.");

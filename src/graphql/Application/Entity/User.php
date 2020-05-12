@@ -100,11 +100,22 @@ class User extends EntityBase
      * */
 
     /**
+     * Проверка на доступ к функции
+     *
      * @param int $action_id
      * @param string $list_id
      * @return bool
      */
     public function hasAccess(int $action_id, string $list_id = "1"): bool{
+
+        //TODO: следует ли проверять права неавторизованного пользователя?
+        if($this->id == 0)
+            return false;
+
+        // Если пользователь неавторизован
+        //TODO: объединить верхний блок с нижним
+        if(!$this->isAuthorized())
+            return false;
 
         /** @var array $user_role */
         $user_role = DataSource::findAll("UserRole", "user_id = :uid", ["uid" => $this->id]);
@@ -126,6 +137,8 @@ class User extends EntityBase
     }
 
     /**
+     * Проверка на доступ к функции. Если доступа нет, то приложение выбрасывает ошибку.
+     *
      * @param int $action_id
      * @param string $list_id
      * @return bool
