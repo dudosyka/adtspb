@@ -283,13 +283,16 @@ class DataSource
         $req->bindValue("name", $user->name);
         $req->bindValue("midname", $user->midname);
 
-        // TODO: выбрасывать ошибку при неудачи запроса
-        $req->execute();
+        $isSuccessful = $req->execute();
+        if(!$isSuccessful)
+        {
+            $arr = print_r($req->errorInfo(), true);
+            throw new Error("Не удалось совершить генерацию уникального ID нового пользователя: ".$arr);
+        }
 
         $id = (int)$req->fetchAll()[0] + 1;
 
-        // TODO: генерация логина на латыни
-        $user->login = $user->surname + $user->name[0] + $user->midname[0] + $id;
+        $user->login = User::serializeNickname($user->surname, $user->name, $user->midname, $id);
 
         return self::insert($user);
     }
