@@ -37,6 +37,13 @@
 
         <p>{{last_upload_status_adminUploadAssociations}}</p>
 
+        <p>
+            Загрузка списка административных сотрудников:
+        </p>
+
+        <input type="file">
+
+
     </div>
 </template>
 
