@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Май 12 2020 г., 00:50
+-- Время создания: Май 20 2020 г., 22:49
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -323,6 +323,42 @@ INSERT INTO `mailing` (`id`, `started_date`, `author_id`, `target_id`, `text`) V
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `passwordrestore`
+--
+
+DROP TABLE IF EXISTS `passwordrestore`;
+CREATE TABLE `passwordrestore` (
+  `id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL COMMENT 'ID пользователя',
+  `key_code` text NOT NULL COMMENT 'Ключ к восстановлению пароля',
+  `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Дата создания запроса',
+  `ip` text NOT NULL COMMENT 'IP, с которого пытаются восстановить пароль'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Запросы пользователей на восстановление пароля';
+
+--
+-- Дамп данных таблицы `passwordrestore`
+--
+
+INSERT INTO `passwordrestore` (`id`, `user_id`, `key_code`, `date_created`, `ip`) VALUES
+(99, 7, '78F684913', '2020-05-20 17:20:53', '123'),
+(100, 7, 'BB93FC8B', '2020-05-20 17:21:12', '127.0.0.1'),
+(101, 7, '4D2ACFE7', '2020-05-20 17:23:06', '127.0.0.1'),
+(102, 7, '684BBA03', '2020-05-20 17:24:10', '127.0.0.1'),
+(103, 7, 'CE6DDBE4', '2020-05-20 17:25:01', '127.0.0.1'),
+(104, 7, '3BE4DADD', '2020-05-20 17:27:21', '127.0.0.1'),
+(107, 7, 'CC07C917', '2020-05-20 18:26:40', '127.0.0.1'),
+(108, 7, '9AF504A9', '2020-05-20 18:28:17', '127.0.0.1'),
+(109, 7, 'D6858E20', '2020-05-20 18:31:43', '127.0.0.1'),
+(110, 7, '8D05E309', '2020-05-20 18:49:50', '127.0.0.1'),
+(111, 7, '493291E1', '2020-05-20 18:51:14', '127.0.0.1'),
+(112, 7, 'D3B5095D', '2020-05-20 18:52:22', '127.0.0.1'),
+(113, 7, '1D3693A8', '2020-05-20 18:53:54', '127.0.0.1'),
+(114, 7, 'E3B77AC4', '2020-05-20 18:54:37', '127.0.0.1'),
+(115, 7, '0FD689D7', '2020-05-20 18:56:30', '127.0.0.1');
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `proposal`
 --
 
@@ -500,7 +536,7 @@ INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midnam
 (4, '2020-04-10 19:23:03', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7 (123) 123-12-12', 'admin@localh.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwf'),
 (5, '2020-04-10 19:34:01', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7 (123) 123-12-12', 'admin@localh.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwf'),
 (6, '2020-04-10 20:32:14', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwБMf'),
-(7, '2020-04-15 19:55:50', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost.ru', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, 'qwБMf'),
+(7, '2020-04-15 19:55:50', '', 'Тестов', 'Тест', 'Тесович', 'м', '+7(123)123-12-12', 'admin@localhost', 'ожидание', NULL, 'г. СПБ, ул. Другая, д. 1', 'г. МСК, ул. Еще Одна, д. 5555', 'г. СПБ, ул. Рощинская, д. 1', 'лялялляля фирма', 1, '', '', NULL, '$2y$12$jqnruwRz8RmJa2wUe8R7KuQ/FZre7znuV9.biEjf9vriPVwNtStty'),
 (8, '2020-04-17 21:33:00', '', '123@123.ru', '123@123.ru', '123@123.ru', 'ж', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '123@123.ru', '123@123.ru', '123@123.ru', '123@123.ru', 1, '', '', NULL, '$2y$12$GggrDCuzFCm.dGnX7TRpjOI9W5WfM6Ia3QDkFA.aLM7rbMrquevgC'),
 (90, '2020-05-07 21:58:25', '', 'Волконский', 'Гектор', 'Климович', 'м', '', 'user1@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user1@adtspb.ru\r', 1, '', '', NULL, '$2y$12$BKK2x5x9B4F4DHU1EcuftOjo54dmPkN9iWBz8D2ndBMKSIw1hx1jG'),
 (91, '2020-05-07 21:58:25', '', 'Магалов', 'Виталий', 'Тимофеевич', 'м', '', 'user2@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user2@adtspb.ru\r', 1, '', '', NULL, '$2y$12$VoA5HZYGD4z.nx47dDdQwedFm3gi1QHpt0A.ii3zFIBC85P7lgtei'),
@@ -555,7 +591,9 @@ INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midnam
 (140, '2020-05-08 22:28:54', '', 'Карбышев', 'Герберт', 'Лаврович', 'м', '', 'user6@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user6@adtspb.ru\r', 1, '', '', NULL, '$2y$12$N5EVKYxjntJGE9mrBPA8U.fL4ltiGAZjPoDms5XRIbbv9dEynp.HS'),
 (141, '2020-05-08 22:28:54', '', 'Деменков', 'Иуст', 'Лукьянович', 'м', '', 'user7@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user7@adtspb.ru\r', 1, '', '', NULL, '$2y$12$y2mggQGp6e4lQKlJo0Sl5u2Kr5wXprg/OBjegM4Pk7ABOZZdvlmQK'),
 (142, '2020-05-08 22:28:55', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user8@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user8@adtspb.ru\r', 1, '', '', NULL, '$2y$12$XNVWeS.fx0DH7A8SdJrjWuwbNxUoo9hYXZgqft5sfmXRGVpMaHs2q'),
-(143, '2020-05-08 22:28:55', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$yFybzYqGk68D1DCCRm3Iq.54a003JyP.CGh0sp6MdNnc5x4YNxlmK');
+(143, '2020-05-08 22:28:55', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$yFybzYqGk68D1DCCRm3Iq.54a003JyP.CGh0sp6MdNnc5x4YNxlmK'),
+(144, '2020-05-14 22:21:28', 'andrey2', 'Андрей', 'Иванов', 'Александрович', 'м', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '$req', '$req', '$req', '$req', 1, '', '', NULL, '$2y$12$WqVmRvsAjceO5QmJE4eAmOPcahox5P4Ia0BnQgsQ7ebT2t4u9ibu2'),
+(145, '2020-05-14 22:21:36', 'andrey2', 'Андрей', 'Иванов', 'Александрович', 'м', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '$req', '$req', '$req', '$req', 1, '', '', NULL, '$2y$12$9LBF19yLAS5KXHHMUdkS/OK25DV41FPtt9X.B3NxuZ8sAcuPe0zpi');
 
 -- --------------------------------------------------------
 
@@ -764,6 +802,13 @@ ALTER TABLE `mailing`
   ADD KEY `target_id` (`target_id`);
 
 --
+-- Индексы таблицы `passwordrestore`
+--
+ALTER TABLE `passwordrestore`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Индексы таблицы `proposal`
 --
 ALTER TABLE `proposal`
@@ -934,6 +979,12 @@ ALTER TABLE `mailing`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT для таблицы `passwordrestore`
+--
+ALTER TABLE `passwordrestore`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+
+--
 -- AUTO_INCREMENT для таблицы `proposal`
 --
 ALTER TABLE `proposal`
@@ -979,7 +1030,7 @@ ALTER TABLE `upload`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=144;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
@@ -1009,7 +1060,7 @@ ALTER TABLE `user_role`
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -1075,6 +1126,12 @@ ALTER TABLE `group_timetableexception`
 ALTER TABLE `mailing`
   ADD CONSTRAINT `mailing_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `mailing_ibfk_2` FOREIGN KEY (`target_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `passwordrestore`
+--
+ALTER TABLE `passwordrestore`
+  ADD CONSTRAINT `passwordrestore_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Ограничения внешнего ключа таблицы `proposal`
