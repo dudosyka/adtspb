@@ -41,7 +41,8 @@ class DataSource
 			$db_pass = ConfigManager::getField("db_pass");
 			try {
 				self::$pdo = new PDO("{$db_type}:dbname={$db_name};host={$db_host};charset=utf8", $db_user, $db_pass,[
-					PDO::ATTR_PERSISTENT => true
+					PDO::ATTR_PERSISTENT => true,
+//                    PDO::ATTR_EMULATE_PREPARES => false
 				]);
 			} catch (PDOException $e) {
 				throw new Error("Не могу соединиться с базой данных.");
@@ -117,22 +118,22 @@ class DataSource
 		$assoc_table = (new $class(null))->__getTable();
 
 
-		$query = self::getPDO()->prepare("SELECT * FROM `{$assoc_table}` WHERE {$query}");
+        $q = self::getPDO()->prepare("SELECT * FROM `{$assoc_table}` WHERE {$query}");
 		foreach($bindings as $key => $value)
 		{
-			$query->bindValue($key, $value);
+			$q->bindValue($key, $value);
 		}
 
 
-		$isSuccessful = $query->execute();
+		$isSuccessful = $q->execute();
 
 		if(!$isSuccessful)
 		{
-			$arr = print_r($query->errorInfo(), true);
+			$arr = print_r($q->errorInfo(), true);
 			throw new Error("Не удалось совершить запрос: ".$arr);
 		}
 
-		$res = $query->fetchAll();
+		$res = $q->fetchAll();
 		$result = [];
 		foreach($res as $object_key => $object_value)
 		{
@@ -172,6 +173,7 @@ class DataSource
         //TODO: оптимизировать
 
         foreach((array)$instance as $key => $value){
+            if(is_int($key)) continue;
             if(is_null($value)){
                 $fields[] = "`".$key."`";
                 $values[] = "NULL";
@@ -201,6 +203,62 @@ class DataSource
 
         return true;
     }
+
+
+    /**
+     * Обновление сущности
+     *
+     * @param EntityBase $instance
+     * @return bool
+     * @throws RequestError
+     */
+    public static function update(EntityBase $instance){
+        if(!method_exists($instance,'__getTable') || trim($instance->__getTable()) == ""){
+            throw new Error("Отсутствует метод __getTable или возвращает неверные данные у сущности");
+        }
+
+        $assoc_table = $instance->__getTable();
+        //`id`, `date_registered`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`
+        //NULL, CURRENT_TIMESTAMP, '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', '', '', NULL
+
+        $fields = [];
+        $values = [];
+        $bindings = [];
+
+        //TODO: оптимизировать
+
+        foreach((array)$instance as $key => $value){
+            if(is_int($key)) continue;
+            if(is_null($value)){
+                $fields[] = "`".$key."` = NULL";
+                continue;
+            }
+
+            $fields[] = "`".$key."` = :".$key."";
+            $bindings[$key] = $value;
+        }
+
+
+        $str = "UPDATE `{$assoc_table}` SET ".implode(",", $fields)." WHERE `{$assoc_table}`.`id` = {$instance->id}";
+
+        $query = self::getPDO()->prepare($str);
+        foreach($bindings as $key => $value)
+        {
+            $query->bindValue($key, $value);
+        }
+
+        $isSuccessful = $query->execute();
+
+        if(!$isSuccessful)
+        {
+            $arr = print_r($query->errorInfo(), true);
+            throw new Error("Не удалось совершить запрос (".$str."): ".$arr);
+        }
+
+        return true;
+    }
+
+
 
 
     /**

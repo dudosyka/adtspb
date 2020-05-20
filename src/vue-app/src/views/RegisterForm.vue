@@ -13,14 +13,14 @@
 
                 <b-form @submit.stop.prevent="passes(onSubmit)">
                     <b-form-row>
-                        <div class="social-networks-list d-inline-flex justify-content-center">
-                            <FacebookButton class="mr-3"></FacebookButton>
-                            <GoogleButton></GoogleButton>
-                        </div>
+<!--                        <div class="social-networks-list d-inline-flex justify-content-center">-->
+<!--                            <FacebookButton class="mr-3"></FacebookButton>-->
+<!--                            <GoogleButton></GoogleButton>-->
+<!--                        </div>-->
 
-                        <CenteredCaption>
-                            Или
-                        </CenteredCaption>
+<!--                        <CenteredCaption>-->
+<!--                            Или-->
+<!--                        </CenteredCaption>-->
 
                         <b-alert variant="danger" v-bind:show="graphql_errors.length > 0" v-if="graphql_errors.length > 0" id="register_errors_container">
                             {{graphql_errors[0].message}}
@@ -120,6 +120,8 @@
                                     v-model="password"
                                     placeholder="Пароль"
                                     type="password"
+                                    ref="password"
+                                    name="password"
 
                                     :state="getValidationState(validationContext)"
                                     aria-describedby="email-feedback"
@@ -132,7 +134,7 @@
                             style="width: 100%;"
 
                             name="Подтверждение пароля"
-                            :rules="{ required: true, password: true }"
+                            :rules="{ required: true, password: true, password_match: password }"
                             v-slot="validationContext"
                         >
                             <b-form-group>

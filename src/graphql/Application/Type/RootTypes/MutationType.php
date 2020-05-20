@@ -6,6 +6,7 @@ use GraphQL\Application\Bearer;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\Association;
+use GraphQL\Application\Entity\PasswordRestore;
 use GraphQL\Application\Entity\Upload;
 use GraphQL\Application\Entity\User;
 use GraphQL\Application\Entity\UserToken;
@@ -47,6 +48,8 @@ class MutationType extends ObjectType
 //                    ]
 //                ],
 
+                // TODO: повторная отправка письма
+
 
                 'register' => [
                     'type' => Types::boolean(),
@@ -80,6 +83,30 @@ class MutationType extends ObjectType
                     'description' => 'Выход из аккаунта',
                     'args' => []
                 ],
+
+                "restorePasswordRequest" => [
+                    'type' => Types::boolean(),
+                    'args' => [
+                        "username" => Types::nonNull(Types::string())
+                    ]
+                ],
+
+                "validateCode" => [
+                    "type" => Types::boolean(),
+                    'args' => [
+                       "key_code" => Types::nonNull(Types::string())
+                    ]
+                ],
+
+                "restorePasswordSaveNew" => [
+                    "type" => Types::boolean(),
+                    "args" => [
+                        "new_password" => Types::nonNull(Types::password()),
+                        "key_code" => Type::nonNull(Types::string())
+                    ]
+                ],
+
+
 
                 'adminUploadAssociations' => [
                     'type' => Types::string(),
@@ -197,6 +224,118 @@ class MutationType extends ObjectType
 
         return $successful;
     }
+
+
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws \Exception
+     */
+    public function restorePasswordRequest($rootValue, $args, AppContext $context){
+        //TODO: кулдаун 30 минут?
+        //TODO: умножающийся кулдаун (в 1й раз 30 минут, во 2й раз 1 (30мин*2) час, в 3й раз 2(1*2) часа, ...)?
+        //TODO: удалять больше 10 записей о восстановлении пароля у пользователя
+        //TODO: запрет на изменение пароля непроверненного пользователя (у которого не подтверждены email или другие данные)
+        //TODO: анти-брутфорс
+
+        // Поиск пользователя
+        /** @var User $found */
+        $found = DataSource::findOne("user", "email = :username OR phone_number = :username OR login = :username", [
+            ':username' => $args['username']
+        ]);
+        if($found == null)
+            throw new RequestError("Неверный логин, e-mail или телефон");
+
+        $email = $found->email;
+        $key_code = Application::generateValidationCode();
+
+        $insert_request = DataSource::insert(new PasswordRestore([
+            "user_id" => $found->id,
+            "key_code" => $key_code,
+            "ip" => $context->ip,
+            "date_created" => DataSource::timeInMYSQLFormat()
+        ]));
+
+        if(!$insert_request)
+            throw new \Exception("Ошибка создания запроса на восстановление пароля: невозможно записать запрос в базу");
+
+
+        $html = <<<HTML
+<p>Ваш код для восстановления пароля:</p>
+<pre>{$key_code}</pre>
+
+<p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/login/restore-password?code={$key_code}">ссылкой для восстановления</a>.</p>
+HTML;
+
+
+        Application::sendMail($email, "Восстановление пароля", $html);
+
+
+
+        return $insert_request;
+    }
+
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function restorePasswordSaveNew($rootValue, $args, AppContext $context) {
+        //TODO: кулдаун 30 минут?
+        //TODO: умножающийся кулдаун (в 1й раз 30 минут, во 2й раз 1 (30мин*2) час, в 3й раз 2(1*2) часа, ...)?
+        //TODO: удалять больше 10 записей о восстановлении пароля у пользователя
+        //TODO: анти-ддос
+        //TODO: запрет на изменение пароля непроверненного пользователя (у которого не подтверждены email или другие данные)
+
+        /** @var PasswordRestore $found */
+        $found = DataSource::findOne("PasswordRestore", "key_code = :key", [
+            ':key' => $args['key_code']
+        ]);
+        if($found == null)
+            throw new RequestError("Неверный код подтверждения");
+
+        /** @var User $user */
+        $user = DataSource::findOne("User", "id = :user", [
+            ':user' => $found->user_id
+        ]);
+        $user->password = User::hashPassword($args["new_password"]);
+        $res = DataSource::update($user);
+
+        // Очистка записи запроса
+        DataSource::delete('PasswordRestore', $found->id);
+
+        return true;
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     */
+    public function validateCode($rootValue, $args, AppContext $context){
+        //TODO: кулдаун 30 минут?
+        //TODO: умножающийся кулдаун (в 1й раз 30 минут, во 2й раз 1 (30мин*2) час, в 3й раз 2(1*2) часа, ...)?
+        //TODO: удалять больше 10 записей о восстановлении пароля у пользователя
+        //TODO: анти-ддос
+        //TODO: запрет на изменение пароля непроверненного пользователя (у которого не подтверждены email или другие данные)
+
+        /** @var PasswordRestore $found */
+        $found = DataSource::findOne("PasswordRestore", "key_code = :key", [
+            ':key' => $args['key_code']
+        ]);
+        if($found == null)
+            return false;
+
+        return true;
+    }
+
 
 
     /**

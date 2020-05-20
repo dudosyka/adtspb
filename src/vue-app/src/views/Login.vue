@@ -20,7 +20,7 @@
                         <validation-provider
                             style="width: 100%;"
 
-                            name="Отчество"
+                            name="E-mail, номер телефона или логин"
                             :rules="{ required: true }"
                             v-slot="validationContext"
                         >
@@ -62,18 +62,18 @@
 
                         <b-button class="theme" type="submit" block :disabled="is_sending_request">Войти</b-button>
 
-                        <p class="theme text-muted mx-auto lost-password">Забыли <router-link class="theme" to="/login/forgot-password">Логин / Пароль</router-link>?</p>
+                        <p class="theme text-muted mx-auto lost-password" style="width: 100%; text-align: center;">Забыли <router-link class="theme" to="/login/restore-password">Логин / Пароль</router-link>?</p>
 
-                        <CenteredCaption>
-                            Или войти через
-                        </CenteredCaption>
+<!--                        <CenteredCaption>-->
+<!--                            Или войти через-->
+<!--                        </CenteredCaption>-->
 
-                        <div class="social-networks-list d-inline-flex justify-content-center">
-                            <FacebookButton class="mr-3"></FacebookButton>
-                            <GoogleButton></GoogleButton>
-                        </div>
+<!--                        <div class="social-networks-list d-inline-flex justify-content-center">-->
+<!--                            <FacebookButton class="mr-3"></FacebookButton>-->
+<!--                            <GoogleButton></GoogleButton>-->
+<!--                        </div>-->
 
-                        <p class="theme text-muted mx-auto register-account">
+                        <p class="theme text-muted mx-auto register-account" style="width: 100%; text-align: center;">
                             <router-link class="theme" to="/register">
                                 Создать аккаунт <b-icon-arrow-right></b-icon-arrow-right>
                             </router-link>

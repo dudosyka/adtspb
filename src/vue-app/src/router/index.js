@@ -38,6 +38,11 @@ const routes = [
         name: 'Dashboard',
         component: () => import('../views/Dashboard.vue')
     },
+    {
+        path: '/login/restore-password',
+        name: 'Restore password',
+        component: () => import('../views/RestorePassword.vue')
+    },
 
 ]
 

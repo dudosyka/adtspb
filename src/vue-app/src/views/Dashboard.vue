@@ -8,40 +8,40 @@
             Выйти
         </b-button>
 
-        <p>
-            Форма для добавления ребенка:
-        </p>
+<!--        <p>-->
+<!--            Форма для добавления ребенка:-->
+<!--        </p>-->
 
-        <AddressInput placeholder="Фамилия"/>
-        <AddressInput placeholder="Имя"/>
-        <AddressInput placeholder="Отчество"/>
-        <AddressInput placeholder="Дата рождения"/>
-        <AddressInput placeholder="Школа"/>
-        <AddressInput placeholder="Класс"/>
+<!--        <AddressInput placeholder="Фамилия"/>-->
+<!--        <AddressInput placeholder="Имя"/>-->
+<!--        <AddressInput placeholder="Отчество"/>-->
+<!--        <AddressInput placeholder="Дата рождения"/>-->
+<!--        <AddressInput placeholder="Школа"/>-->
+<!--        <AddressInput placeholder="Класс"/>-->
 
-        <b-btn>Добавить</b-btn>
+<!--        <b-btn>Добавить</b-btn>-->
 
-        <p>
-            Загрузка списка педагогов:
-        </p>
+<!--        <p>-->
+<!--            Загрузка списка педагогов:-->
+<!--        </p>-->
 
-        <input type="file" @change="uploadTeachersList">
+<!--        <input type="file" @change="uploadTeachersList">-->
 
-        <p>{{last_upload_status_uploadTeachersList}}</p>
+<!--        <p>{{last_upload_status_uploadTeachersList}}</p>-->
 
-        <p>
-            Загрузка списка объедений:
-        </p>
+<!--        <p>-->
+<!--            Загрузка списка объедений:-->
+<!--        </p>-->
 
-        <input type="file" @change="adminUploadAssociations">
+<!--        <input type="file" @change="adminUploadAssociations">-->
 
-        <p>{{last_upload_status_adminUploadAssociations}}</p>
+<!--        <p>{{last_upload_status_adminUploadAssociations}}</p>-->
 
-        <p>
-            Загрузка списка административных сотрудников:
-        </p>
+<!--        <p>-->
+<!--            Загрузка списка административных сотрудников:-->
+<!--        </p>-->
 
-        <input type="file">
+<!--        <input type="file">-->
 
 
     </div>

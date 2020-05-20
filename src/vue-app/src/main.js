@@ -13,6 +13,9 @@ import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
 import {GraphQLClient, request} from 'graphql-request';
 import { ValidationObserver, ValidationProvider, extend, localize } from "vee-validate";
 import VueScrollTo from 'vue-scrollto';
+import VueGoodWizard from 'vue-good-wizard';
+
+
 // import YmapPlugin from 'vue-yandex-maps'
 // import ymaps_settings from './ymaps'
 
@@ -20,6 +23,7 @@ import VueScrollTo from 'vue-scrollto';
 dom.watch();
 
 library.add(fab, faGoogle);
+
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
@@ -43,7 +47,7 @@ Vue.use(VueScrollTo, {
     x: false,
     y: true
 });
-
+Vue.use(VueGoodWizard);
 
 /* Vee-validate */
 //TODO: сделать подгрузку системы валидации в отдельном JS-файле (в директории globals)
@@ -91,6 +95,15 @@ extend("agreement",{
     }
 });
 
+// Совпадение паролей
+extend('password_match', {
+    params: ['target'],
+    validate(value, { target }) {
+        return value === target;
+    },
+    message: 'Пароли не совпадают'
+});
+
 import vee_validate_ru from "vee-validate/dist/locale/ru.json";
 localize("ru", vee_validate_ru);
 
@@ -128,6 +141,11 @@ Vue.directive('scroll', {
 
 Vue.prototype.$request_endpoint = "http://localhost:8085/api.php";
 Vue.prototype.$request = request;
+
+
+
+
+
 
 /* Токены */
 //TODO: сделать подгрузку системы токенов в отдельном JS-файле (в директории globals)

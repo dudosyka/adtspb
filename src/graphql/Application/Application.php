@@ -302,6 +302,34 @@ class Application
         return md5(serialize(bin2hex(random_bytes(16))));
     }
 
+    /**
+     * @return false|mixed|string|string[]|null
+     */
+    public static function generateValidationCode(){
+        try {
+            $str = self::getRandomString();
+        } catch (Exception $e) {
+            $str = md5(date('U'));
+        }
+        $str = mb_strtoupper(mb_substr($str, 0, 8));
+        return (string)$str;
+    }
+
+    /**
+     * @param string $recipient
+     * @param string $subject
+     * @param string $html_body
+     */
+    public static function sendMail(string $recipient, string $subject, string $html_body){
+
+        $headers = [];
+        $headers["From"] = "webmaster@example.com";
+//      $headers["Reply-To"] = "webmaster@example.com";
+        $headers["X-Mailer"] = 'PHP/' . phpversion();
+
+        mail($recipient, $subject, $html_body, $headers);
+    }
+
 
 
 }
