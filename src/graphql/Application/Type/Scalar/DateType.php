@@ -43,7 +43,8 @@ class DateType extends ScalarType
      */
     public function parseValue($value)
     {
-        if (($timestamp = strtotime($value)) === false) {
+//        if (($timestamp = strtotime($value)) === false) {
+        if (!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $value)) {
             throw new \UnexpectedValueException("Cannot represent value as date: " . Utils::printSafe($value));
         }
         return $value;
@@ -64,7 +65,8 @@ class DateType extends ScalarType
         if (!$valueNode instanceof StringValueNode) {
             throw new Error('Query error: Can only parse strings got: ' . $valueNode->kind, [$valueNode]);
         }
-        if (($timestamp = strtotime($valueNode)) === false) {
+//        if (($timestamp = strtotime($valueNode)) === false) {
+        if (!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $valueNode->value)) {
             throw new Error("Not a valid date", [$valueNode]);
         }
         return $valueNode->value;

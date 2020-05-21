@@ -51,7 +51,6 @@ class Types
     private static $node;
 	private static $query;
     private static $mutation;
-    private static $adminMutation;
     /**
      * Тип объекта, имеющего ID
      *
@@ -82,15 +81,6 @@ class Types
         return self::$mutation ?: (self::$mutation = new MutationType());
     }
 
-    /**
-     * Тип объекта с методами дейстийвий для администратора
-     *
-     * @return AdminMutationType
-     */
-    public static function adminMutation()
-    {
-        return self::$adminMutation ?: (self::$adminMutation = new AdminMutationType());
-    }
 
 
 

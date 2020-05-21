@@ -5,6 +5,7 @@ use Error;
 use GraphQL\Application\ConfigManager;
 use GraphQL\Application\Entity\EntityBase;
 use GraphQL\Application\Entity\User;
+use GraphQL\Application\Entity\UserRole;
 use GraphQL\Server\RequestError;
 use PDO;
 use PDOException;
@@ -154,7 +155,7 @@ class DataSource
      * Добавить сущность в таблицу
      *
      * @param EntityBase $instance
-     * @return bool
+     * @return string
      * @throws RequestError
      */
 	public static function insert(EntityBase $instance){
@@ -201,7 +202,7 @@ class DataSource
             throw new Error("Не удалось совершить запрос (".$str."): ".$arr);
         }
 
-        return true;
+        return self::getPDO()->lastInsertId('id');
     }
 
 
@@ -326,10 +327,11 @@ class DataSource
      * Регистрация нового пользователя в системе
      *
      * @param User $user
+     * @param int $role_id
      * @return bool
      * @throws RequestError
      */
-    public static function registerUser(User $user){
+    public static function registerUser(User $user, int $role_id = 1){
         // TODO: регистрация прав пользователя (для разных типов пользователей: родитель, ребенок, учитель, супермодератор, ...)
 
         // Генерируем ID пользователя, ищем, сколько таких же пользователей с одинаковыми ФИО
@@ -348,11 +350,20 @@ class DataSource
             throw new Error("Не удалось совершить генерацию уникального ID нового пользователя: ".$arr);
         }
 
-        $id = (int)$req->fetchAll()[0] + 1;
+        $id = (int)$req->fetchAll()[0][0] + 1;
 
         $user->login = User::serializeNickname($user->surname, $user->name, $user->midname, $id);
 
-        return self::insert($user);
+        // TODO: сделать цепочку запросов (отправлять всё сразу, а не отдельно)
+
+        $id = self::insert($user);
+
+        self::insert(new UserRole([
+            "user_id" => $id,
+            "role_id" => $role_id
+        ]));
+
+        return true;
     }
 
 

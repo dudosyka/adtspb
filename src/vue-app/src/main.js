@@ -13,7 +13,6 @@ import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
 import {GraphQLClient, request} from 'graphql-request';
 import { ValidationObserver, ValidationProvider, extend, localize } from "vee-validate";
 import VueScrollTo from 'vue-scrollto';
-import VueGoodWizard from 'vue-good-wizard';
 
 
 // import YmapPlugin from 'vue-yandex-maps'
@@ -47,7 +46,6 @@ Vue.use(VueScrollTo, {
     x: false,
     y: true
 });
-Vue.use(VueGoodWizard);
 
 /* Vee-validate */
 //TODO: сделать подгрузку системы валидации в отдельном JS-файле (в директории globals)
@@ -92,6 +90,13 @@ extend("agreement",{
     message: "Требуется подтверждение согласия",
     validate: function(value){
         return value === true;
+    }
+});
+
+extend("date",{
+    message: "Дата должна быть заполнена в следующем формате: ГГГГ-ММ-ДД",
+    validate: function(value){
+        return value.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) !== null;
     }
 });
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Май 20 2020 г., 22:49
+-- Время создания: Май 21 2020 г., 22:13
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -529,7 +529,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship_id`, `study_place`, `study_class`, `birthday`, `password`) VALUES
-(0, '1970-01-01 12:00:00', '', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', '0', 'г. Москва', 'г. Москва', 'г. Москва', 'Аноним', 1, '', '', '1970-01-01', ''),
+(0, '1970-01-01 12:00:00', '', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', NULL, 'г. Москва', 'г. Москва', 'г. Москва', 'Аноним', 1, '', '', '1970-01-01', ''),
 (1, '2020-02-22 23:59:37', '', 'Человеков', 'Человек', 'Человекович', 'м', '+ (123) 123-45-67', 'admin@site.com', 'ожидание', NULL, 'г. Спб, Улица Гармошкина, д. 12, к. 3', 'г. Спб, Улица Летчиков, д. 33, к. 5', 'г. Москва, Улица Доброделов, д. 1', 'Секретарь', 1, '', '', '1982-10-10', ''),
 (2, '2020-02-22 23:59:37', '', 'Примеров', 'Пример', 'Примерович', 'ж', '+7 (321) 222-33-21', 'user@somesite.org', 'подтвержден', NULL, 'г. Спб, ул. Декабристов, д. 3', 'г. Спб, пр. Мира, д. 6', '', '', 2, 'Школа №1', '8Б', '1982-10-10', ''),
 (3, '2020-03-21 17:10:08', '', 'Лоремов', 'Лоремий', 'Ипсумович', 'ж', '+7 (321) 999-12-34', 'test@example.com', 'ожидание', NULL, 'г. Санкт-Петербург, ул. Грибоедова, д. 99, к. 90', 'г. Санкт-Петербург, ул. Центральная, д. 66, к. 44', '', '', 2, 'Школа №2', '3А', '2018-11-06', ''),
@@ -593,7 +593,12 @@ INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midnam
 (142, '2020-05-08 22:28:55', '', 'Возницын', 'Никифор', 'Кимович', 'м', '', 'user8@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user8@adtspb.ru\r', 1, '', '', NULL, '$2y$12$XNVWeS.fx0DH7A8SdJrjWuwbNxUoo9hYXZgqft5sfmXRGVpMaHs2q'),
 (143, '2020-05-08 22:28:55', '', 'Зубатов', 'Филон', 'Никодимович', 'м', '', 'user9@adtspb.ru\r', 'подтвержден', NULL, '', '', '', 'user9@adtspb.ru\r', 1, '', '', NULL, '$2y$12$yFybzYqGk68D1DCCRm3Iq.54a003JyP.CGh0sp6MdNnc5x4YNxlmK'),
 (144, '2020-05-14 22:21:28', 'andrey2', 'Андрей', 'Иванов', 'Александрович', 'м', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '$req', '$req', '$req', '$req', 1, '', '', NULL, '$2y$12$WqVmRvsAjceO5QmJE4eAmOPcahox5P4Ia0BnQgsQ7ebT2t4u9ibu2'),
-(145, '2020-05-14 22:21:36', 'andrey2', 'Андрей', 'Иванов', 'Александрович', 'м', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '$req', '$req', '$req', '$req', 1, '', '', NULL, '$2y$12$9LBF19yLAS5KXHHMUdkS/OK25DV41FPtt9X.B3NxuZ8sAcuPe0zpi');
+(145, '2020-05-14 22:21:36', 'andrey2', 'Андрей', 'Иванов', 'Александрович', 'м', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '$req', '$req', '$req', '$req', 1, '', '', NULL, '$2y$12$9LBF19yLAS5KXHHMUdkS/OK25DV41FPtt9X.B3NxuZ8sAcuPe0zpi'),
+(146, '2020-05-21 15:27:33', '123localhostru112', '123@localhost.ru', '123@localhost.ru', '123@localhost.ru', 'м', '+7(123)123-12-12', '123@localhost.ru', 'ожидание', NULL, '123@localhost.ru', '123@localhost.ru', '123@localhost.ru', '123@localhost.ru', 1, '', '', NULL, '$2y$12$xODTB.Gl6RYkh3jWecs.COOTjTll1lVcUhM3iZ.4Ack/lGceTCQye'),
+(147, '2020-05-21 15:42:28', '123123ruurururur112', '123@123.ruurururur', '123@123.ruurururur', '123@123.ruurururur', 'м', '+7(123)123-12-12', '123@123.ruurururur', 'ожидание', NULL, '123@123.ruurururur', '123@123.ruurururur', '123@123.ruurururur', '123@123.ruurururur', 1, '', '', NULL, '$2y$12$WWPMduTTRzNJK1dN66qsHOXnnOxw/mjasIGwrhnZ7D.Fct.w/8UCy'),
+(148, '2020-05-21 15:45:24', '123123ru112', '123@123.ru', '123@123.ru', '123@123.ru', 'м', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '123@123.ru', '123@123.ru', '123@123.ru', '123@123.ru', 1, '', '', NULL, '$2y$12$zL24uPqVnsxr/CPN79OEw.ouhWFA4hN/E0iF.HJFJyE7dB3Cy.O3K'),
+(149, '2020-05-21 15:46:08', '123123ru112', '123@123.ru', '123@123.ru', '123@123.ru', 'м', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '123@123.ru', '123@123.ru', '123@123.ru', '123@123.ru', 1, '', '', NULL, '$2y$12$JiX5wfR9ktkeTTaYus8u..6JXoOXuNjAY76e2j/otjLqRP6AV5/t.'),
+(150, '2020-05-21 15:49:12', '123123ru112', '123@123.ru', '123@123.ru', '123@123.ru', 'м', '+7(123)123-12-12', '123@123.ru', 'ожидание', NULL, '123@123.ru', '123@123.ru', '123@123.ru', '123@123.ru', 1, '', '', NULL, '$2y$12$HYXiw0MvO/NIdk38YUwrtuHSZCNcjXQVOe6urx9eozQhZlapP0bHe');
 
 -- --------------------------------------------------------
 
@@ -1030,7 +1035,7 @@ ALTER TABLE `upload`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=146;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=151;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
@@ -1060,7 +1065,7 @@ ALTER TABLE `user_role`
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

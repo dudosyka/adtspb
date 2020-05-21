@@ -48,7 +48,7 @@ class MutationType extends ObjectType
 //                    ]
 //                ],
 
-                // TODO: повторная отправка письма
+                // TODO: повторная отправка письма на подтверждение кодов?
 
 
                 'register' => [
@@ -65,7 +65,38 @@ class MutationType extends ObjectType
                         'job_position' => Types::nonNull(Types::string()),
                         'job_place' => Types::nonNull(Types::string()),
                         'registration_address' => Types::nonNull(Types::string()),
-                        'residence_address' => Types::nonNull(Types::string())
+                        'residence_address' => Types::nonNull(Types::string()),
+                        'birthday' => Types::nonNull(Types::date()),
+                    ]
+                ],
+
+                'registerChild' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Зарегистрировать ребенка (от родителя)',
+                    'args' => [
+                        'relationship' => Types::nonNull(Types::string()),
+                        'name' => Types::nonNull(Types::string()),
+                        'surname' => Types::nonNull(Types::string()),
+                        'midname' => Types::nonNull(Types::string()),
+                        'sex' => Types::nonNull(Types::sex()),
+                        'residence_address' => Types::nonNull(Types::string()),
+                        'study_place' => Types::nonNull(Types::string()),
+                        'study_class' => Types::nonNull(Types::string()),
+                        'birthday' => Types::nonNull(Types::date()),
+                        'registration_address' => Types::nonNull(Types::string()),
+                        'email' => Types::email(),
+                        'phone_number' => Types::phoneNumber(),
+                        'password' => Types::nonNull(Types::password())
+                    ]
+                ],
+
+
+                'validateRegistration' => [
+                    'type' => Types::string(),
+                    'description' => 'Проверка кода на подтверждение аккаунта после регистрации, изменение статуса аккаунта на "подтвержден" при успешной проверке',
+                    'args' => [
+                        "key_code" => Types::nonNull(Types::string()),
+                        'email' => Types::nonNull(Types::email())
                     ]
                 ],
 
@@ -86,6 +117,7 @@ class MutationType extends ObjectType
 
                 "restorePasswordRequest" => [
                     'type' => Types::boolean(),
+                    'description' => 'Запрос на восстановление пароля',
                     'args' => [
                         "username" => Types::nonNull(Types::string())
                     ]
@@ -93,6 +125,7 @@ class MutationType extends ObjectType
 
                 "validateCode" => [
                     "type" => Types::boolean(),
+                    'description' => 'Проверка кода на запрос на восстановление пароля',
                     'args' => [
                        "key_code" => Types::nonNull(Types::string())
                     ]
@@ -100,6 +133,7 @@ class MutationType extends ObjectType
 
                 "restorePasswordSaveNew" => [
                     "type" => Types::boolean(),
+                    'description' => 'Проверка кода на запрос на восстановление пароля',
                     "args" => [
                         "new_password" => Types::nonNull(Types::password()),
                         "key_code" => Type::nonNull(Types::string())
@@ -147,12 +181,15 @@ class MutationType extends ObjectType
         //TODO: запрет на регистрацию кириллического пароля
         //TODO: генерация логина
 
+        $key_code = Application::generateValidationCode();
+
+        $email = $args['email'];
 
         $instance = new User([
             'name' => $args['name'],
             'surname' => $args['surname'],
             'midname' => $args['midname'],
-            'email' => $args['email'],
+            'email' => $email,
             'password' => User::hashPassword($args['password']),
             'phone_number' => $args['phone_number'],
             'sex' => $args['sex'],
@@ -164,11 +201,59 @@ class MutationType extends ObjectType
             'study_place' => '',
             'study_class' => '',
             'date_registered' => DataSource::timeInMYSQLFormat(),
-            'status_email' => 'ожидание'
+            'verification_key_email' => $key_code,
+            'status_email' => User::EMAIL_PENDING,
+            "birthday" => $args["birthday"]
         ]);
 
-        return DataSource::registerUser($instance);
+        DataSource::registerUser($instance, 2);
+
+        $html = <<<HTML
+<p>Ваш код для подтверждения аккаунта:</p>
+<pre>{$key_code}</pre>
+HTML;
+//        <p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/register/form?code={$key_code}&email={$email}">ссылкой для восстановления</a>.</p>
+
+        //TODO: реализовать переход по ссылке
+
+
+        Application::sendMail($email, "Подтверждение аккаунта", $html);
+
+        return true;
     }
+
+
+    /**
+     * Проверка кода на подтверждение аккаунта после регистрации
+     *
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return \Lcobucci\JWT\Token
+     * @throws RequestError
+     */
+    public function validateRegistration($rootValue, $args, AppContext $context){
+        //TODO: кулдаун 30 минут?
+        //TODO: умножающийся кулдаун (в 1й раз 30 минут, во 2й раз 1 (30мин*2) час, в 3й раз 2(1*2) часа, ...)?
+        //TODO: анти-ддос, анти-брутфорс
+
+        /** @var User $found */
+        $found = DataSource::findOne("User", "email = :email AND verification_key_email = :key", [
+            ":email" => $args["email"],
+            ':key' => $args['key_code']
+        ]);
+        if($found == null ||
+            $found->verification_key_email == null || // На всякий случай
+            $found->verification_key_email == "" // На всякий случай
+        )
+            throw new RequestError("Неверный код");
+
+        $found->status_email = User::EMAIL_VALIDATED;
+        DataSource::update($found);
+
+        return $found->generateLoginToken($context);
+    }
+
 
     /**
      * Авторизация пользователя, вывод токена
@@ -186,7 +271,9 @@ class MutationType extends ObjectType
         //TODO: анти-DDOS авторизации
         //TODO: защита от распространенных атак
         //TODO: привязывать ли сессию к IP-адресу?
+        //TODO: редирект на добавление детей у регистрации, если пользователь их еще не добавлял
 
+        /** @var User $found */
         $found = DataSource::findOne("user", "email = :username OR phone_number = :username OR login = :username", [
             ':username' => $args['username']
         ]);
@@ -195,16 +282,8 @@ class MutationType extends ObjectType
             throw new RequestError("Неверный логин или пароль");
 
         // Создание токена пользователя и сохранение в базу данных
-        $token = Bearer::generate($context, $found);
-        $token_inst = new UserToken([
-            "token" => $token,
-            "date_created" => DataSource::timeInMYSQLFormat(),
-            "user_id" => $found->id
-        ]);
-        DataSource::insert($token_inst);
-
         return [
-            'token' => $token
+            'token' => $found->generateLoginToken($context)
         ];
     }
 
@@ -267,9 +346,9 @@ class MutationType extends ObjectType
 <p>Ваш код для восстановления пароля:</p>
 <pre>{$key_code}</pre>
 
-<p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/login/restore-password?code={$key_code}">ссылкой для восстановления</a>.</p>
 HTML;
-
+//        <p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/login/restore-password?code={$key_code}">ссылкой для восстановления</a>.</p>
+//TODO реализовать переход по ссылке из письма
 
         Application::sendMail($email, "Восстановление пароля", $html);
 
@@ -349,7 +428,7 @@ HTML;
      * @throws \Exception
      */
     public function adminUploadAssociations($rootValue, $args, AppContext $context){
-        $context->viewer->hasAccessOrError(1);
+        $context->viewer->hasAccessOrError(1); //TODO: adminUploadAssociations action_id в константу
         $file = $context->getFileOrError("file0"); //TODO: биндинг файла через graphql
 
         if(!$file->isUTF8())
@@ -447,7 +526,7 @@ HTML;
      * @throws \Exception
      */
     public function adminUploadTeachersList($rootValue, $args, AppContext $context){
-        $context->viewer->hasAccessOrError(2);
+        $context->viewer->hasAccessOrError(2); //TODO: adminUploadTeachersList action_id в константу
         $file = $context->getFileOrError("file0"); //TODO: биндинг файла через graphql
 
         if(!$file->isUTF8())

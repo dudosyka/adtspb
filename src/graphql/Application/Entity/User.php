@@ -1,9 +1,12 @@
 <?php
 namespace GraphQL\Application\Entity;
 
+use GraphQL\Application\AppContext;
+use GraphQL\Application\Bearer;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Server\RequestError;
 use GraphQL\Utils\Utils;
+use Lcobucci\JWT\Token;
 
 /**
  * Class User
@@ -16,6 +19,9 @@ use GraphQL\Utils\Utils;
 
 class User extends EntityBase
 {
+    const EMAIL_PENDING = "ожидание";
+    const EMAIL_VALIDATED = "подтвержден";
+
     public $password;
     public $surname;
     public $name;
@@ -92,12 +98,9 @@ class User extends EntityBase
      * @return bool
      */
     public function isAuthorized(){
-        return isset($this->id) && $this->id != 0;
+        return isset($this->id) && $this->id != 0 && $this->status_email == User::EMAIL_VALIDATED;
     }
 
-    /*
-     * //TODO реализовать проверку на доступ к правам (https://habr.com/ru/post/51327/)
-     * */
 
     /**
      * Проверка на доступ к функции
@@ -182,6 +185,24 @@ class User extends EntityBase
 
         $s = preg_replace("/[^0-9a-z-_ ]/i", "", $s); // очищаем строку от недопустимых символов
         return $s; // возвращаем результат
+    }
+
+    /**
+     * Генерация токена для входа. Используется при авторизации пользователя, ...
+     *
+     * @param AppContext $context
+     * @return Token
+     * @throws RequestError
+     */
+    public function generateLoginToken(AppContext $context){
+        $token = Bearer::generate($context, $this);
+        $token_inst = new UserToken([
+            "token" => $token,
+            "date_created" => DataSource::timeInMYSQLFormat(),
+            "user_id" => $this->id
+        ]);
+        DataSource::insert($token_inst);
+        return $token;
     }
 
 }

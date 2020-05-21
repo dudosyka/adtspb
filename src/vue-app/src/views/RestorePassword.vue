@@ -157,17 +157,21 @@
 
 </template>
 
+<!-- TODO реализовать переход к нужному шагу через ссылки -->
+
 <script>
     import CenteredCaption from "../components/CenteredCaption";
     import FacebookButton from "../components/social/FacebookButton";
     import GoogleButton from "../components/social/GoogleButton";
+    import { GoodWizard } from 'vue-good-wizard';
 
     export default {
         name: "RestorePassword.vue",
         components: {
             FacebookButton,
             CenteredCaption,
-            GoogleButton
+            GoogleButton,
+            'vue-good-wizard': GoodWizard,
         },
         data(){
             return {
@@ -175,6 +179,7 @@
                 username: "",
                 key_code: "",
 
+                // TODO: оптимизироватьсделать один массив ошибок на все уведомления с ошибками
                 using_account_graphql_errors: [],
                 incorrect_restore_code: null,
                 restore_graphql_errors: [],
