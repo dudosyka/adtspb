@@ -22,6 +22,11 @@ class User extends EntityBase
     const EMAIL_PENDING = "ожидание";
     const EMAIL_VALIDATED = "подтвержден";
 
+    const PARENT = 2;
+    const CHILD = 6;
+    const TEACHER = 7;
+
+    public $login;
     public $password;
     public $surname;
     public $name;
@@ -33,7 +38,7 @@ class User extends EntityBase
     public $residence_address;
     public $job_position;
     public $job_place;
-    public $relationship_id;
+    public $relationship;
     public $study_place;
     public $study_class;
     public $date_registered;
@@ -164,7 +169,9 @@ class User extends EntityBase
      * @return string
      */
     public static function serializeNickname(string $surname, string $name, string $midname, int $id): string{
-        $s = $surname . mb_substr($name, 0, 1) . mb_substr($midname, 0, 1) . $id;
+        $s = $surname . mb_substr($name, 0, 1) . mb_substr($midname, 0, 1);
+        if($id > 1) $s .= $id;
+
         $s = str_replace(["\n", "\r"], " ", $s); // убираем перевод каретки
         $s = preg_replace("/\s+/", ' ', $s); // удаляем повторяющие пробелы
         $s = trim($s); // убираем пробелы в начале и конце строки

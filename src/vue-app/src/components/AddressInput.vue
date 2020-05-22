@@ -2,8 +2,8 @@
 <!--    <b-form-input class="select icon" :id="id"></b-form-input>-->
 
     <!-- TODO: отобразить значок выпадающего списка -->
-    <!-- TODO: реализовать передачу аргументов на компонент (скопировать и вставить содержимое компонента в этот модуль) -->
     <vue-bootstrap-typeahead
+        ref="field"
         v-bind="$attrs"
         class="autofill-container"
         :data="addresses"
@@ -19,7 +19,7 @@
 
     <!--        :input.required="is_required"-->
 <!--    {{is_required}}-->
-    <!-- TODO: полная поддержка v-model (на перезапись значения) -->
+    <!-- TODO: вводить значение при старте компонента -->
 
 </template>
 
@@ -100,7 +100,12 @@
         },
 
         watch: {
-            addressSearch: _.debounce(function(addr) { this.getAddresses(addr) }, 500)
+            addressSearch: _.debounce(function(addr) {
+                this.getAddresses(addr)
+            }, 500),
+            value: function(addr){
+                this.$refs.field.inputValue = addr;
+            }
         }
     }
 </script>

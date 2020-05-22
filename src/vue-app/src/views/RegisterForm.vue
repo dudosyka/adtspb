@@ -83,7 +83,7 @@
                                     style="width: 100%;"
 
                                     name="Отчество"
-                                    :rules="{ required: true }"
+                                    :rules="{ required: false }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -343,7 +343,8 @@
                     <p>На Ваш e-mail, указанный при регистрации, был отправлен код подтверждения. Введите его в поле ниже.</p>
                     <p>Письмо может доставляться в течение 5 минут.<br>Если письмо не пришло, проверьте папку "Спам".</p>
 
-                    <b-alert :show="step1_back_notification" dismissible variant="warning">
+                    <!-- dismissible -->
+                    <b-alert :show="step1_back_notification" variant="warning">
                         Пожалуйста, введите код подтверждения.
                     </b-alert>
 
@@ -378,7 +379,8 @@
                         <h3 class="form-title" id="children_add">Добавление детей</h3>
                     </div>
 
-                    <b-alert :show="step2_back_notification" dismissible variant="warning">
+                    <!-- dismissible -->
+                    <b-alert :show="step2_back_notification" variant="warning" id="back_to_code_warning">
                         Дополнительных действий по изменению регистрационных данных или кода подтверждения не требуется.
                     </b-alert>
 
@@ -415,6 +417,12 @@
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-relationship-feedback'"
                                         ></b-form-input>
+
+                                        <div>
+                                            <b-link @click="item.relationship = 'Родитель'">Родитель</b-link>,
+                                            <b-link @click="item.relationship = 'Законный представитель'">законный представитель</b-link>
+                                        </div>
+
                                         <b-form-invalid-feedback :id="'cld-'+index+'-relationship-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
@@ -460,7 +468,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true }"
+                                    :rules="{ required: false }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -470,9 +478,9 @@
                                             placeholder="Отчество"
 
                                             :state="getValidationState(validationContext)"
-                                            :aria-describedby="midname-feedback"
+                                            :aria-describedby="'cld-'+index+'-midname-feedback'"
                                         ></b-form-input>
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-surname-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-midname-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -580,12 +588,32 @@
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    :rules="{ required: true, date: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            class="icon"
+                                            v-model="item.birthday"
+                                            placeholder="Дата рождения"
+
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-birthday-birthday'"
+                                        ></b-form-input>
+
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-birthday-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
                                     :rules="{ required: true }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
                                         <b-form-input
-                                            class="icon building"
+                                            class="icon"
                                             v-model="item.study_place"
                                             placeholder="Место учебы"
 
@@ -599,19 +627,19 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true }"
+                                    :rules="{ required: true, max: 10 }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
                                         <b-form-input
-                                            class="icon briefcase-fill"
-                                            v-model="item.job_position"
+                                            class="icon"
+                                            v-model="item.study_class"
                                             placeholder="Класс"
 
                                             :state="getValidationState(validationContext)"
-                                            :aria-describedby="'cld-'+index+'-job_position-feedback'"
+                                            :aria-describedby="'cld-'+index+'-study_class-feedback'"
                                         ></b-form-input>
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-job_position-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-study_class-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -625,8 +653,15 @@
                                     <b-form-group>
                                         <AddressInput
                                             v-model="item.registration_address"
-                                            placeholder="Адрес регистрации" />
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-job_position-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                            placeholder="Адрес регистрации"
+
+                                            :aria-describedby="'cld-'+index+'-registration_address-feedback'"
+                                        />
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <div>
+                                            <b-link @click="getRegistrationAddressAsParentToChild(index)">Как у родителя</b-link>
+                                        </div>
+
                                     </b-form-group>
                                 </validation-provider>
 
@@ -644,12 +679,19 @@
 
                                             :aria-describedby="'cld-'+index+'-residence_address-feedback'" />
                                         <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <div>
+                                            <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>
+                                        </div>
                                     </b-form-group>
                                 </validation-provider>
                             </div>
 
-                            <a href="#" @click="children.push(child_prototype)">Добавить ребенка</a>
+                            <hr style="width: 100%;">
 
+                            <div>
+                                <b-link @click="children.push({...child_prototype})">Добавить ребенка</b-link>,
+                                <b-link @click="(children.length > 1) ? children.splice(-1,1) : false">удалить последнюю форму</b-link>
+                            </div>
 
 
 
@@ -772,7 +814,7 @@
                 // Шаг 3
                 child_prototype: child_prototype,
                 children: [
-                    child_prototype
+                    {... child_prototype}
                 ],
 
 
@@ -820,6 +862,10 @@
         methods: {
 
             nextClicked(currentPage) {
+
+                if(this.is_sending_request)
+                    return false;
+
                 if (currentPage == 0) {
                     this.submitAccountRegistration();
                     return false;
@@ -830,16 +876,36 @@
                     return false;
                 }
 
+                if(currentPage == 2){
+                    this.addChildren();
+                    return false;
+                }
+
                 return true;
             },
 
             backClicked(currentPage) {
 
-                if(currentPage == 1)
-                    this.step1_back_notification = true;
+                this.step1_back_notification = false;
+                this.step2_back_notification = false;
 
-                if(currentPage == 2)
+                if(currentPage == 1){
+                    const _this = this;
+                    this.step1_back_notification = true;
+                    this.$nextTick(function(){
+                        _this.$scrollTo("#incorrect_code_message");
+                    });
+                }
+
+
+                if(currentPage == 2){
+                    const _this = this;
                     this.step2_back_notification = true;
+                    this.$nextTick(function(){
+                        _this.$scrollTo("#back_to_code_warning");
+                    });
+                }
+
 
                 // if(currentPage >= 3)
                 //     return true; // Можем вернуться назад
@@ -852,52 +918,136 @@
                 return dirty || validated ? valid : null;
             },
 
-            /* Шаг 3 */
-            async addChildren(){
-                const isValid = await this.$refs.key_code.validate();
-                if(!isValid.valid) return false;
 
 
-                let request = `mutation(`;
-                /*
-                    mutation(
-                        $email: Email!,
-                        $key_code: String!
-                    ) {
-                        validateRegistration (
-                            email: $email,
-                            key_code: $key_code
-                        )
+            async getRegistrationAddressAsParentToChild(child_id){
+                if(this.registration_address != null){
+                    this.children[child_id].registration_address = this.registration_address;
+                    return;
+                }
+
+                // this.registration_address = "";
+
+                const request = `
+                    query {
+                        viewer {
+                            registration_address
+                        }
                     }
                 `;
-                 */
 
-                request += "";
+                let response = await this.$graphql_client.request(request, {});
+                this.children[child_id].registration_address = response.viewer.registration_address;
+                this.registration_address = response.viewer.registration_address;
+            },
+
+            async getResidenceAddressAsParentToChild(child_id){
+                if(this.residence_address != null){
+                    this.children[child_id].residence_address = this.residence_address;
+                    return;
+                }
+
+                // this.residence_address = "";
+
+                const request = `
+                    query {
+                        viewer {
+                            residence_address
+                        }
+                    }
+                `;
+
+                let response = await this.$graphql_client.request(request, {});
+                this.children[child_id].residence_address = response.viewer.residence_address;
+                this.residence_address = response.viewer.residence_address;
+            },
 
 
 
-                const data = {
-                    email:                  this.email,
-                    key_code:               this.key_code
-                };
+
+            /* Шаг 3 */
+            async addChildren(){
+                const isValid = await this.$refs.children_observer.validate();
+                if(!isValid) return false;
+
+
+                // TODO: оптимизировать отправку нескольких детей
+
+                let variables = ``;
+                let requests = ``;
+                let data = {};
+
+                for(let i in this.children){
+                    let current = this.children[i];
+
+                    variables =
+                        `$relationship`+i+`: String!,`+
+                        `$name`+i+`: String!,`+
+                        `$surname`+i+`: String!,`+
+                        `$midname`+i+`: String,`+
+                        `$sex`+i+`: Sex!,`+
+                        `$residence_address`+i+`: String!,`+
+                        `$study_place`+i+`: String!,`+
+                        `$study_class`+i+`: String!,`+
+                        `$birthday`+i+`: Date!,`+
+                        `$registration_address`+i+`: String!,`+
+                        `$email`+i+`: Email,`+
+                        `$phone_number`+i+`: PhoneNumber,`+
+                        `$password`+i+`: Password!`;
+
+                    requests += `registerChild (`+
+                            `relationship: $relationship`+i+`,`+
+                            `name: $name`+i+`,`+
+                            `surname: $surname`+i+`,`+
+                            `midname: $midname`+i+`,`+
+                            `sex: $sex`+i+`,`+
+                            `residence_address: $residence_address`+i+`,`+
+                            `study_place: $study_place`+i+`,`+
+                            `study_class: $study_class`+i+`,`+
+                            `birthday: $birthday`+i+`,`+
+                            `registration_address: $registration_address`+i+`,`+
+                            `email: $email`+i+`,`+
+                            `phone_number: $phone_number`+i+`,`+
+                            `password: $password`+i+`,`+
+                        `)`;
+
+                    data["relationship"+i] = current["relationship"];
+                    data["name"+i] = current["name"];
+                    data["surname"+i] = current["surname"];
+                    data["midname"+i] = current["midname"];
+                    data["sex"+i] = current["sex_options_selected"];
+                    data["residence_address"+i] = current["residence_address"];
+                    data["study_place"+i] = current["study_place"];
+                    data["study_class"+i] = current["study_class"];
+                    data["birthday"+i] = current["birthday"];
+                    data["registration_address"+i] = current["registration_address"];
+                    data["email"+i] = (current["email"] == "") ? null : current["email"];
+                    data["phone_number"+i] = (current["phone_number"] == "") ? null : current["phone_number"];
+                    data["password"+i] = current["password"];
+
+                }
+                let request = `mutation(` + variables + "){" + requests + "}";
+
+                // console.log(variables);
+                // console.log(requests);
+                // console.log(request);
+                // console.log(data);
+
 
                 this.is_sending_request = true;
                 this.incorrect_code = true;
 
                 const _component = this;
 
-                this.$request(this.$request_endpoint, request, data).then(function(data){
+                this.$graphql_client.request(request, data).then(function(data){
                     _component.is_sending_request = false;
-                    _component.$token = data.validateRegistration;
                     _component.$refs.wizard.currentStep++;
                 }).catch(function(e){
                     _component.is_sending_request = false;
-                    // let errors = e.response.errors;
-
-                    _component.incorrect_code = true;
+                    _component.graphql_errors = e.response.errors;
 
                     _component.$nextTick(function(){
-                        _component.$scrollTo("#incorrect_code_message");
+                        _component.$scrollTo("#children_add");
                     });
 
                 });
@@ -957,7 +1107,7 @@
                     mutation(
                         $name: String!,
                         $surname: String!,
-                        $midname: String!,
+                        $midname: String,
                         $email: Email!,
                         $password: Password!,
                         $phone_number: PhoneNumber!,

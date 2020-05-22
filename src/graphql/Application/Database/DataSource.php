@@ -2,9 +2,11 @@
 namespace GraphQL\Application\Database;
 
 use Error;
+use GraphQL\Application\AppContext;
 use GraphQL\Application\ConfigManager;
 use GraphQL\Application\Entity\EntityBase;
 use GraphQL\Application\Entity\User;
+use GraphQL\Application\Entity\UserChild;
 use GraphQL\Application\Entity\UserRole;
 use GraphQL\Server\RequestError;
 use PDO;
@@ -331,23 +333,27 @@ class DataSource
      * @return bool
      * @throws RequestError
      */
-    public static function registerUser(User $user, int $role_id = 1){
+    public static function registerUser(User $user, AppContext $context, int $role_id = 1){
         // TODO: регистрация прав пользователя (для разных типов пользователей: родитель, ребенок, учитель, супермодератор, ...)
 
         // Генерируем ID пользователя, ищем, сколько таких же пользователей с одинаковыми ФИО
         // TODO: Проверить работоспособность!
         // TODO: сделать через цепочку mysql запросов (?)
-        $req = self::getPDO()->prepare("SELECT COUNT(id) FROM `user` WHERE surname = :sname AND name = :name AND midname = :midname");
+
+        $sql = "SELECT COUNT(id) FROM `user` WHERE surname = :sname AND name LIKE :name";
+        if(trim($user->midname) != "") $sql .= " AND midname LIKE :midname";
+
+        $req = self::getPDO()->prepare($sql);
 
         $req->bindValue("sname", $user->surname);
-        $req->bindValue("name", $user->name);
-        $req->bindValue("midname", $user->midname);
+        $req->bindValue("name", mb_substr($user->name, 0, 1)."%");
+        if(trim($user->midname) != "") $req->bindValue("midname", mb_substr($user->midname, 0, 1)."%");
 
         $isSuccessful = $req->execute();
         if(!$isSuccessful)
         {
             $arr = print_r($req->errorInfo(), true);
-            throw new Error("Не удалось совершить генерацию уникального ID нового пользователя: ".$arr);
+            throw new Error("Не удалось совершить генерацию уникального ID нового пользователя: ".$arr.", ".$sql);
         }
 
         $id = (int)$req->fetchAll()[0][0] + 1;
@@ -362,6 +368,20 @@ class DataSource
             "user_id" => $id,
             "role_id" => $role_id
         ]));
+
+
+        // Специфика регистрации пользователей разных типаов
+        switch($role_id){
+            case User::CHILD:
+
+                self::insert(new UserChild([
+                    "parent_id" => $context->viewer->id,
+                    "child_id" => $id
+                ]));
+
+                break;
+        }
+
 
         return true;
     }

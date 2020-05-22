@@ -57,7 +57,7 @@ class MutationType extends ObjectType
                     'args' => [
                         'name' => Types::nonNull(Types::string()),
                         'surname' => Types::nonNull(Types::string()),
-                        'midname' => Types::nonNull(Types::string()),
+                        'midname' => Types::string(),
                         'email' => Types::nonNull(Types::email()),
                         'password' => Types::nonNull(Types::password()),
                         'phone_number' => Types::nonNull(Types::phoneNumber()),
@@ -77,7 +77,7 @@ class MutationType extends ObjectType
                         'relationship' => Types::nonNull(Types::string()),
                         'name' => Types::nonNull(Types::string()),
                         'surname' => Types::nonNull(Types::string()),
-                        'midname' => Types::nonNull(Types::string()),
+                        'midname' => Types::string(),
                         'sex' => Types::nonNull(Types::sex()),
                         'residence_address' => Types::nonNull(Types::string()),
                         'study_place' => Types::nonNull(Types::string()),
@@ -179,16 +179,33 @@ class MutationType extends ObjectType
         //TODO: анти-DDOS регистрации
         //TODO: защита от распространенных атак
         //TODO: запрет на регистрацию кириллического пароля
-        //TODO: генерация логина
 
         $key_code = Application::generateValidationCode();
+
+        // TODO: уникальность e-mailа в базе mysql сразу там прописать
+
+        /** @var User $found */
+        $found = DataSource::findOne("User", "email = :email OR phone_number = :phone_number", [
+            ":email" => $args["email"],
+            ":phone_number" => $args["phone_number"]
+        ]);
+        if($found != null)
+            throw new RequestError("Данный e-mail или телефон уже зарегистрирован в базе. Пожалуйста, введите другой e-mail или телефон.");
+
+
+
+
+
+
+
+
 
         $email = $args['email'];
 
         $instance = new User([
             'name' => $args['name'],
             'surname' => $args['surname'],
-            'midname' => $args['midname'],
+            'midname' => $args['midname'] ?? "",
             'email' => $email,
             'password' => User::hashPassword($args['password']),
             'phone_number' => $args['phone_number'],
@@ -197,7 +214,7 @@ class MutationType extends ObjectType
             'job_place' => $args['job_place'],
             'registration_address' => $args['registration_address'],
             'residence_address' => $args['residence_address'],
-            'relationship_id' => 1, //TODO: поиск родителя из бд (исходя из настроек администратора)
+            'relationship' => "",
             'study_place' => '',
             'study_class' => '',
             'date_registered' => DataSource::timeInMYSQLFormat(),
@@ -206,7 +223,7 @@ class MutationType extends ObjectType
             "birthday" => $args["birthday"]
         ]);
 
-        DataSource::registerUser($instance, 2);
+        DataSource::registerUser($instance, $context, User::PARENT);
 
         $html = <<<HTML
 <p>Ваш код для подтверждения аккаунта:</p>
@@ -218,6 +235,66 @@ HTML;
 
 
         Application::sendMail($email, "Подтверждение аккаунта", $html);
+
+        return true;
+    }
+
+
+    /**
+     * Регистрация пользователя
+     *
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function registerChild($rootValue, $args, AppContext $context){
+
+        //TODO: проверка на уникальность пользователя(?) (ФИО, e-mail, phone_number)
+        //TODO: капча(?)
+        //TODO: анти-DDOS регистрации
+        //TODO: защита от распространенных атак
+        //TODO: запрет на регистрацию кириллического пароля
+        //TODO: генерация особенного логина для ребенка логина
+
+        $context->viewer->hasAccessOrError(4);
+
+        $email = $args['email'] ?? "";
+
+        $instance = new User([
+            'name' => $args['name'],
+            'surname' => $args['surname'],
+            'midname' => $args['midname'],
+            'email' => $email,
+            'password' => User::hashPassword($args['password']),
+            'phone_number' => $args['phone_number'] ?? "",
+            'sex' => $args['sex'],
+            'job_position' => "",
+            'job_place' => "",
+            'registration_address' => $args['registration_address'],
+            'residence_address' => $args['residence_address'],
+            'relationship' => $args['relationship'],
+            'study_place' => $args['study_place'],
+            'study_class' => $args['study_class'], //TODO: парсер класса
+            'date_registered' => DataSource::timeInMYSQLFormat(),
+            'verification_key_email' => "",
+            'status_email' => User::EMAIL_PENDING,
+            "birthday" => $args["birthday"]
+        ]);
+
+        DataSource::registerUser($instance, $context, User::CHILD);
+
+        /*
+        $html = <<<HTML
+<p>Ваш код для подтверждения аккаунта:</p>
+<pre>{$key_code}</pre>
+HTML;
+//        <p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/register/form?code={$key_code}&email={$email}">ссылкой для восстановления</a>.</p>
+*/
+
+
+//        Application::sendMail($email, "Подтверждение аккаунта", $html);
 
         return true;
     }
@@ -431,6 +508,9 @@ HTML;
         $context->viewer->hasAccessOrError(1); //TODO: adminUploadAssociations action_id в константу
         $file = $context->getFileOrError("file0"); //TODO: биндинг файла через graphql
 
+        throw new RequestError("TODO");
+
+        /*
         if(!$file->isUTF8())
             throw new RequestError("Неверная кодировка файла: файл должен иметь кодировку UTF-8.");
 
@@ -510,6 +590,7 @@ HTML;
                 DataSource::insert($group);
             }
         });
+        */
 
         return true;
     }
@@ -534,7 +615,7 @@ HTML;
 
         $registered = [];
 
-        CSVFileHandler::scanFileByRow($file, function($line_index, $data) use(&$registered){
+        CSVFileHandler::scanFileByRow($file, function($line_index, $data) use(&$registered, &$context){
 
             // Игнорируем пустые линии
             if(count($data) <= 1 && trim($data[0]) == "") return; //TODO: игнорирование пустых строк в классе обработчика CSV?
@@ -561,7 +642,7 @@ HTML;
             $instance = new User([
                 'name' => $name,
                 'surname' => $surname,
-                'midname' => $midname,
+                'midname' => $midname ?? "",
                 'email' => $data[2],
                 'password' => User::hashPassword($password),
                 'phone_number' => "", // TODO: регистрация номера телефона у педагога
@@ -570,14 +651,14 @@ HTML;
                 'job_place' => "", // TODO: регистрация места работы у педагога
                 'registration_address' => "", // TODO: регистрация адреса регистрации у педагога
                 'residence_address' => "", // TODO: регистрация адреса проживания у педагога
-                'relationship_id' => 1, // TODO: регистрация роли у педагога
+                'relationship' => "", // TODO: регистрация роли у педагога
                 'study_place' => '',
                 'study_class' => '',
                 'date_registered' => DataSource::timeInMYSQLFormat(),
                 'status_email' => 'подтвержден'
             ]);
 
-            DataSource::registerUser($instance);
+            DataSource::registerUser($instance, $context, User::TEACHER);
 
             $registered[] = "Педагог {$name} {$surname} {$midname} зарегистрирован. Пароль: {$password}";
         });
