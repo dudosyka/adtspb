@@ -19,11 +19,12 @@
                 <exclude name="composer.json" />
                 <exclude name="composer.lock" />
                 <exclude name="config.example.json" />
+                <exclude name="public_html/explorer.html" />
             </fileset>
         </copy>
 
-<!--        <echo>Applying file permissions of ${dist_dir}</echo>-->
-<!--        <exec command="chown -R www-data:www-data ${dist_dir}" escape="false"  passthru="true" />-->
+        <echo>Applying file permissions of ${dist_dir}</echo>
+        <exec command="chown -R www-data:www-data ${dist_dir}" escape="false"  passthru="true" />
 
     </target>
 
