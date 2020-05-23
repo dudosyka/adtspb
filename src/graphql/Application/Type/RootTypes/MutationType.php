@@ -7,6 +7,7 @@ use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\Association;
 use GraphQL\Application\Entity\PasswordRestore;
+use GraphQL\Application\Entity\Proposal;
 use GraphQL\Application\Entity\Upload;
 use GraphQL\Application\Entity\User;
 use GraphQL\Application\Entity\UserToken;
@@ -71,7 +72,7 @@ class MutationType extends ObjectType
                 ],
 
                 'registerChild' => [
-                    'type' => Types::boolean(),
+                    'type' => Types::id(),
                     'description' => 'Зарегистрировать ребенка (от родителя)',
                     'args' => [
                         'relationship' => Types::nonNull(Types::string()),
@@ -87,6 +88,15 @@ class MutationType extends ObjectType
                         'email' => Types::email(),
                         'phone_number' => Types::phoneNumber(),
                         'password' => Types::nonNull(Types::password())
+                    ]
+                ],
+
+                'selectChildAssociations' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Выбрать ассоциацию ребенка',
+                    'args' => [
+                        'association_id' => Types::nonNull(Types::int()),
+                        'child_id' => Types::nonNull(Types::int())
                     ]
                 ],
 
@@ -283,7 +293,7 @@ HTML;
             "birthday" => $args["birthday"]
         ]);
 
-        DataSource::registerUser($instance, $context, User::CHILD);
+        $id = DataSource::registerUser($instance, $context, User::CHILD);
 
         /*
         $html = <<<HTML
@@ -295,6 +305,55 @@ HTML;
 
 
 //        Application::sendMail($email, "Подтверждение аккаунта", $html);
+
+        return $id;
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @throws RequestError
+     */
+    public function selectChildAssociations($rootValue, $args, AppContext $context){
+        // Есть ли доступ
+        $context->viewer->hasAccessOrError(7);
+
+        // Есть ли такая ассоциация
+        $findAssoc = DataSource::find("Association", $args["association_id"]);
+        if($findAssoc == null)
+            throw new RequestError("Объединение не найдено!");
+
+        // Есть ли такой ребенок у такого родителя
+        $findChild = DataSource::findOne("UserChild", "parent_id = :parent_id AND child_id = :child_id", [
+            "parent_id" => $context->viewer->id,
+            "child_id" => $args["child_id"]
+        ]);
+        if($findChild == null)
+            throw new RequestError("Неверно задан id ребенка");
+
+        // Было ли уже подано заявление
+        $findProposal = DataSource::findOne("Proposal", "parent_id = :parent_id AND child_id = :child_id AND association_id = :association_id", [
+            "parent_id" => $context->viewer->id,
+            "child_id" => $args["child_id"],
+            "association_id" => $args["association_id"]
+        ]);
+        if($findProposal != null)
+            throw new RequestError("Заявление уже подано");
+
+
+
+
+
+        DataSource::insert(new Proposal([
+            "timestamp" => DataSource::timeInMYSQLFormat(),
+            'child_id' => $args["child_id"],
+            'parent_id' => $context->viewer->id,
+            'association_id' => $args["association_id"],
+            'status_admin_id' => 1, //TODO: константы статусов ожидания запроса?
+            'status_parent_id' => 4, //TODO: константы статусов ожидания запроса?
+            'status_teacher_id' => 1 //TODO: константы статусов ожидания запроса?
+        ]));
 
         return true;
     }

@@ -1,6 +1,8 @@
 <?php
 namespace GraphQL\Application\Entity;
 
+use DateTime;
+use DateTimeZone;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Bearer;
 use GraphQL\Application\Database\DataSource;
@@ -210,6 +212,23 @@ class User extends EntityBase
         ]);
         DataSource::insert($token_inst);
         return $token;
+    }
+
+    /**
+     *
+     * @throws \Exception
+     */
+    public function getAge(){
+
+        if($this->birthday == null)
+            return 0;
+
+        $tz  = new DateTimeZone('Europe/Moscow');
+        $age = DateTime::createFromFormat('Y-m-d', $this->birthday, $tz)
+            ->diff(new DateTime('now', $tz))
+            ->y;
+
+        return $age;
     }
 
 }

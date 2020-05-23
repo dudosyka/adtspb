@@ -340,24 +340,24 @@ class DataSource
         // TODO: Проверить работоспособность!
         // TODO: сделать через цепочку mysql запросов (?)
 
+        if(!isset($user->midname) || $user->midname == null) $user->midname = "";
+
         $sql = "SELECT COUNT(id) FROM `user` WHERE surname = :sname AND name LIKE :name";
-        if(trim($user->midname) != "") $sql .= " AND midname LIKE :midname";
+        if($user->midname != "") $sql .= " AND midname LIKE :midname";
 
         $req = self::getPDO()->prepare($sql);
 
         $req->bindValue("sname", $user->surname);
         $req->bindValue("name", mb_substr($user->name, 0, 1)."%");
-        if(trim($user->midname) != "") $req->bindValue("midname", mb_substr($user->midname, 0, 1)."%");
+        if($user->midname != "") $req->bindValue("midname", mb_substr($user->midname, 0, 1)."%");
 
         $isSuccessful = $req->execute();
-        if(!$isSuccessful)
-        {
+        if(!$isSuccessful) {
             $arr = print_r($req->errorInfo(), true);
             throw new Error("Не удалось совершить генерацию уникального ID нового пользователя: ".$arr.", ".$sql);
         }
 
         $id = (int)$req->fetchAll()[0][0] + 1;
-
         $user->login = User::serializeNickname($user->surname, $user->name, $user->midname, $id);
 
         // TODO: сделать цепочку запросов (отправлять всё сразу, а не отдельно)
@@ -383,7 +383,7 @@ class DataSource
         }
 
 
-        return true;
+        return $id;
     }
 
 

@@ -4,6 +4,16 @@
 
         <vue-headful title="Вход | Личный кабинет"/>
 
+<!--        <div class="top-panel d-flex">-->
+
+<!--            <div>-->
+<!--                <router-link class="theme" to="/">-->
+<!--                    <b-button variant="dark" class="theme-alt top-panel-button selected"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>-->
+<!--                </router-link>-->
+<!--            </div>-->
+
+<!--        </div>-->
+
         <b-container class="form">
             <div>
                 <h3 class="form-title">Авторизация</h3>
@@ -186,6 +196,26 @@
     .lost-password{
         margin: 10px 0 0 0;
         font-size: 10pt;
+    }
+
+
+    /* TODO: объединить стили кнопки в одно место */
+
+    .top-panel{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        padding: 10px 5%;
+        /*pointer-events: none;*/
+    }
+
+    .top-panel-button{
+        padding: 20px 40px !important;
+        width: max-content;
+        font-size: 16pt;
+        height: 80px !important;
     }
 
 

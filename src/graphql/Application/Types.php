@@ -2,6 +2,7 @@
 namespace GraphQL\Application;
 
 use GraphQL\Application\Type\AdminMutationType;
+use GraphQL\Application\Type\AssociationType;
 use GraphQL\Application\Type\MutationType;
 use GraphQL\Application\Type\NodeType;
 use GraphQL\Application\Type\QueryType;
@@ -27,6 +28,7 @@ class Types
 {
 	/* Типы данных сущностей */
     private static $user;
+    private static $association;
 
 
     /**
@@ -37,6 +39,11 @@ class Types
     public static function user()
     {
         return self::$user ?: (self::$user = new UserType());
+    }
+
+    public static function association()
+    {
+        return self::$association ?: (self::$association = new AssociationType());
     }
 
 

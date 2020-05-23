@@ -18,6 +18,8 @@
     "bootstrap-vue": "latest",
     "core-js": "^3.6.4",
     "graphql-request": "^1.8.2",
+    "html2canvas": "^1.0.0-rc.5",
+    "jspdf": "^1.5.3",
     "lodash": "^4.17.15",
     "particles.js": "^2.0.0",
     "popper.js": "^1.16.1",

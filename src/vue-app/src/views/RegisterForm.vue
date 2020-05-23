@@ -4,6 +4,16 @@
 
         <vue-headful title="Регистрация | Личный кабинет"/>
 
+<!--        <div class="top-panel d-flex">-->
+<!---->
+<!--            <div>-->
+<!--                <router-link class="theme" to="/register">-->
+<!--                    <b-button variant="dark" class="theme-alt top-panel-button selected"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>-->
+<!--                </router-link>-->
+<!--            </div>-->
+<!---->
+<!--        </div>-->
+
         <b-container class="form">
 
             <vue-good-wizard
@@ -16,6 +26,7 @@
                 :previousStepLabel="'Назад'"
                 :finalStepLabel="'Отправить'"
             >
+                <!-- Шаг 1 -->
                 <div slot="page1">
                     <div>
                         <h3 class="form-title">Регистрация</h3>
@@ -336,6 +347,8 @@
                     </validation-observer>
 
                 </div>
+
+                <!-- Шаг 2 -->
                 <div slot="page2">
                     <div>
                         <h3 class="form-title">Подтверждение аккаунта</h3>
@@ -374,6 +387,8 @@
 
 
                 </div>
+
+                <!-- Шаг 3 -->
                 <div slot="page3">
                     <div>
                         <h3 class="form-title" id="children_add">Добавление детей</h3>
@@ -728,12 +743,82 @@
 
                 </div>
                 <div slot="page4">
-                    <h4>Step 4</h4>
-                    <p>This is step 4</p>
+                    <div>
+                        <h3 class="form-title">Выбор объединений</h3>
+                    </div>
+
+                    <div v-for="(item, index) in children" style="width: 100%;">
+
+                        <hr style="width: 100%;">
+
+                        <label class="text-center">{{item.name}} {{item.surname}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
+
+                        <b-table  :busy="associations.length <= 0" class="mt-3" outlined>
+                            <template v-slot:table-busy>
+                                <div class="text-center text-danger my-2">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>Загрузка...</strong>
+                                </div>
+                            </template>
+                        </b-table>
+
+                        <b-table
+                            :ref="'associations_child_'+index"
+                            selectable
+                            :select-mode="'multi'"
+                            :items="associations"
+                            :fields="association_list_fields"
+                            @row-selected="onRowAssociationsSelected(index, $event)"
+                            responsive="sm"
+                        >
+                            <!-- Example scoped slot for select state illustrative purposes -->
+                            <template v-slot:cell(selected)="{ rowSelected }">
+                                <template v-if="rowSelected">
+                                    <span aria-hidden="true">&check;</span>
+                                    <span class="sr-only">Выбрано</span>
+                                </template>
+                                <template v-else>
+                                    <span aria-hidden="true">&nbsp;</span>
+                                    <span class="sr-only">Не выбрано</span>
+                                </template>
+                            </template>
+                        </b-table>
+
+                    </div>
+
+
+
                 </div>
                 <div slot="page5">
-                    <h4>Step 5</h4>
-                    <p>This is step 5</p>
+                    <div>
+                        <h3 class="form-title">Заявления</h3>
+                    </div>
+
+
+
+                    <div v-for="(item, index) in children" style="width: 100%;">
+
+                        <hr style="width: 100%;">
+
+                        <label class="text-center">{{item.name}} {{item.surname}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
+
+                        <b-table
+                            :select-mode="'multi'"
+                            :items="item.associations_selected"
+                            :fields="associations_download_fields"
+                            @row-selected="onRowAssociationsSelected(index, $event)"
+                            responsive="sm"
+                        >
+                            <template v-slot:cell(status)="row">
+                                Подано
+                            </template>
+                            <template v-slot:cell(actions)="row">
+                                <b-button @click="generateForm(item, row.item.id)" size="sm" style="width: 100%;">Скачать PDF</b-button>
+                            </template>
+                        </b-table>
+
+                    </div>
+
                 </div>
             </vue-good-wizard>
 
@@ -746,12 +831,17 @@
 
 </template>
 
+
+<!-- TODO: подгрузка детей из graphql при переходе на страницу регистрации по ссылке -->
+
 <script>
     import CenteredCaption from "../components/CenteredCaption";
     import FacebookButton from "../components/social/FacebookButton";
     import GoogleButton from "../components/social/GoogleButton";
     import AddressInput from "../components/AddressInput";
     import { GoodWizard } from 'vue-good-wizard';
+    import jsPDF from 'jspdf';
+    import html2canvas from "html2canvas";
 
     export default {
         name: "RegisterForm",
@@ -766,6 +856,8 @@
 
             // Прототип данных о ребенке
             const child_prototype = {
+                id: 0,
+
                 relationship: null,
                 name: null,
                 surname: null,
@@ -780,7 +872,9 @@
                 phone_number: null,
 
                 password: null,
-                password_matching: null
+                password_matching: null,
+
+                associations_selected: []
             };
 
             return {
@@ -817,6 +911,25 @@
                     {... child_prototype}
                 ],
 
+                //Шаг 4
+                associations: [],
+                association_list_fields: [
+                    {key: 'selected', label: 'Выбрано', sortable: false},
+                    // thClass: 'd-none', tdClass: 'd-none' = для скрытия столбца
+                    {key: 'id', label: 'ID', thClass: 'd-none', tdClass: 'd-none', sortable: false},
+                    {key: 'name', label: 'Наименование', sortable: true},
+                    {key: 'min_age', label: 'Мин. возраст', sortable: true},
+                    {key: 'max_age', label: 'Макс. возраст', sortable: true},
+                    {key: 'study_hours_week', label: 'Часов в неделю', sortable: true},
+                ],
+
+                // Шаг 5
+                associations_download_fields: [
+                    {key: 'id', label: 'ID', thClass: 'd-none', tdClass: 'd-none', sortable: false},
+                    {key: 'name', label: 'Наименование', sortable: false},
+                    {key: 'status', label: 'Статус', sortable: false},
+                    {key: 'actions', label: 'Действия', sortable: false},
+                ],
 
                 // Остальное
                 is_sending_request: false,
@@ -861,6 +974,10 @@
 
         methods: {
 
+            onRowAssociationsSelected(i, items) {
+                this.children[i].associations_selected = items;
+            },
+
             nextClicked(currentPage) {
 
                 if(this.is_sending_request)
@@ -878,6 +995,12 @@
 
                 if(currentPage == 2){
                     this.addChildren();
+                    //TODO: загрузка списка доступных объединений в глобальном слушателе
+                    return false;
+                }
+
+                if(currentPage == 3){
+                    this.sendProps();
                     return false;
                 }
 
@@ -917,8 +1040,6 @@
             getValidationState({ dirty, validated, valid = null }) {
                 return dirty || validated ? valid : null;
             },
-
-
 
             async getRegistrationAddressAsParentToChild(child_id){
                 if(this.registration_address != null){
@@ -962,8 +1083,101 @@
                 this.residence_address = response.viewer.residence_address;
             },
 
+            async loadAssociations(){
+                // TODO: оптимизировать выгрузку списка доступных объединений
 
 
+                let request = `
+                    query {
+                        associations {
+                            id,
+                            name,
+                            min_age,
+                            max_age,
+                            study_hours_week
+                        }
+                    }
+                `;
+
+                const _this = this;
+
+                this.is_sending_request = true;
+
+                this.$graphql_client.request(request, {}).then(function(data){
+                    _this.is_sending_request = false;
+                    _this.associations = data.associations;
+                }).catch(function(e){
+                    _this.is_sending_request = false;
+                });
+            },
+
+            generateForm(child, association_id){
+                const _this = this;
+
+                //TODO: фетчинг не graphql файла через что-то цивильное?
+
+                fetch(this.$request_endpoint+"?__module=ProposalGenerate&child_id="+child.id+"&association_id="+association_id, {
+                    method: 'GET',
+                    headers: new Headers({
+                        "Authorization": "Bearer " + this.$token
+                    })
+                })
+                    .then(response => response.blob())
+                    .then(blob => {
+                        let url = window.URL.createObjectURL(blob);
+                        let a = document.createElement('a');
+                        a.href = url;
+                        // a.download = "Заявление "++"("+child.name+" "+child.surname+").pdf";
+                        a.download = "Заявление.pdf";
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    });
+
+            },
+
+
+
+
+
+
+            /* Шаг 4 */
+            sendProps(){
+                // TODO: оптимизировать отправку нескольких детей
+
+                let requests = ``;
+
+                for(let i in this.children){
+                    let current = this.children[i];
+
+                    for(let i2 in current.associations_selected){
+                        let current2 = current.associations_selected[i2];
+
+                        requests += `child`+i+`_assoc`+current2.id+`: selectChildAssociations (`+
+                            `child_id: `+current["id"]+`,`+
+                            `association_id: `+current2.id+``+
+                            `),`;
+                    }
+
+                }
+                let request = 'mutation{' + requests + "}";
+
+                this.is_sending_request = true;
+                const _component = this;
+
+                this.$graphql_client.request(request, {}).then(function(data){
+                    _component.is_sending_request = false;
+                    _component.$refs.wizard.currentStep++;
+                }).catch(function(e){
+                    _component.is_sending_request = false;
+                    _component.graphql_errors = e.response.errors;
+
+                    _component.$nextTick(function(){
+                        _component.$scrollTo("#children_add");
+                    });
+
+                });
+            },
 
             /* Шаг 3 */
             async addChildren(){
@@ -980,7 +1194,7 @@
                 for(let i in this.children){
                     let current = this.children[i];
 
-                    variables =
+                    variables +=
                         `$relationship`+i+`: String!,`+
                         `$name`+i+`: String!,`+
                         `$surname`+i+`: String!,`+
@@ -993,9 +1207,9 @@
                         `$registration_address`+i+`: String!,`+
                         `$email`+i+`: Email,`+
                         `$phone_number`+i+`: PhoneNumber,`+
-                        `$password`+i+`: Password!`;
+                        `$password`+i+`: Password!,`;
 
-                    requests += `registerChild (`+
+                    requests += `child`+i+`: registerChild (`+
                             `relationship: $relationship`+i+`,`+
                             `name: $name`+i+`,`+
                             `surname: $surname`+i+`,`+
@@ -1035,13 +1249,20 @@
 
 
                 this.is_sending_request = true;
-                this.incorrect_code = true;
 
                 const _component = this;
 
                 this.$graphql_client.request(request, data).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
+
+                    let incr = 0;
+                    for(let i in data){
+                        _component.children[incr].id = parseInt(data[i], 10);
+                        incr++;
+                    }
+
+                    _component.loadAssociations();
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
@@ -1195,6 +1416,25 @@
     .lost-password{
         margin: 10px 0 0 0;
         font-size: 10pt;
+    }
+
+    /* TODO: объединить стили кнопки в одно место */
+
+    .top-panel{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        padding: 10px 5%;
+        /*pointer-events: none;*/
+    }
+
+    .top-panel-button{
+        padding: 20px 40px !important;
+        width: max-content;
+        font-size: 16pt;
+        height: 80px !important;
     }
 
 </style>

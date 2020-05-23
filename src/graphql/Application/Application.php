@@ -7,6 +7,7 @@ use Exception;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\ConfigManager;
 use GraphQL\Application\Entity\User;
+use GraphQL\Application\Modules\Module;
 use \GraphQL\Application\Types;
 use \GraphQL\Application\Database\DataSource;
 use GraphQL\Server\RequestError;
@@ -21,6 +22,15 @@ class Application
     private $debug = false;
     private array $applicationHeaders = [];
 
+    private array $modules = [];
+
+    private function moduleExists(string $name){
+        return in_array($name, $this->modules);
+    }
+
+    private function registerModule($public_name){
+        $this->modules[] = $public_name;
+    }
 
     /**
      * Инициализация запроса
@@ -56,6 +66,18 @@ class Application
                 }
             }
         }
+
+        // Модули (отдельно)
+
+        foreach(scandir(__DIR__ . '/Modules/') as $key => $file){
+            if ($file != '.' && $file != '..' && !is_dir(__DIR__ . '/' . $value . '/' . $file)) {
+                require_once __DIR__ . '/Modules/' . $file;
+                $public_name = str_replace("Module.php", "", $file);
+                $this->registerModule($public_name);
+            }
+
+        }
+
     }
 
     /**
@@ -106,10 +128,25 @@ class Application
      * @throws \Throwable
      */
     private function handleRequest(){
+
         try {
             $this->echoHeaders();
 
             $appContext = $this->generateAppContext();
+
+            // Модули
+            if(isset($_GET["__module"]) && $this->moduleExists($_GET["__module"])){
+                $module = $_GET["__module"];
+
+                $module_name = "GraphQL\\Application\\Modules\\".$module."Module";
+
+                /** @var Module $module */
+                $module = new $module_name($appContext);
+                $module->result($appContext);
+
+                return;
+            }
+
             $data = $this->parseData();
 
             // Генерация GraphQL-схемы

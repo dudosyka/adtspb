@@ -2,8 +2,10 @@
 namespace GraphQL\Application\Type;
 
 use GraphQL\Application\AppContext;
-use GraphQL\Application\Data\User;
 use GraphQL\Application\Database\DataSource;
+use GraphQL\Application\Entity\Association;
+use GraphQL\Application\Entity\User;
+use GraphQL\Application\Entity\UserChild;
 use GraphQL\Application\Types;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ObjectType;
@@ -39,6 +41,27 @@ class QueryType extends ObjectType
                 'viewer' => [
                     'type' => Types::user(),
                     'description' => 'Текущий (локальный) пользователь.'
+                ],
+                'association' => [
+                    'type' => Types::association(),
+                    'description' => 'Вывод информации об объединении',
+                    'args' => [
+                        'id' => Types::nonNull(Types::id())
+                    ]
+                ],
+                'associations' => [
+                    'type' => Types::listOf(Types::association()),
+                    'description' => 'Вывод всех доступных объединений',
+                    'args' => [
+                        'min_age' => Types::int()
+                    ]
+                ],
+                'associationsForChild' => [
+                    'type' => Types::listOf(Types::association()),
+                    'description' => 'Вывод всех доступных объединений для конкретного ребенка',
+                    'args' => [
+                        'child_id' => Types::int()
+                    ]
                 ],
 
 //                'hello' => Type::string()
@@ -86,6 +109,82 @@ class QueryType extends ObjectType
         }
 
         return $context->viewer;
+    }
+
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return Association|null
+     * @throws RequestError
+     */
+    public function association($rootValue, $args, AppContext $context){
+        $context->viewer->hasAccessOrError(5);
+        return DataSource::find('Association', $args['id']);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return array
+     * @throws RequestError
+     */
+    public function associations($rootValue, $args, AppContext $context){
+        // TODO: ограничение по списку ассоциаций?
+        $context->viewer->hasAccessOrError(5);
+
+        if(!isset($args["min_age"]) and !isset($args["max_age"]))
+            return DataSource::findAll('Association', '1');
+
+        if(!isset($args["min_age"]))
+            throw new RequestError("Параметр min_age должен быть задан.");
+
+//        if(!isset($args["max_age"]))
+//            throw new RequestError("Параметр max_age должен быть задан.");
+
+//        $args["max_age"] = (int)$args["max_age"];
+        $args["min_age"] = (int)$args["min_age"];
+
+        // || $args["max_age"] < 0 || $args["max_age"] >= 1000 || $args["max_age"] < $args["min_age"]
+        if ($args["min_age"] < 0 || $args["min_age"] >= 1000)
+            throw new RequestError("Неверно задан параметр min_age"); //max_age или
+
+
+        return DataSource::findAll('Association', 'min_age >= :min_age', [ //AND max_age <= :max_age
+            ":min_age" => $args["min_age"],
+//            ":max_age" => $args["max_age"]
+        ]);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return array
+     * @throws RequestError
+     * @throws \Exception
+     */
+    public function associationsForChild($rootValue, $args, AppContext $context) {
+//        $context->viewer->hasAccessOrError(5);
+
+
+        /** @var UserChild $info */
+        $info = DataSource::findOne("UserChild", "child_id = :child_id", [
+            ":child_id" => $args["child_id"]
+        ]);
+
+//        if($info == null || $info->parent_id != $context->viewer->id)
+//            throw new RequestError("Ошибка");
+
+        /** @var User $user */
+        $user = DataSource::find("User", $args["child_id"]);
+
+        $pass = [];
+        $pass["min_age"] = $user->getAge();
+
+        return $this->associations($rootValue, $pass, $context);
     }
 
 
