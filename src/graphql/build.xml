@@ -22,6 +22,9 @@
             </fileset>
         </copy>
 
+<!--        <echo>Applying file permissions of ${dist_dir}</echo>-->
+<!--        <exec command="chown -R www-data:www-data ${dist_dir}" escape="false"  passthru="true" />-->
+
     </target>
 
 </project>
