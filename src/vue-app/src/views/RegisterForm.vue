@@ -24,7 +24,7 @@
 
                 :nextStepLabel="'Далее'"
                 :previousStepLabel="'Назад'"
-                :finalStepLabel="'Отправить'"
+                :finalStepLabel="'Завершить'"
             >
                 <!-- Шаг 1 -->
                 <div slot="page1">
@@ -276,18 +276,24 @@
                                 </validation-provider>
 
                                 <!-- TODO проверка валидации у адресов -->
-                                <!-- :rules="{ required: true }" -->
+                                <!--  -->
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    :rules="{ required: true }"
                                     name="Адрес регистрации"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
                                         <AddressInput
                                             v-model="registration_address"
-                                            placeholder="Адрес регистрации" />
-                                        <b-form-invalid-feedback id="registration_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                            placeholder="Адрес регистрации"
+
+                                            :state="getValidationState(validationContext)"
+                                            aria-describedby="registration_address-feedback"
+                                        />
+
+<!--                                        <b-form-invalid-feedback id="registration_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
                                     </b-form-group>
                                 </validation-provider>
 
@@ -296,7 +302,7 @@
                                     style="width: 100%;"
 
                                     name="Адрес проживания"
-
+                                    :rules="{ required: true }"
                                     v-slot="validationContext"
                                 >
 
@@ -307,9 +313,9 @@
                                             v-model="residence_address"
                                             placeholder="Адрес проживания"
 
-
+                                            :state="getValidationState(validationContext)"
                                             aria-describedby="residence_address-live-feedback" />
-                                        <b-form-invalid-feedback id="residence_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+<!--                                        <b-form-invalid-feedback id="residence_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
                                     </b-form-group>
                                 </validation-provider>
 
@@ -663,6 +669,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    :rules="{ required: true }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -670,9 +677,10 @@
                                             v-model="item.registration_address"
                                             placeholder="Адрес регистрации"
 
+                                            :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-registration_address-feedback'"
                                         />
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+<!--                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
                                         <div>
                                             <b-link @click="getRegistrationAddressAsParentToChild(index)">Как у родителя</b-link>
                                         </div>
@@ -684,6 +692,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    :rules="{ required: true }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -692,8 +701,9 @@
                                             v-model="item.residence_address"
                                             placeholder="Адрес проживания"
 
+                                            :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-residence_address-feedback'" />
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+<!--                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
                                         <div>
                                             <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>
                                         </div>
@@ -1001,6 +1011,11 @@
 
                 if(currentPage == 3){
                     this.sendProps();
+                    return false;
+                }
+
+                if(currentPage == 4){
+                    this.$router.push({path: "/login"});
                     return false;
                 }
 

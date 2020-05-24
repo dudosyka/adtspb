@@ -84,7 +84,7 @@
 <!--                        </div>-->
 
                         <p class="theme text-muted mx-auto register-account" style="width: 100%; text-align: center;">
-                            <router-link class="theme" to="/register">
+                            <router-link class="theme" to="/register" style="color: green !important;">
                                 Создать аккаунт <b-icon-arrow-right></b-icon-arrow-right>
                             </router-link>
                         </p>

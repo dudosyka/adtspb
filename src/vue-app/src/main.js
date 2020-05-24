@@ -154,7 +154,7 @@ Vue.directive('scroll', {
     }
 });
 
-Vue.prototype.$request_endpoint = "http://localhost:8085/api.php";
+Vue.prototype.$request_endpoint = process.env.VUE_APP_REQUEST_ENDPOINT;
 Vue.prototype.$request = request;
 
 

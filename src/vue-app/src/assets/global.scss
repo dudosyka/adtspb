@@ -301,7 +301,8 @@ button.theme-alt{
 
 button.theme-alt:hover, button.theme-alt:active, button.theme-alt:focus, button.theme-alt.selected{
     color: #fff;
-    background-color: rgba(0,0,0,0.2) !important;
+    //background-color: rgba(0,0,0,0.2) !important;
+    background-color: #165aa7 !important;
     border-color: rgba(0,0,0,0) !important;
 }
 
@@ -310,7 +311,8 @@ button.theme-alt:active, button.theme-alt:focus{
     outline: inherit !important;
     -webkit-box-shadow: none !important;
     box-shadow: none !important;
-    background-color: rgba(0,0,0,0.4) !important;
+    //background-color: rgba(0,0,0,0.4) !important;
+    background-color: #165aa7 !important;
     border-color: rgba(0,0,0,0) !important;
 }
 

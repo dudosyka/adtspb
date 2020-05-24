@@ -1,19 +1,28 @@
 <template>
 <!--    <b-form-input class="select icon" :id="id"></b-form-input>-->
 
-    <!-- TODO: отобразить значок выпадающего списка -->
-    <vue-bootstrap-typeahead
-        ref="field"
-        v-bind="$attrs"
-        class="autofill-container"
-        :data="addresses"
-        v-model="addressSearch"
-        :value="value"
-        :placeholder="placeholder"
-        style="width: 100%;"
-        @input="handleInput"
-        :state="state"
-    />
+    <div>
+        <!-- TODO: отобразить значок выпадающего списка -->
+        <vue-bootstrap-typeahead
+            ref="field"
+            v-bind="$attrs"
+            class="autofill-container"
+            :data="addresses"
+            v-model="addressSearch"
+            :value="value"
+            :placeholder="placeholder"
+            style="width: 100%;"
+            @input="handleInput"
+            :state="state"
+        />
+        <!-- TODO отображать ошибки непосредственно в форме, а не в компоненте (сделать компонент адреса по-нормальному) -->
+<!--        <b-form-invalid-feedback v-if="!state">Данное поле должно быть заполнено</b-form-invalid-feedback>-->
+        <div v-if="state != undefined && !state" class="error">Обязательно для заполнения</div>
+
+    </div>
+
+
+
 
 
 
@@ -32,8 +41,7 @@
         props:{
             placeholder: String,
             is_required: Boolean,
-            state: String,
-            aria_describedby: String,
+            state: Boolean,
 
             value: String
         },
@@ -95,7 +103,8 @@
                 }
             },
             handleInput (e) {
-                this.$emit('input', this.addressSearch)
+                this.$emit('input', this.addressSearch);
+                this.$emit('state', this.state);
             }
         },
 
@@ -118,5 +127,12 @@
         background-repeat: no-repeat;
         background-size: 8px 10px;
         background-position: right 2rem center;
+    }
+
+    div.error{
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 80%;
+        color: #dc3545;
     }
 </style>
