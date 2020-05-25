@@ -1463,7 +1463,7 @@
                 this.$request(this.$request_endpoint, request, data).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
-                    _component.$router.push({path: "/register/form?page=1&email"+_component.email});
+                    _component.$router.push({path: "/register/form?page=1&email="+_component.email});
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     let errors = e.response.errors;
