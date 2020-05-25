@@ -757,6 +757,10 @@
                         <h3 class="form-title">Выбор объединений</h3>
                     </div>
 
+                    <b-alert :show="step3_error_notification" variant="warning" id="associations_selecting_error">
+                        Пожалуйста, проверьте заполненность всех полей выбора объединений.
+                    </b-alert>
+
                     <div v-for="(item, index) in children" style="width: 100%;">
 
                         <hr style="width: 100%;">
@@ -932,6 +936,7 @@
                     {key: 'max_age', label: 'Макс. возраст', sortable: true},
                     {key: 'study_hours_week', label: 'Часов в неделю', sortable: true},
                 ],
+                step3_error_notification: false,
 
                 // Шаг 5
                 associations_download_fields: [
@@ -982,6 +987,61 @@
             };
         },
 
+        mounted: async function(){
+            const page = (this.$route.query.page == undefined) ? 0 : parseInt(this.$route.query.page, 10);
+            this.$refs.wizard.currentStep = page;
+
+            const email = (this.$route.query.email == "") ? 0 : this.$route.query.email;
+            this.email = email;
+
+            // Если шаг >= 4, то грузим информацию о детях
+            if(page >= 3){
+                await this.loadAssociations();
+                let data = await this.$graphql_client.request("query{ viewer{ getChildren{ id, name, surname, midname } } }");
+
+                for(var i in data.viewer.getChildren){
+                    let current = data.viewer.getChildren[i];
+
+                    this.children[i] = {
+                        ...this.child_prototype,
+                        id: parseInt(current.id, 10),
+                        name: current.name,
+                        surname: current.surname,
+                        midname: current.midname
+                    };
+
+                }
+                this.$forceUpdate();
+            }
+
+            // Если шаг >= 5, то грузим информацию о поданных заявлениях
+            if(page >= 4){
+                let data = await this.$graphql_client.request("query{ viewer{ getChildren{ getInProposals { getAssociation { id, name } } } } }");
+
+                for(var i in data.viewer.getChildren){
+                    let current = data.viewer.getChildren[i];
+
+                    let selected_associations = [];
+
+                    for(let y in current.getInProposals){
+                        let y_current = current.getInProposals[y];
+
+                        selected_associations.push({
+                            id: parseInt(y_current.getAssociation.id, 10),
+                            name: y_current.getAssociation.name,
+                        });
+                    }
+
+                    this.children[i] = {
+                        ...this.children[i],
+                        associations_selected: selected_associations
+                    };
+                }
+                this.$forceUpdate();
+            }
+
+        },
+
         methods: {
 
             onRowAssociationsSelected(i, items) {
@@ -1000,11 +1060,13 @@
 
                 if(currentPage == 1){
                     this.checkKeyCode();
+
                     return false;
                 }
 
                 if(currentPage == 2){
                     this.addChildren();
+
                     //TODO: загрузка списка доступных объединений в глобальном слушателе
                     return false;
                 }
@@ -1015,7 +1077,7 @@
                 }
 
                 if(currentPage == 4){
-                    this.$router.push({path: "/login"});
+                    this.$router.push({path: "/"});
                     return false;
                 }
 
@@ -1118,7 +1180,7 @@
 
                 this.is_sending_request = true;
 
-                this.$graphql_client.request(request, {}).then(function(data){
+                await this.$graphql_client.request(request, {}).then(function(data){
                     _this.is_sending_request = false;
                     _this.associations = data.associations;
                 }).catch(function(e){
@@ -1177,18 +1239,23 @@
                 }
                 let request = 'mutation{' + requests + "}";
 
+                // TODO: проверка на наличие незаполненных (невыбранных) объединений у ребенка на клиент-сайде
+
+                this.step3_error_notification = false;
                 this.is_sending_request = true;
                 const _component = this;
 
                 this.$graphql_client.request(request, {}).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
+                    _component.$router.push({path: "/register/form?page=4"});
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
+                    _component.step3_error_notification = true;
 
                     _component.$nextTick(function(){
-                        _component.$scrollTo("#children_add");
+                        _component.$scrollTo("#associations_selecting_error");
                     });
 
                 });
@@ -1278,6 +1345,7 @@
                     }
 
                     _component.loadAssociations();
+                    _component.$router.push({path: "/register/form?page=3"});
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
@@ -1321,6 +1389,7 @@
                     _component.incorrect_code = false;
                     _component.$token = data.validateRegistration;
                     _component.$refs.wizard.currentStep++;
+                    _component.$router.push({path: "/register/form?page=2"});
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     // let errors = e.response.errors;
@@ -1394,7 +1463,7 @@
                 this.$request(this.$request_endpoint, request, data).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
-
+                    _component.$router.push({path: "/register/form?page=1&email"+_component.email});
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     let errors = e.response.errors;

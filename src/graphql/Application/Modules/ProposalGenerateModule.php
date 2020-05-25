@@ -162,9 +162,9 @@ class ProposalGenerateModule implements Module {
             <p style='font-size: 9pt;'>Паспорт (серия, номер) _____________ №______________________</p>
             <p style='font-size: 9pt;'>Выдан______________________________________________________________________________________________________________________</p>
             <p style='font-size: 9pt; margin-bottom: 0; padding-bottom: 0;'>_____________________________________________________________________________________________________________________________</p>
-            <i style='text-align: center; font-size: 6pt; margin-top: 0pt; padding-top: 0;'>когда и кем выдан</i>
+            <i style='text-align: center; font-size: 6pt; margin-top: 0pt; padding-top: 0; width: 100%;'>когда и кем выдан</i>
             <p style='font-size: 9pt; margin-bottom: 0; padding-bottom: 0;'>_____________________________________________________________________________________________________________________________</p>
-            <i style='margin: 0 auto; font-size: 6pt; margin-top: 0pt; padding-top: 0;'>в случае опекунства указать реквизиты документа, на основании которого осуществляется опека или попечительство</i>
+            <i style='text-align: center; font-size: 6pt; margin-top: 0pt; padding-top: 0; width: 100%;'>в случае опекунства указать реквизиты документа, на основании которого осуществляется опека или попечительство</i>
             
             
             <p style='font-size: 9pt; margin-bottom: 0pt; padding-bottom: 0;'>являясь законным представителем несовершеннолетнего <u>{$child_name} {$child_surname} {$child_midname}</u>,</p>

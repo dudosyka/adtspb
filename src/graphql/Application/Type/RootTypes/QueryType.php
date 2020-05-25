@@ -104,7 +104,8 @@ class QueryType extends ObjectType
      */
 	public function viewer($rootValue, $args, AppContext $context)
     {
-        if(!$context->viewer->isAuthorized()){
+        // Делаем не через isAuthorized() т.к. нам нужно узнать данные о себе (необходимо при авторизации)
+        if(!isset($context->viewer->id) || $context->viewer->id == 0){
             throw new RequestError("Требуется авторизация");
         }
 

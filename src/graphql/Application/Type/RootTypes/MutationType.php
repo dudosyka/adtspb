@@ -379,12 +379,14 @@ HTML;
             ':key' => $args['key_code']
         ]);
         if($found == null ||
-            $found->verification_key_email == null || // На всякий случай
-            $found->verification_key_email == "" // На всякий случай
+            $found->status_email == User::EMAIL_VALIDATED || // E-mail уже подтвержден
+            $found->verification_key_email == null ||
+            $found->verification_key_email == ""
         )
             throw new RequestError("Неверный код");
 
         $found->status_email = User::EMAIL_VALIDATED;
+        $found->verification_key_email = "";
         DataSource::update($found);
 
         return $found->generateLoginToken($context);

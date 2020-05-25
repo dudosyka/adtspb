@@ -1,10 +1,10 @@
 <?php
 namespace GraphQL\Application;
 
-use GraphQL\Application\Type\AdminMutationType;
 use GraphQL\Application\Type\AssociationType;
 use GraphQL\Application\Type\MutationType;
 use GraphQL\Application\Type\NodeType;
+use GraphQL\Application\Type\ProposalType;
 use GraphQL\Application\Type\QueryType;
 use GraphQL\Application\Type\Scalar\DateType;
 use GraphQL\Application\Type\Scalar\EmailType;
@@ -29,6 +29,7 @@ class Types
 	/* Типы данных сущностей */
     private static $user;
     private static $association;
+    private static $proposal;
 
 
     /**
@@ -44,6 +45,11 @@ class Types
     public static function association()
     {
         return self::$association ?: (self::$association = new AssociationType());
+    }
+
+    public static function proposal()
+    {
+        return self::$proposal ?: (self::$proposal = new ProposalType());
     }
 
 

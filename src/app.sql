@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Май 23 2020 г., 22:59
+-- Время создания: Май 25 2020 г., 23:27
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -21,8 +21,6 @@ SET time_zone = "+00:00";
 --
 -- База данных: `app`
 --
-CREATE DATABASE IF NOT EXISTS `app` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `app`;
 
 -- --------------------------------------------------------
 
@@ -30,7 +28,6 @@ USE `app`;
 -- Структура таблицы `action`
 --
 
-DROP TABLE IF EXISTS `action`;
 CREATE TABLE `action` (
   `id` bigint(20) NOT NULL,
   `name` text NOT NULL,
@@ -48,7 +45,9 @@ INSERT INTO `action` (`id`, `name`, `description`) VALUES
 (4, 'Регистрация ребенка', 'Регистрация ребенка от имени родителя.'),
 (5, 'Просмотр списка объединений', 'Функция для просмотра списка объединений (ассоциаций).'),
 (6, 'PDF заявление', 'Генерация поданных заявлений на группу в PDF'),
-(7, 'Выбор групп ребенка', 'Выбор групп ребенка от лица родителя');
+(7, 'Выбор групп ребенка', 'Выбор групп ребенка от лица родителя'),
+(8, 'Состояние регистрации формы детей', 'Просмотр состояния наличия регистрации детей родителя в системе.'),
+(9, 'Просмотр данных ребенка', 'Просмотр данных зарегистрированных детей (ребенка).');
 
 -- --------------------------------------------------------
 
@@ -56,7 +55,6 @@ INSERT INTO `action` (`id`, `name`, `description`) VALUES
 -- Структура таблицы `action_list`
 --
 
-DROP TABLE IF EXISTS `action_list`;
 CREATE TABLE `action_list` (
   `id` bigint(20) NOT NULL,
   `list_id` bigint(20) NOT NULL COMMENT 'ID списка с правами',
@@ -79,7 +77,9 @@ INSERT INTO `action_list` (`id`, `list_id`, `role_id`, `action_id`, `sign`) VALU
 (7, 1, 2, 4, '+'),
 (8, 1, 2, 5, '+'),
 (9, 1, 2, 6, '+'),
-(10, 1, 2, 7, '+');
+(10, 1, 2, 7, '+'),
+(11, 1, 2, 8, '+'),
+(12, 1, 2, 9, '+');
 
 -- --------------------------------------------------------
 
@@ -87,7 +87,6 @@ INSERT INTO `action_list` (`id`, `list_id`, `role_id`, `action_id`, `sign`) VALU
 -- Структура таблицы `association`
 --
 
-DROP TABLE IF EXISTS `association`;
 CREATE TABLE `association` (
   `id` bigint(20) NOT NULL,
   `name` text COMMENT 'Наименование объединения',
@@ -111,7 +110,6 @@ INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`, `study_years`, `s
 -- Структура таблицы `association_requiredassociation`
 --
 
-DROP TABLE IF EXISTS `association_requiredassociation`;
 CREATE TABLE `association_requiredassociation` (
   `id` bigint(20) NOT NULL,
   `association_id` bigint(20) NOT NULL COMMENT 'ID ассоциации',
@@ -124,7 +122,6 @@ CREATE TABLE `association_requiredassociation` (
 -- Структура таблицы `event`
 --
 
-DROP TABLE IF EXISTS `event`;
 CREATE TABLE `event` (
   `id` bigint(20) NOT NULL,
   `name` text NOT NULL COMMENT 'Наименование мероприятия',
@@ -146,7 +143,6 @@ INSERT INTO `event` (`id`, `name`, `description`, `date_start`, `date_end`) VALU
 -- Структура таблицы `event_file`
 --
 
-DROP TABLE IF EXISTS `event_file`;
 CREATE TABLE `event_file` (
   `id` bigint(20) NOT NULL,
   `event_id` bigint(20) NOT NULL COMMENT 'ID мероприятия',
@@ -168,7 +164,6 @@ INSERT INTO `event_file` (`id`, `event_id`, `category_id`, `path`) VALUES
 -- Структура таблицы `event_participant`
 --
 
-DROP TABLE IF EXISTS `event_participant`;
 CREATE TABLE `event_participant` (
   `id` bigint(20) NOT NULL,
   `event_id` bigint(20) NOT NULL COMMENT 'ID мероприятия',
@@ -181,7 +176,6 @@ CREATE TABLE `event_participant` (
 -- Структура таблицы `event_speaker`
 --
 
-DROP TABLE IF EXISTS `event_speaker`;
 CREATE TABLE `event_speaker` (
   `id` bigint(20) NOT NULL,
   `event_id` bigint(20) NOT NULL COMMENT 'ID мероприятия',
@@ -194,7 +188,6 @@ CREATE TABLE `event_speaker` (
 -- Структура таблицы `group`
 --
 
-DROP TABLE IF EXISTS `group`;
 CREATE TABLE `group` (
   `id` bigint(20) NOT NULL,
   `association_id` bigint(20) NOT NULL COMMENT 'ID ассоциации',
@@ -207,7 +200,6 @@ CREATE TABLE `group` (
 -- Структура таблицы `group_timetable`
 --
 
-DROP TABLE IF EXISTS `group_timetable`;
 CREATE TABLE `group_timetable` (
   `id` bigint(20) NOT NULL,
   `group_id` bigint(20) NOT NULL COMMENT 'ID группы (из таблицы groups)',
@@ -224,7 +216,6 @@ CREATE TABLE `group_timetable` (
 -- Структура таблицы `group_timetableexception`
 --
 
-DROP TABLE IF EXISTS `group_timetableexception`;
 CREATE TABLE `group_timetableexception` (
   `id` bigint(20) NOT NULL,
   `date_start` datetime NOT NULL COMMENT 'Новая дата начала занятий',
@@ -246,7 +237,6 @@ INSERT INTO `group_timetableexception` (`id`, `date_start`, `date_end`, `status_
 -- Структура таблицы `mailing`
 --
 
-DROP TABLE IF EXISTS `mailing`;
 CREATE TABLE `mailing` (
   `id` bigint(20) NOT NULL,
   `started_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Время начала рассылки',
@@ -261,7 +251,6 @@ CREATE TABLE `mailing` (
 -- Структура таблицы `passwordrestore`
 --
 
-DROP TABLE IF EXISTS `passwordrestore`;
 CREATE TABLE `passwordrestore` (
   `id` bigint(20) NOT NULL,
   `user_id` bigint(20) NOT NULL COMMENT 'ID пользователя',
@@ -276,7 +265,6 @@ CREATE TABLE `passwordrestore` (
 -- Структура таблицы `proposal`
 --
 
-DROP TABLE IF EXISTS `proposal`;
 CREATE TABLE `proposal` (
   `id` bigint(20) NOT NULL,
   `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Дата подачи',
@@ -294,7 +282,6 @@ CREATE TABLE `proposal` (
 -- Структура таблицы `role`
 --
 
-DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
   `id` bigint(20) NOT NULL,
   `name` tinytext
@@ -319,7 +306,6 @@ INSERT INTO `role` (`id`, `name`) VALUES
 -- Структура таблицы `settings_eventfiletype`
 --
 
-DROP TABLE IF EXISTS `settings_eventfiletype`;
 CREATE TABLE `settings_eventfiletype` (
   `id` bigint(20) NOT NULL,
   `name` text NOT NULL COMMENT 'Наименование категории файла'
@@ -340,7 +326,6 @@ INSERT INTO `settings_eventfiletype` (`id`, `name`) VALUES
 -- Структура таблицы `settings_proposal`
 --
 
-DROP TABLE IF EXISTS `settings_proposal`;
 CREATE TABLE `settings_proposal` (
   `id` bigint(20) NOT NULL,
   `name` text NOT NULL
@@ -366,7 +351,6 @@ INSERT INTO `settings_proposal` (`id`, `name`) VALUES
 -- Структура таблицы `settings_relationship`
 --
 
-DROP TABLE IF EXISTS `settings_relationship`;
 CREATE TABLE `settings_relationship` (
   `id` bigint(20) NOT NULL,
   `name` text NOT NULL
@@ -386,7 +370,6 @@ INSERT INTO `settings_relationship` (`id`, `name`) VALUES
 -- Структура таблицы `settings_timetablestatus`
 --
 
-DROP TABLE IF EXISTS `settings_timetablestatus`;
 CREATE TABLE `settings_timetablestatus` (
   `id` bigint(20) NOT NULL,
   `name` text NOT NULL
@@ -407,7 +390,6 @@ INSERT INTO `settings_timetablestatus` (`id`, `name`) VALUES
 -- Структура таблицы `upload`
 --
 
-DROP TABLE IF EXISTS `upload`;
 CREATE TABLE `upload` (
   `id` bigint(20) NOT NULL,
   `type` text NOT NULL,
@@ -421,7 +403,6 @@ CREATE TABLE `upload` (
 -- Структура таблицы `user`
 --
 
-DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` bigint(20) NOT NULL COMMENT 'Уникальный ID',
   `date_registered` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Дата регистрации',
@@ -450,7 +431,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship`, `study_place`, `study_class`, `birthday`, `password`) VALUES
-(0, '1970-01-01 12:00:00', '', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', NULL, 'г. Москва', 'г. Москва', 'г. Москва', 'Аноним', '1', '', '', '1970-01-01', '');
+(0, '1970-01-01 12:00:00', '', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', NULL, 'г. Москва', 'г. Москва', 'г. Москва', 'Аноним', '1', '', '', '1970-01-01', ''),
+(7, '2020-05-25 20:25:13', 'petrovichgi', 'Петрович', 'Георгий', 'Иванович', 'м', '', 'admin@testov.com', 'ожидание', '', 'Россия, Москва, Центральный административный округ, Пресненский район, Московский международный деловой центр Москва-Сити ', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе ', '', '', 'Родитель', 'Школа 12', '1а', '2003-12-12', '$2y$12$FCrQkF5Tf8.kNIjD0tBJQO3U4/HWI1S349IKcL0hj3Gomo/uSNYI2');
 
 -- --------------------------------------------------------
 
@@ -458,7 +440,6 @@ INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midnam
 -- Структура таблицы `user_child`
 --
 
-DROP TABLE IF EXISTS `user_child`;
 CREATE TABLE `user_child` (
   `id` bigint(20) NOT NULL,
   `parent_id` bigint(20) NOT NULL COMMENT 'ID родителя',
@@ -471,7 +452,6 @@ CREATE TABLE `user_child` (
 -- Структура таблицы `user_doc`
 --
 
-DROP TABLE IF EXISTS `user_doc`;
 CREATE TABLE `user_doc` (
   `id` bigint(20) NOT NULL COMMENT 'Уникальный ID',
   `user_id` bigint(20) NOT NULL COMMENT 'ID пользователя (кому принадлежит)',
@@ -487,7 +467,6 @@ CREATE TABLE `user_doc` (
 -- Структура таблицы `user_group`
 --
 
-DROP TABLE IF EXISTS `user_group`;
 CREATE TABLE `user_group` (
   `id` bigint(20) NOT NULL,
   `user_id` bigint(20) NOT NULL,
@@ -500,12 +479,18 @@ CREATE TABLE `user_group` (
 -- Структура таблицы `user_role`
 --
 
-DROP TABLE IF EXISTS `user_role`;
 CREATE TABLE `user_role` (
   `id` bigint(20) NOT NULL,
   `role_id` bigint(20) NOT NULL,
   `user_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связка пользователей с ролями';
+
+--
+-- Дамп данных таблицы `user_role`
+--
+
+INSERT INTO `user_role` (`id`, `role_id`, `user_id`) VALUES
+(13, 6, 7);
 
 -- --------------------------------------------------------
 
@@ -513,7 +498,6 @@ CREATE TABLE `user_role` (
 -- Структура таблицы `user_token`
 --
 
-DROP TABLE IF EXISTS `user_token`;
 CREATE TABLE `user_token` (
   `id` int(11) NOT NULL,
   `token` text NOT NULL COMMENT 'Токен',
@@ -721,19 +705,19 @@ ALTER TABLE `user_token`
 -- AUTO_INCREMENT для таблицы `action`
 --
 ALTER TABLE `action`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `action_list`
 --
 ALTER TABLE `action_list`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT для таблицы `association`
 --
 ALTER TABLE `association`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `association_requiredassociation`
@@ -757,19 +741,19 @@ ALTER TABLE `event_file`
 -- AUTO_INCREMENT для таблицы `event_participant`
 --
 ALTER TABLE `event_participant`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `event_speaker`
 --
 ALTER TABLE `event_speaker`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `group`
 --
 ALTER TABLE `group`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `group_timetable`
@@ -787,19 +771,19 @@ ALTER TABLE `group_timetableexception`
 -- AUTO_INCREMENT для таблицы `mailing`
 --
 ALTER TABLE `mailing`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `passwordrestore`
 --
 ALTER TABLE `passwordrestore`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `proposal`
 --
 ALTER TABLE `proposal`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `role`
@@ -841,19 +825,19 @@ ALTER TABLE `upload`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID';
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
 --
 ALTER TABLE `user_child`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `user_doc`
 --
 ALTER TABLE `user_doc`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID';
 
 --
 -- AUTO_INCREMENT для таблицы `user_group`
@@ -865,13 +849,13 @@ ALTER TABLE `user_group`
 -- AUTO_INCREMENT для таблицы `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

@@ -3,8 +3,10 @@ namespace GraphQL\Application\Type;
 
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
-use GraphQL\Application\Data\User;
+use GraphQL\Application\Entity\User;
+use GraphQL\Application\Entity\UserChild;
 use GraphQL\Application\Types;
+use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -16,6 +18,8 @@ class UserType extends ObjectType
             'name' => 'User',
             'description' => 'Пользователи личного кабинета.',
             'fields' => function() {
+
+                //TODO: запретить вывод некоторых полей для любых пользователей, разрешить просматривать все поля только viewer'у.
 
                 return [
                     'id' => Types::id(),
@@ -40,7 +44,12 @@ class UserType extends ObjectType
 	                'date_registered' => ['type' => Types::date()],
 	                'birthday' => ['type' => Types::date()],
 	                'status_email' => ['type' => Types::string()],
-	                'verification_key_email' => ['type' => Types::string()],
+//	                'verification_key_email' => ['type' => Types::string()], // публике это поле не надо знать
+
+                    'hasAnyChildrenAdded' => ['type' => Types::boolean()],
+                    'hasAnyProposals' => ['type' => Types::boolean()],
+                    'getChildren' => ['type' => Types::listOf(Types::user())],
+                    'getInProposals' => Types::listOf(Types::proposal())
                 ];
             },
             'interfaces' => [
@@ -58,18 +67,105 @@ class UserType extends ObjectType
         parent::__construct($config);
     }
 
-    /*
-     * <b>Как добавить свое GraphQL полё</b>
-     * Любой видимый для GraphQL в данном классе метод должен:
-     *  1) быть публичной функцией,
-     *  2) начинаться со слова 'resolve' (см. код на строчках 34-39), последующее слово должно быть написано с большой буквы (например, resolveMyName или resolveMyname и т.п.)
-     * Не стоит забывать, что метод должен вернуть какое-нибудь значение для клиента.
-     *
-     * Пример объявления:
-    public function resolvePhoto(User $user, $args)
+    /**
+     * @param User $user
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return bool
+     * @throws RequestError
+     */
+    public function resolveHasAnyChildrenAdded(User $user, array $args, AppContext $context, ResolveInfo $info)
     {
-        return DataSource::getUserPhoto($user->id, $args['size']);
+        // Если не родитель
+        if(!$context->viewer->hasAccess(8)) return false; // Не выводим ошибку т.к. необходимо без ошибок завершить запрос при авторизации
+
+        // Если не локальный пользователь
+        if($context->viewer->id != $user->id)
+            throw new RequestError("Доступ запрещен");
+
+        return DataSource::findOne("UserChild", "parent_id = :parent_id", ["parent_id" => $user->id]) != null;
     }
-    */
+
+    /**
+     * @param User $user
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return array
+     * @throws RequestError
+     */
+    public function resolveGetChildren(User $user, array $args, AppContext $context, ResolveInfo $info){
+
+        // Если не родитель
+        $context->viewer->hasAccessOrError(9);
+
+        // Если не локальный пользователь
+        if($context->viewer->id != $user->id)
+            throw new RequestError("Доступ запрещен");
+
+
+        // TODO: оптимизировать вывод всех детей (resolveGetChildren)
+
+        $children = DataSource::findAll("UserChild", "parent_id = :parent_id", [
+            "parent_id" => $user->id
+        ]);
+
+        $return = [];
+
+        foreach($children as $child){
+            /** @var UserChild $child */
+            $return[] = DataSource::find("User", $child->child_id);
+        }
+
+        return $return;
+    }
+
+    /**
+     * @param User $user
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return bool
+     * @throws RequestError
+     */
+    public function resolveHasAnyProposals(User $user, array $args, AppContext $context, ResolveInfo $info) {
+        // Если не родитель
+        if(!$context->viewer->hasAccess(8)) return false; // Не выводим ошибку т.к. необходимо без ошибок завершить запрос при авторизации
+
+        // Если не локальный пользователь
+        if($context->viewer->id != $user->id)
+            throw new RequestError("Доступ запрещен");
+
+        return DataSource::findOne("Proposal", "parent_id = :parent_id", ["parent_id" => $user->id]) != null;
+    }
+
+    /**
+     * @param User $user
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return array
+     * @throws RequestError
+     */
+    public function resolveGetInProposals(User $user, array $args, AppContext $context, ResolveInfo $info) {
+        // Если не родитель
+        $context->viewer->hasAccessOrError(8);
+
+        // Если не родитель ребенка
+        $find = DataSource::findOne("UserChild", "parent_id = :parent_id AND child_id = :child_id", [
+           "child_id" => $user->id,
+           "parent_id" => $context->viewer->id
+        ]);
+
+        if($find == null)
+            throw new RequestError("Доступ запрещен");
+
+
+
+
+        return DataSource::findAll("Proposal", "child_id = :child_id", ["child_id" => $user->id]);
+    }
+
 
 }
