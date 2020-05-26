@@ -83,11 +83,15 @@
 <!--                            <GoogleButton></GoogleButton>-->
 <!--                        </div>-->
 
+                        <b-button class="theme" style="background-color: #1862b6 !important;" block @click="gotoRegistration()">Создать аккаунт</b-button>
+
+                        <!--
                         <p class="theme text-muted mx-auto register-account" style="width: 100%; text-align: center;">
                             <router-link class="theme" to="/register" style="color: green !important;">
                                 Создать аккаунт <b-icon-arrow-right></b-icon-arrow-right>
                             </router-link>
                         </p>
+                        -->
 
                     </b-form-row>
                 </b-form>
@@ -127,6 +131,10 @@
 
             getValidationState({ dirty, validated, valid = null }) {
                 return dirty || validated ? valid : null;
+            },
+
+            gotoRegistration(){
+                this.$router.push({path: "/register/form"});
             },
 
             onSubmit(){

@@ -155,7 +155,7 @@ class ProposalGenerateModule implements Module {
             
             <p style='text-align: center;'>СОГЛАСИЕ РОДИТЕЛЯ/ ЗАКОННОГО ПРЕДСТАВИТЕЛЯ НА ОБРАБОТКУ ПЕРСОНАЛЬНЫХ ДАННЫХ НЕСОВЕРШЕННОЛЕТНЕГО</p>
             
-            <p style='font-size: 9pt; margin-bottom: 17px; margin-bottom: 0; padding-bottom: 0;'>Я, <u>{$parent_name} {$parent_surname} {$parent_midname}</u></p>
+            <p style='font-size: 9pt; margin-bottom: 17px; margin-bottom: 0; padding-bottom: 0;'>Я, <u>{$parent_surname} {$parent_name} {$parent_midname}</u></p>
             <p style='font-size: 6pt; margin-left: 17px; margin-top: 0pt; padding-top: 0;'>(ФИО родителя или законного представителя)</p>
             
             
@@ -167,7 +167,7 @@ class ProposalGenerateModule implements Module {
             <i style='text-align: center; font-size: 6pt; margin-top: 0pt; padding-top: 0; width: 100%;'>в случае опекунства указать реквизиты документа, на основании которого осуществляется опека или попечительство</i>
             
             
-            <p style='font-size: 9pt; margin-bottom: 0pt; padding-bottom: 0;'>являясь законным представителем несовершеннолетнего <u>{$child_name} {$child_surname} {$child_midname}</u>,</p>
+            <p style='font-size: 9pt; margin-bottom: 0pt; padding-bottom: 0;'>являясь законным представителем несовершеннолетнего <u>{$child_surname} {$child_name} {$child_midname}</u>,</p>
             <p style='font-size: 6pt; margin-left: 337px; margin-top: 0pt; padding-top: 0;'>(ФИО несовершеннолетнего)</p>
             <p style='font-size: 9pt;'>приходящегося мне _____________________, зарегистрированного по адресу: <u>{$child_registration_address}</u> соответствии с Федеральным законом № от 27.7.2006 № 152-ФЗ «О персональных данных», даю свое согласие на обработку моих персональных данных и персональных данных несовершеннолетнего, относящихся исключительно к ниже перечисленным категориям персональных данных, в <b>ГБНОУ «Академия цифровых технологий»</b>, расположенное по адресу: 197198, Санкт-Петербург, Большой проспект П.С., 29/2 (далее Академия).</p>
             

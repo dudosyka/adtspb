@@ -104,9 +104,26 @@ extend("agreement",{
 });
 
 extend("date",{
-    message: "Дата должна быть заполнена в следующем формате: ГГГГ-ММ-ДД",
+    message: "Дата должна быть действительной (формат: ГГГГ-ММ-ДД)",
     validate: function(value){
-        return value.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) !== null;
+        let input = value.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) !== null;
+
+        let __data = value.split("-");
+        let year = parseInt(__data[0]);
+        let month = parseInt(__data[1]);
+        let day = parseInt(__data[2]);
+
+        let validation1 = year >= 1000 && year <= 9999;
+        let validation2 = month >= 1 && month <= 12;
+        let validation3 = day >= 1 && day <= 31;
+
+        let year_validation = ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0);
+
+        let special = (month == 4 || month == 6 || month == 9 || month == 11) ? day <= 30 : true; // месяцы, где нет 31 дня
+        let special1 = (!year_validation && month == 2) ? day <= 28 : true; // февраль
+        let special2 = (year_validation && month == 2) ? day <= 29 : true; // високосный год
+
+        return input && validation1 && validation2 && validation3 && special && special1 && special2;
     }
 });
 

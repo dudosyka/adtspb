@@ -43,10 +43,15 @@ class DateType extends ScalarType
      */
     public function parseValue($value)
     {
-//        if (($timestamp = strtotime($value)) === false) {
         if (!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $value)) {
-            throw new \UnexpectedValueException("Cannot represent value as date: " . Utils::printSafe($value));
+            throw new \UnexpectedValueException("Немогу запарсить значение как дату: " . Utils::printSafe($value));
         }
+
+        if (($timestamp = strtotime($value)) === false) {
+            throw new \UnexpectedValueException("Немогу запарсить значение как дату: " . Utils::printSafe($value));
+        }
+
+
         return $value;
     }
 
@@ -63,12 +68,17 @@ class DateType extends ScalarType
         // Note: throwing GraphQL\Error\Error vs \UnexpectedValueException to benefit from GraphQL
         // error location in query:
         if (!$valueNode instanceof StringValueNode) {
-            throw new Error('Query error: Can only parse strings got: ' . $valueNode->kind, [$valueNode]);
+            throw new Error('Ошибка запроса: могу запарсить только строки, получил: ' . $valueNode->kind, [$valueNode]);
         }
-//        if (($timestamp = strtotime($valueNode)) === false) {
+
         if (!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $valueNode->value)) {
-            throw new Error("Not a valid date", [$valueNode]);
+            throw new Error("Некорректная дата", [$valueNode]);
         }
+
+        if (($timestamp = strtotime($valueNode)) === false) {
+            throw new Error("Некорректная дата", [$valueNode]);
+        }
+
         return $valueNode->value;
     }
 }

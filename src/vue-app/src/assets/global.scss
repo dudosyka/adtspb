@@ -142,10 +142,11 @@ button.btn{
 }
 
 button.btn{
+    border-color: rgba(0,0,0,0) !important;
     border-radius: 20px !important;
     height: 43px;
     margin: 5px 0 5px 0;
-    background-color: #6c757d !important;
+    background-color: #6c757d; /*  !important */
 }
 
 button.btn:active{
@@ -172,7 +173,6 @@ button.btn:hover{
 button.btn.info-block-button{
     margin-bottom: 0 !important;
 }
-
 
 
 

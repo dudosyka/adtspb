@@ -1,24 +1,25 @@
 <template>
-    <div class="home" v-scroll="handleScroll">
+    <div class="home" v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'padding-top: 180px;'"> <!--  v-scroll="handleScroll"-->
 
         <vue-headful title="Главная страница | Личный кабинет"/>
 
         <div class="content">
-        <div class="top-panel d-flex">
+        <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''">
 
-            <div>
-                <a href="https://adtspb.ru/" target="_blank">
-                    <b-button variant="dark" class="theme-alt top-panel-button" v-bind:class="(topScroll > 0) ? 'selected' : ''"><b-icon-chevron-double-left></b-icon-chevron-double-left> Вернуться на сайт</b-button>
-                </a>
-            </div>
 
-            <div class="spacer"></div>
+            <a href="https://adtspb.ru/" target="_blank">
+                <!-- v-bind:class="(topScroll > 0) ? 'selected' : ''" -->
+                <b-button variant="dark" class="theme-alt top-panel-button"
+                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Вернуться на сайт</b-button>
+            </a>
 
-            <div>
-                <router-link to="/login">
-                    <b-button variant="dark" class="theme-alt top-panel-button" v-bind:class="(topScroll > 0) ? 'selected' : ''">К личному кабинету <b-icon-chevron-double-right></b-icon-chevron-double-right></b-button>
-                </router-link>
-            </div>
+            <div class="spacer" v-if="enoughSpaceForTopButtons()"></div>
+
+            <router-link to="/login">
+                <!-- v-bind:class="(topScroll > 0) ? 'selected' : ''" -->
+                <b-button variant="dark" class="theme-alt top-panel-button darker"
+                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'">К личному кабинету <b-icon-chevron-double-right></b-icon-chevron-double-right></b-button>
+            </router-link>
 
 
         </div>
@@ -38,8 +39,8 @@
 
         <!-- TODO адаптация блока плюсов под мобильные устройства -->
 
-        <div class="form advantage-form d-inline-flex justify-content-around align-items-start">
-            <div class="advantage">
+        <div class="form advantage-form justify-content-around align-items-start" v-bind:class="(enoughSpace()) ? 'd-inline-flex' : ''">
+            <div v-bind:class="(enoughSpace()) ? 'advantage' : 'advantage-mobile'">
                 <h2>Родителям</h2>
                 <div class="advantage-info-block">
                     <div class="advantage-image-container">
@@ -70,9 +71,9 @@
                 </div>
             </div>
 
-            <div class="advantage-separator"></div>
+            <div v-bind:class="(enoughSpace()) ? 'advantage-separator' : 'advantage-separator-mobile'"></div>
 
-            <div class="advantage">
+            <div v-bind:class="(enoughSpace()) ? 'advantage' : 'advantage-mobile'">
                 <h2>Обущающимся</h2>
                 <div class="advantage-info-block">
                     <div class="advantage-image-container">
@@ -87,9 +88,9 @@
 
             </div>
 
-            <div class="advantage-separator"></div>
+            <div v-bind:class="(enoughSpace()) ? 'advantage-separator' : 'advantage-separator-mobile'"></div>
 
-            <div class="advantage">
+            <div v-bind:class="(enoughSpace()) ? 'advantage' : 'advantage-mobile'">
                 <h2>Педагогам</h2>
                 <div class="advantage-info-block">
                     <div class="advantage-image-container">
@@ -123,20 +124,20 @@
     </div>
 
         <!-- TODO ссылки из бд (добавление, редактирование) (не особо важно, месяца через 2) -->
-        <div class="footer-navigation d-inline-flex justify-content-around align-items-center">
-            <div class="navigation-page">
+        <div class="footer-navigation justify-content-around align-items-center" v-bind:class="(enoughSpace()) ? 'd-inline-flex' : ''">
+            <div class="navigation-page" v-bind:class="(enoughSpace()) ? '' : 'mobile'">
                 <a href="https://adtspb.ru/" target="_blank">Главная</a>
             </div>
-            <div class="navigation-page">
+            <div class="navigation-page" v-bind:class="(enoughSpace()) ? '' : 'mobile'">
                 <a href="https://adtspb.ru/about/" target="_blank">Об академии</a>
             </div>
-            <div class="navigation-page selected">
+            <div class="navigation-page selected" v-bind:class="(enoughSpace()) ? '' : 'mobile'">
                 <a>Личный кабинет</a>
             </div>
-            <div class="navigation-page">
+            <div class="navigation-page" v-bind:class="(enoughSpace()) ? '' : 'mobile'">
                 <a href="https://adtspb.ru/blog/" target="_blank">Новости</a>
             </div>
-            <div class="navigation-page">
+            <div class="navigation-page" v-bind:class="(enoughSpace()) ? '' : 'mobile'">
                 <a href="https://adtspb.ru/contact/" target="_blank">Контакты</a>
             </div>
         </div>
@@ -170,15 +171,29 @@ export default {
     data: function(){
         return {
             year: new Date().getFullYear(),
-            topScroll: 0
+            topScroll: 0,
+            windowWidth: window.innerWidth
         };
     },
     methods: {
         handleScroll: function (evt, el) {
             this.topScroll = window.scrollY;
+        },
+        enoughSpace: function(){
+            return this.windowWidth >= 1273;
+        },
+        enoughSpaceForTopButtons: function(){
+            return this.windowWidth >= 765;
         }
+    },
 
+    mounted() {
+        const _this = this;
+        window.addEventListener('resize', () => {
+            _this.windowWidth = window.innerWidth
+        });
     }
+
 }
 </script>
 
@@ -223,6 +238,24 @@ export default {
         font-size: 16pt;
         height: 80px !important;
     }
+
+
+    .top-panel-button{
+        background-color: #1862b6 !important;
+    }
+
+    .top-panel-button.darker{
+        background-color: #16529d !important;
+    }
+
+    .top-panel-button:focus, .top-panel-button.darker:focus {
+        background-color: #12417c !important;
+    }
+
+    .top-panel-button:active {
+        background-color: #0f3061 !important;
+    }
+
 
     .welcome-panel{
         margin-top: 40px;
@@ -285,10 +318,23 @@ export default {
         margin: 0 65px;
     }
 
+    .advantage-mobile{
+        /*width: min-content;*/
+        width: 100%;
+        font-size: 14pt;
+    }
+
     .advantage-separator{
         border-left: 1px solid #ccc;
         height: 700px;
         width: 1px;
+    }
+
+    .advantage-separator-mobile{
+        border-bottom: 1px solid #ccc;
+        /*width: 700px;*/
+        width: 100%;
+        height: 1px;
     }
 
     .advantage-image-container, .advantage-image{
@@ -344,6 +390,10 @@ export default {
         width: 350px;
         font-size: 24pt;
         text-transform: uppercase;
+    }
+
+    .navigation-page.mobile{
+        width: 100% !important;
     }
 
     .navigation-page:not(.selected) > a{

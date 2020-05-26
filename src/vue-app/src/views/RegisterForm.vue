@@ -52,6 +52,26 @@
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    name="Фамилия"
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            class="icon person-lines-fill"
+                                            v-model="surname"
+                                            placeholder="Фамилия"
+
+                                            :state="getValidationState(validationContext)"
+                                            aria-describedby="surname-feedback"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback id="surname-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
                                     name="Имя"
                                     :rules="{ required: true }"
                                     v-slot="validationContext"
@@ -67,26 +87,6 @@
                                             aria-describedby="name-feedback"
                                         ></b-form-input>
                                         <b-form-invalid-feedback id="name-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
-                                    </b-form-group>
-                                </validation-provider>
-
-                                <validation-provider
-                                    style="width: 100%;"
-
-                                    name="Фамилия"
-                                    :rules="{ required: true }"
-                                    v-slot="validationContext"
-                                >
-                                    <b-form-group>
-                                        <b-form-input
-                                            class="icon person-lines-fill"
-                                            v-model="surname"
-                                            placeholder="Фамилия"
-
-                                            :state="getValidationState(validationContext)"
-                                            aria-describedby="surname-feedback"
-                                        ></b-form-input>
-                                        <b-form-invalid-feedback id="surname-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -381,7 +381,7 @@
                         <b-form-group>
                             <b-form-input
                                 class="theme icon envelope"
-                                placeholder="Ключ подтверждения"
+                                placeholder="Код подтверждения"
                                 v-model="key_code"
 
                                 :state="getValidationState(validationContext)"
@@ -457,13 +457,13 @@
                                     <b-form-group>
                                         <b-form-input
                                             class="icon person-lines-fill"
-                                            v-model="item.name"
-                                            placeholder="Имя"
+                                            v-model="item.surname"
+                                            placeholder="Фамилия"
 
                                             :state="getValidationState(validationContext)"
-                                            :aria-describedby="'cld-'+index+'-name-feedback'"
+                                            :aria-describedby="'cld-'+index+'-surname-feedback'"
                                         ></b-form-input>
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-name-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-surname-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -476,13 +476,13 @@
                                     <b-form-group>
                                         <b-form-input
                                             class="icon person-lines-fill"
-                                            v-model="item.surname"
-                                            placeholder="Фамилия"
+                                            v-model="item.name"
+                                            placeholder="Имя"
 
                                             :state="getValidationState(validationContext)"
-                                            :aria-describedby="'cld-'+index+'-surname-feedback'"
+                                            :aria-describedby="'cld-'+index+'-name-feedback'"
                                         ></b-form-input>
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-surname-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-name-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -767,7 +767,7 @@
 
                         <label class="text-center">{{item.name}} {{item.surname}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
 
-                        <b-table  :busy="associations.length <= 0" class="mt-3" outlined>
+                        <b-table :busy="associations.length <= 0" class="mt-3" outlined>
                             <template v-slot:table-busy>
                                 <div class="text-center text-danger my-2">
                                     <b-spinner class="align-middle"></b-spinner>
@@ -1248,7 +1248,8 @@
                 this.$graphql_client.request(request, {}).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
-                    _component.$router.push({path: "/register/form?page=4"});
+                    // _component.$router.pushState({path: "/register/form?page=4"});
+                    history.replaceState(null, null, '/register/form?page=4');
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
@@ -1345,7 +1346,8 @@
                     }
 
                     _component.loadAssociations();
-                    _component.$router.push({path: "/register/form?page=3"});
+                    // _component.$router.pushState({path: "/register/form?page=3"});
+                    history.replaceState(null, null, '/register/form?page=3');
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
@@ -1389,7 +1391,8 @@
                     _component.incorrect_code = false;
                     _component.$token = data.validateRegistration;
                     _component.$refs.wizard.currentStep++;
-                    _component.$router.push({path: "/register/form?page=2"});
+                    // _component.$router.pushState({path: "/register/form?page=2"});
+                    history.replaceState(null, null, '/register/form?page=2');
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     // let errors = e.response.errors;
@@ -1463,7 +1466,8 @@
                 this.$request(this.$request_endpoint, request, data).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
-                    _component.$router.push({path: "/register/form?page=1&email="+_component.email});
+                    // _component.$router.pushState({path: "/register/form?page=1&email="+_component.email});
+                    history.replaceState(null, null, "/register/form?page=1&email="+_component.email);
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     let errors = e.response.errors;
