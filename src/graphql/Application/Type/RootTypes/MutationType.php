@@ -313,6 +313,7 @@ HTML;
      * @param $rootValue
      * @param $args
      * @param AppContext $context
+     * @return bool
      * @throws RequestError
      */
     public function selectChildAssociations($rootValue, $args, AppContext $context){
@@ -340,6 +341,27 @@ HTML;
         ]);
         if($findProposal != null)
             throw new RequestError("Заявление уже подано");
+
+
+        // Проверка на количество часов
+        // TODO: оптимизировать механизм проверки количества часов
+        $findAllProps = DataSource::findAll("Proposal", "parent_id = :parent_id AND child_id = :child_id", [
+            "parent_id" => $context->viewer->id,
+            "child_id" => $args["child_id"]
+        ]);
+        if($findAllProps != null){
+            $hours = 0;
+            foreach($findAllProps as $prop){
+                /** @var Proposal $prop */
+                /** @var Association $info */
+                $info = DataSource::find("Association", $prop->association_id);
+                $hours += $info->study_hours_week;
+                if($hours >= 10) break;
+            }
+            if($hours >= 10)
+                throw new RequestError("Загруженность ребенка превышает 10 часов");
+        }
+
 
 
 

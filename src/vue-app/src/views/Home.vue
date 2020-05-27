@@ -17,7 +17,7 @@
 
             <router-link to="/login">
                 <!-- v-bind:class="(topScroll > 0) ? 'selected' : ''" -->
-                <b-button variant="dark" class="theme-alt top-panel-button darker"
+                <b-button variant="dark" class="theme-alt top-panel-button-darker"
                           v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'">К личному кабинету <b-icon-chevron-double-right></b-icon-chevron-double-right></b-button>
             </router-link>
 
@@ -232,7 +232,7 @@ export default {
         padding: 10px 5%;
     }
 
-    .top-panel-button{
+    .top-panel-button, .top-panel-button-darker{
         padding: 20px 40px !important;
         width: max-content;
         font-size: 16pt;
@@ -244,15 +244,15 @@ export default {
         background-color: #1862b6 !important;
     }
 
-    .top-panel-button.darker{
+    .top-panel-button-darker{
         background-color: #16529d !important;
     }
 
-    .top-panel-button:focus, .top-panel-button.darker:focus {
+    .top-panel-button:focus, .top-panel-button-darker:focus {
         background-color: #12417c !important;
     }
 
-    .top-panel-button:active {
+    .top-panel-button:active, .top-panel-button-darker:active {
         background-color: #0f3061 !important;
     }
 
@@ -335,6 +335,8 @@ export default {
         /*width: 700px;*/
         width: 100%;
         height: 1px;
+        margin-top: 50px;
+        margin-bottom: 50px;
     }
 
     .advantage-image-container, .advantage-image{

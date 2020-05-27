@@ -83,7 +83,7 @@
 <!--                            <GoogleButton></GoogleButton>-->
 <!--                        </div>-->
 
-                        <b-button class="theme" style="background-color: #1862b6 !important;" block @click="gotoRegistration()">Создать аккаунт</b-button>
+                        <b-button class="theme" style="background-color: #1862b6 !important; margin-top: 15px;" block @click="gotoRegistration()">Создать аккаунт</b-button>
 
                         <!--
                         <p class="theme text-muted mx-auto register-account" style="width: 100%; text-align: center;">

@@ -761,6 +761,10 @@
                         Пожалуйста, проверьте заполненность всех полей выбора объединений.
                     </b-alert>
 
+                    <b-alert :show="graphql_errors.length > 0" v-if="graphql_errors.length > 0" variant="danger" id="associations_selecting_graphql_errors">
+                        {{graphql_errors[0].message}}
+                    </b-alert>
+
                     <div v-for="(item, index) in children" style="width: 100%;">
 
                         <hr style="width: 100%;">
@@ -799,6 +803,45 @@
                         </b-table>
 
                     </div>
+
+                    <b-modal id="step4-warning" title="Предупреждение" v-model="step4_warning" :centered="true">
+                        <p class="my-4">Загрузка ребенка в неделю превышает 8 часов. Вы уверены в своем выборе?</p>
+
+                        <template v-slot:modal-footer>
+                            <div class="w-100">
+                                <b-button
+                                    class="float-right"
+                                    @click="step4_warning=false"
+                                >
+                                    Изменить выбор
+                                </b-button>
+
+                                <b-button
+                                    style="margin-right: 10px;"
+                                    class="float-right"
+                                    @click="sendProps(); step4_warning=false"
+                                >
+                                    Продолжить
+                                </b-button>
+
+                            </div>
+                        </template>
+                    </b-modal>
+
+                    <b-modal id="step4-fatal" title="Большая нагрузка" v-model="step4_fatal" :centered="true">
+                        <p class="my-4">Пожалуйста, проверьте свой выбор и выберите меньшее число объединений.</p>
+
+                        <template v-slot:modal-footer>
+                            <div class="w-100">
+                                <b-button
+                                    class="float-right"
+                                    @click="step4_fatal=false"
+                                >
+                                    Изменить выбор
+                                </b-button>
+                            </div>
+                        </template>
+                    </b-modal>
 
 
 
@@ -937,6 +980,8 @@
                     {key: 'study_hours_week', label: 'Часов в неделю', sortable: true},
                 ],
                 step3_error_notification: false,
+                step4_warning: false,
+                step4_fatal: false,
 
                 // Шаг 5
                 associations_download_fields: [
@@ -1072,7 +1117,7 @@
                 }
 
                 if(currentPage == 3){
-                    this.sendProps();
+                    this.preSendProps();
                     return false;
                 }
 
@@ -1219,6 +1264,42 @@
 
 
             /* Шаг 4 */
+
+            preSendProps(){
+                for(let i in this.children) {
+                    let child = this.children[i];
+                    let hours = 0;
+
+
+
+                    if(child.associations_selected.length <= 0){
+                        this.step3_error_notification = true;
+                        const _this = this;
+                        this.$nextTick(function(){
+                            _this.$scrollTo("#associations_selecting_error");
+                        });
+                        return;
+                    }
+                    // TODO: оптимизировать провеку количества часов
+                    for (let i2 in child.associations_selected) {
+                        let selected = child.associations_selected[i2];
+                        hours += parseInt(selected.study_hours_week, 10);
+                    }
+
+                    if (hours >= 8 && hours <= 9) {
+                        this.step4_warning = true;
+                        return;
+                    }
+
+                    if (hours >= 10) {
+                        this.step4_fatal = true;
+                        return;
+                    }
+
+                }
+                this.sendProps();
+            },
+
             sendProps(){
                 // TODO: оптимизировать отправку нескольких детей
 
@@ -1244,19 +1325,20 @@
                 this.step3_error_notification = false;
                 this.is_sending_request = true;
                 const _component = this;
+                this.graphql_errors = [];
 
                 this.$graphql_client.request(request, {}).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
+                    _component.graphql_errors = [];
                     // _component.$router.pushState({path: "/register/form?page=4"});
                     history.replaceState(null, null, '/register/form?page=4');
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
-                    _component.step3_error_notification = true;
 
                     _component.$nextTick(function(){
-                        _component.$scrollTo("#associations_selecting_error");
+                        _component.$scrollTo("#associations_selecting_graphql_errors");
                     });
 
                 });
