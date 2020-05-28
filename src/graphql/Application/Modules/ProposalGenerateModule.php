@@ -22,6 +22,7 @@ class ProposalGenerateModule implements Module {
      * @return array
      * @throws \GraphQL\Server\RequestError
      * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
      */
     public function result(AppContext $context): array {
 
@@ -101,6 +102,42 @@ class ProposalGenerateModule implements Module {
         for($i = 0; $i < mb_strlen($parent_name); $i++) $padding .= "&nbsp;";
         for($i = 0; $i < mb_strlen($parent_midname); $i++) $padding .= "&nbsp;";
 
+//        $mpdf->SetImportUse();
+//        $mpdf->SetImportUse();
+        $mpdf->percentSubset = 0;
+
+        //"\{\$parent_full_name\}"
+        //"test"
+
+        /*
+        $search = array(
+            'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXZZZZZZZZ'
+        );
+
+        $replacement = array(
+            "personalised for Jos\xc3\xa9 Bloggs",
+            "COPYRIGHT: Licensed to Jos\xc3\xa9 Bloggs"
+        );
+
+        error_reporting(0);
+
+        $mpdf->OverWrite(FileStorage::getStoragePath() . '/proposal_template/proposal_libre.pdf', $search, $replacement, 'I', FileStorage::getStoragePath() . '/proposal_template/mpdf.pdf' ) ;
+        */
+
+
+
+        /*
+        $mpdf->OverWrite(FileStorage::getStoragePath() . '/proposal_template/proposal_libre.pdf', [
+            "\{\$child_full_name\}"
+        ], [
+            "test"
+        ], 'D' );
+        */
+
+
+
+        /*
         $mpdf->WriteHTML("
         
             <div style='width: 300px; float: right; display: block;'>
@@ -202,11 +239,43 @@ class ProposalGenerateModule implements Module {
             </p>
             
             ");
+        */
 
 
+//        $mpdf->pdf
+
+//        $mpdf->SetImportUse();
+
+        $pagecount = $mpdf->SetSourceFile(FileStorage::getStoragePath()."/proposal_template/proposal_libre.pdf");
 
 
-//        $mpdf->Output(FileStorage::getStoragePath()."/temp/file.pdf", 'F');
+        $mpdf->AddPage();
+        $template = $mpdf->importPage(1);
+        $mpdf->useTemplate($template);
+
+        $mpdf->AddPage();
+        $template = $mpdf->importPage(2);
+        $mpdf->useTemplate($template);
+
+
+        $mpdf->Output(FileStorage::getStoragePath()."/proposal_template/proposal_libre11.pdf", 'F');
+
+        $mpdf = new Mpdf();
+        $mpdf->percentSubset = 0;
+        $mpdf->OverWrite(FileStorage::getStoragePath() . '/proposal_template/proposal_libre11.pdf', [
+            "XXXXXXXXXXXXXXXXXXXXXXXXX"
+        ], [
+            "test"
+        ]);
+
+        /*
+        $tplId = $mpdf->importPage(1);
+        $mpdf->useTemplate($tplId);
+        $tplId = $mpdf->importPage(2);
+        $mpdf->useTemplate($tplId);
+        */
+
+//        $mpdf->Output(FileStorage::getStoragePath()."/proposal_template/proposal_libre.pdf", 'D');
         $mpdf->Output();
         die();
     }

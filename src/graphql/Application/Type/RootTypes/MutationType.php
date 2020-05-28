@@ -87,7 +87,14 @@ class MutationType extends ObjectType
                         'registration_address' => Types::nonNull(Types::string()),
                         'email' => Types::email(),
                         'phone_number' => Types::phoneNumber(),
-                        'password' => Types::nonNull(Types::password())
+                        'password' => Types::nonNull(Types::password()),
+
+                        "state" => Types::nonNull(Types::string()),
+                        "registration_type" => [
+                            "description" => "да = постоянная, нет = временная",
+                            "type" => Types::nonNull(Types::yesNo())
+                        ],
+                        "ovz" => Types::nonNull(Types::yesNo())
                     ]
                 ],
 
@@ -230,7 +237,11 @@ class MutationType extends ObjectType
             'date_registered' => DataSource::timeInMYSQLFormat(),
             'verification_key_email' => $key_code,
             'status_email' => User::EMAIL_PENDING,
-            "birthday" => $args["birthday"]
+            "birthday" => $args["birthday"],
+
+            "state" => "",
+            "registration_type" => "-",
+            "ovz" => "-"
         ]);
 
         DataSource::registerUser($instance, $context, User::PARENT);
@@ -290,7 +301,11 @@ HTML;
             'date_registered' => DataSource::timeInMYSQLFormat(),
             'verification_key_email' => "",
             'status_email' => User::EMAIL_PENDING,
-            "birthday" => $args["birthday"]
+            "birthday" => $args["birthday"],
+
+            "state" => $args["state"],
+            "registration_type" => $args["registration_type"],
+            "ovz" => $args["ovz"]
         ]);
 
         $id = DataSource::registerUser($instance, $context, User::CHILD);

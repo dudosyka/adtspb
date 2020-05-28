@@ -48,6 +48,10 @@ class User extends EntityBase
     public $status_email;
     public $verification_key_email;
 
+    public $state;
+    public $registration_type;
+    public $ovz;
+
     //TODO: заносить данные в сущность через __construct
 	public function __construct(array $data = null)
 	{

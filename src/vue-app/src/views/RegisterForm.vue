@@ -619,7 +619,7 @@
                                             placeholder="Дата рождения"
 
                                             :state="getValidationState(validationContext)"
-                                            :aria-describedby="'cld-'+index+'-birthday-birthday'"
+                                            :aria-describedby="'cld-'+index+'-birthday-feedback'"
                                         ></b-form-input>
 
                                         <b-form-invalid-feedback :id="'cld-'+index+'-birthday-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -635,8 +635,32 @@
                                     <b-form-group>
                                         <b-form-input
                                             class="icon"
+                                            v-model="item.state"
+                                            placeholder="Гражданство (государство)"
+
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-state-feedback'"
+                                        ></b-form-input>
+
+                                        <div>
+                                            <b-link @click="item.state = 'РФ'">РФ</b-link>
+                                        </div>
+
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-state-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            class="icon"
                                             v-model="item.study_place"
-                                            placeholder="Место учебы"
+                                            placeholder="Образовательное учреждение"
 
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-study_place-feedback'"
@@ -648,14 +672,14 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true, max: 10 }"
+                                    :rules="{ required: true }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
                                         <b-form-input
                                             class="icon"
                                             v-model="item.study_class"
-                                            placeholder="Класс"
+                                            placeholder="Класс/группа"
 
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-study_class-feedback'"
@@ -664,8 +688,26 @@
                                     </b-form-group>
                                 </validation-provider>
 
-                                <!-- TODO проверка валидации у адресов -->
-                                <!-- :rules="{ required: true }" -->
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-select
+                                            placeholder="Тип регистрации"
+                                            v-model="item.registration_type"
+                                            :options="registration_type"
+
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-registration_type-feedback'"
+                                        ></b-form-select>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_type-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
                                 <validation-provider
                                     style="width: 100%;"
 
@@ -709,6 +751,28 @@
                                         </div>
                                     </b-form-group>
                                 </validation-provider>
+
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group
+                                        description="В целях возможности создания соответствующих условий при организации образовательного процесса">
+                                        <b-form-select
+                                            placeholder="Относится ли ребёнок к категории лиц из числа ОВЗ"
+                                            v-model="item.ovz"
+                                            :options="ovz_type"
+
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-ovz-feedback'"
+                                        ></b-form-select>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-ovz-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
                             </div>
 
                             <hr style="width: 100%;">
@@ -805,7 +869,7 @@
                     </div>
 
                     <b-modal id="step4-warning" title="Предупреждение" v-model="step4_warning" :centered="true">
-                        <p class="my-4">Загрузка ребенка в неделю превышает 8 часов. Вы уверены в своем выборе?</p>
+                        <p class="my-4">Обратите внимание на общее число академических часов в неделю по всем объединениям. У одного или нескольких детей сумма часов в неделю составляет 8 или более, что является большой нагрузкой.</p>
 
                         <template v-slot:modal-footer>
                             <div class="w-100">
@@ -821,15 +885,15 @@
                                     class="float-right"
                                     @click="sendProps(); step4_warning=false"
                                 >
-                                    Продолжить
+                                    Все равно продолжить
                                 </b-button>
 
                             </div>
                         </template>
                     </b-modal>
 
-                    <b-modal id="step4-fatal" title="Большая нагрузка" v-model="step4_fatal" :centered="true">
-                        <p class="my-4">Пожалуйста, проверьте свой выбор и выберите меньшее число объединений.</p>
+                    <b-modal id="step4-fatal" title="Ограничение на подачу заявлений" v-model="step4_fatal" :centered="true">
+                        <p class="my-4">Один или несколько детей имеют количество часов в неделю, превышающее допустимое. Согласно СанПиН максимально допустимый объем нагрузки внеучебной деятельности составляет 10 часов. <br>Пожалуйста, проверьте нагрузку детей и остановите выбор на объединениях, соответствующих этому требованию.</p>
 
                         <template v-slot:modal-footer>
                             <div class="w-100">
@@ -931,6 +995,11 @@
                 password: null,
                 password_matching: null,
 
+
+                state: null,
+                registration_type: null,
+                ovz: null,
+
                 associations_selected: []
             };
 
@@ -943,6 +1012,18 @@
                     { value: null, text: 'Пол', disabled: true },
                     { value: "м", text: 'Мужской' },
                     { value: "ж", text: 'Женский' },
+                ],
+
+                registration_type: [
+                    { value: null, text: 'Тип регистрации (временная/постоянная)', disabled: true },
+                    { value: "да", text: 'Постоянная регистрация' },
+                    { value: "нет", text: 'Временная регистрация' },
+                ],
+
+                ovz_type: [
+                    { value: null, text: 'Относится ли ребёнок к категории лиц из числа ОВЗ?', disabled: true },
+                    { value: "да", text: 'Да, относится' },
+                    { value: "нет", text: 'Нет, не относится' },
                 ],
 
                 name: null,
@@ -1372,6 +1453,11 @@
                         `$registration_address`+i+`: String!,`+
                         `$email`+i+`: Email,`+
                         `$phone_number`+i+`: PhoneNumber,`+
+
+                        `$registration_type`+i+`: YesNo!,`+
+                        `$ovz`+i+`: YesNo!,`+
+                        `$state`+i+`: String!,`+
+
                         `$password`+i+`: Password!,`;
 
                     requests += `child`+i+`: registerChild (`+
@@ -1388,6 +1474,10 @@
                             `email: $email`+i+`,`+
                             `phone_number: $phone_number`+i+`,`+
                             `password: $password`+i+`,`+
+
+                            `registration_type: $registration_type`+i+`,`+
+                            `ovz: $ovz`+i+`,`+
+                            `state: $state`+i+`,`+
                         `)`;
 
                     data["relationship"+i] = current["relationship"];
@@ -1403,6 +1493,10 @@
                     data["email"+i] = (current["email"] == "") ? null : current["email"];
                     data["phone_number"+i] = (current["phone_number"] == "") ? null : current["phone_number"];
                     data["password"+i] = current["password"];
+
+                    data["registration_type"+i] = current["registration_type"];
+                    data["ovz"+i] = current["ovz"];
+                    data["state"+i] = current["state"];
 
                 }
                 let request = `mutation(` + variables + "){" + requests + "}";
@@ -1420,6 +1514,7 @@
                 this.$graphql_client.request(request, data).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
+                    _component.graphql_errors = [];
 
                     let incr = 0;
                     for(let i in data){
@@ -1473,6 +1568,7 @@
                     _component.incorrect_code = false;
                     _component.$token = data.validateRegistration;
                     _component.$refs.wizard.currentStep++;
+                    _component.graphql_errors = [];
                     // _component.$router.pushState({path: "/register/form?page=2"});
                     history.replaceState(null, null, '/register/form?page=2');
                 }).catch(function(e){
@@ -1548,6 +1644,7 @@
                 this.$request(this.$request_endpoint, request, data).then(function(data){
                     _component.is_sending_request = false;
                     _component.$refs.wizard.currentStep++;
+                    _component.graphql_errors = [];
                     // _component.$router.pushState({path: "/register/form?page=1&email="+_component.email});
                     history.replaceState(null, null, "/register/form?page=1&email="+_component.email);
                 }).catch(function(e){

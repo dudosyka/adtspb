@@ -9,7 +9,7 @@ class FileStorage {
      *
      * @var string
      */
-    private static string $storagePath = __DIR__ . "/../storage/";
+    private static string $storagePath = __DIR__ . DIRECTORY_SEPARATOR .".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "storage";
 
     /**
      * Получение пути к папке с хранилищем всех данных

@@ -49,7 +49,12 @@ class UserType extends ObjectType
                     'hasAnyChildrenAdded' => ['type' => Types::boolean()],
                     'hasAnyProposals' => ['type' => Types::boolean()],
                     'getChildren' => ['type' => Types::listOf(Types::user())],
-                    'getInProposals' => Types::listOf(Types::proposal())
+                    'getInProposals' => Types::listOf(Types::proposal()),
+
+                    'state' => Types::string(),
+                    'ovz' => Types::yesNo(),
+                    'registration_type' => Types::yesNo()
+
                 ];
             },
             'interfaces' => [

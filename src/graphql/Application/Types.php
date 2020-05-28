@@ -12,6 +12,7 @@ use GraphQL\Application\Type\Scalar\PasswordType;
 use GraphQL\Application\Type\Scalar\PhoneNumberType;
 use GraphQL\Application\Type\Scalar\SexType;
 use GraphQL\Application\Type\Scalar\UrlType;
+use GraphQL\Application\Type\Scalar\YesNoType;
 use GraphQL\Application\Type\UserType;
 use GraphQL\Type\Definition\CustomScalarType;
 use GraphQL\Type\Definition\ListOfType;
@@ -110,6 +111,7 @@ class Types
     private static $passwordType;
     private static $phoneNumberType;
     private static $sexType;
+    private static $yesNo;
 
 	/**
 	 * Тип e-mail
@@ -169,6 +171,16 @@ class Types
     public static function sex()
     {
         return self::$sexType ?: (self::$sexType = new SexType());
+    }
+
+    /**
+     * Тип данных "да/нет"
+     *
+     * @return YesNoType
+     */
+    public static function yesNo()
+    {
+        return self::$yesNo ?: (self::$yesNo = new YesNoType());
     }
 
 
