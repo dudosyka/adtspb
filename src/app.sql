@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Май 25 2020 г., 23:27
+-- Время создания: Май 29 2020 г., 00:30
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -102,7 +102,10 @@ CREATE TABLE `association` (
 --
 
 INSERT INTO `association` (`id`, `name`, `min_age`, `max_age`, `study_years`, `study_hours`, `study_hours_week`) VALUES
-(1, 'Робототехника', 12, 17, 1, 200, 0);
+(1, 'Робототехника', 12, 17, 1, 200, 0),
+(2, 'Робототехника', 11, 16, 1, 256, 4),
+(3, 'Киберспорт', 11, 16, 1, 256, 2),
+(4, 'Шахматы', 11, 16, 1, 256, 5);
 
 -- --------------------------------------------------------
 
@@ -421,18 +424,20 @@ CREATE TABLE `user` (
   `job_position` text NOT NULL COMMENT 'Должность',
   `relationship` text NOT NULL COMMENT 'Степень родства (родитель приходится ребенку как)',
   `study_place` text NOT NULL COMMENT 'Адрес и номер школы (если есть)',
-  `study_class` varchar(10) NOT NULL COMMENT 'Класс (если есть), формат: 1а - 11я',
+  `study_class` text NOT NULL COMMENT 'Класс (если есть), формат: 1а - 11я',
   `birthday` date DEFAULT NULL COMMENT 'День рождения',
-  `password` text NOT NULL COMMENT 'Пароль пользователя (шифруется приложением!)'
+  `password` text NOT NULL COMMENT 'Пароль пользователя (шифруется приложением!)',
+  `ovz` enum('да','нет','-') CHARACTER SET utf8mb4 NOT NULL COMMENT 'ОВЗ?',
+  `registration_type` enum('да','нет','-') CHARACTER SET utf8mb4 NOT NULL COMMENT 'Постоянная регистрация? да = постоянная, нет = временная',
+  `state` text NOT NULL COMMENT 'Гражданство (государство)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf16 COMMENT='Пользователи';
 
 --
 -- Дамп данных таблицы `user`
 --
 
-INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship`, `study_place`, `study_class`, `birthday`, `password`) VALUES
-(0, '1970-01-01 12:00:00', '', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', NULL, 'г. Москва', 'г. Москва', 'г. Москва', 'Аноним', '1', '', '', '1970-01-01', ''),
-(7, '2020-05-25 20:25:13', 'petrovichgi', 'Петрович', 'Георгий', 'Иванович', 'м', '', 'admin@testov.com', 'ожидание', '', 'Россия, Москва, Центральный административный округ, Пресненский район, Московский международный деловой центр Москва-Сити ', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе ', '', '', 'Родитель', 'Школа 12', '1а', '2003-12-12', '$2y$12$FCrQkF5Tf8.kNIjD0tBJQO3U4/HWI1S349IKcL0hj3Gomo/uSNYI2');
+INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship`, `study_place`, `study_class`, `birthday`, `password`, `ovz`, `registration_type`, `state`) VALUES
+(0, '2020-05-28 22:57:15', 'anonymous', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', NULL, '', NULL, '', '', '', '', '', '2020-05-14', '', 'нет', 'нет', 'РФ');
 
 -- --------------------------------------------------------
 
@@ -484,13 +489,6 @@ CREATE TABLE `user_role` (
   `role_id` bigint(20) NOT NULL,
   `user_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связка пользователей с ролями';
-
---
--- Дамп данных таблицы `user_role`
---
-
-INSERT INTO `user_role` (`id`, `role_id`, `user_id`) VALUES
-(13, 6, 7);
 
 -- --------------------------------------------------------
 
@@ -717,7 +715,7 @@ ALTER TABLE `action_list`
 -- AUTO_INCREMENT для таблицы `association`
 --
 ALTER TABLE `association`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `association_requiredassociation`
@@ -783,7 +781,7 @@ ALTER TABLE `passwordrestore`
 -- AUTO_INCREMENT для таблицы `proposal`
 --
 ALTER TABLE `proposal`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `role`
@@ -825,13 +823,13 @@ ALTER TABLE `upload`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
 --
 ALTER TABLE `user_child`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT для таблицы `user_doc`
@@ -849,13 +847,13 @@ ALTER TABLE `user_group`
 -- AUTO_INCREMENT для таблицы `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
