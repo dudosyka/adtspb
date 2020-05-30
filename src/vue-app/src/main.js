@@ -13,7 +13,9 @@ import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
 import {GraphQLClient, request} from 'graphql-request';
 import { ValidationObserver, ValidationProvider, extend, localize } from "vee-validate";
 import VueScrollTo from 'vue-scrollto';
+const VueInputMask = require('vue-inputmask').default;
 
+Vue.use(VueInputMask);
 
 // import YmapPlugin from 'vue-yandex-maps'
 // import ymaps_settings from './ymaps'

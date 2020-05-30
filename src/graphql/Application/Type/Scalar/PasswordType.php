@@ -29,11 +29,11 @@ class PasswordType extends ScalarType
     public function serialize($value)
     {
         // Assuming internal representation of email is always correct:
-        return $value;
+//        return $value;
 
         // If it might be incorrect and you want to make sure that only correct values are included in response -
         // use following line instead:
-        // return $this->parseValue($value);
+         return $this->parseValue($value);
     }
 
     /**
@@ -49,6 +49,10 @@ class PasswordType extends ScalarType
 //        if (preg_match("/[`{}\[\]:\";'<>\/]/", $value)) {
 //            throw new \UnexpectedValueException("Cannot represent value as date: " . Utils::printSafe($value));
 //        }
+
+        if(mb_strlen($value) > 8)
+            throw new \UnexpectedValueException("Пароль имеет больше, чем 8 символов");
+
         return $value;
     }
 
@@ -70,6 +74,10 @@ class PasswordType extends ScalarType
         if (preg_match("/[`{}\[\]:\";'<>\/]/", $valueNode->value)) {
             throw new Error("Not a valid password", [$valueNode]);
         }
+
+        if(mb_strlen($valueNode->value) > 8)
+            throw new \UnexpectedValueException("Пароль имеет больше, чем 8 символов");
+
         return $valueNode->value;
     }
 }

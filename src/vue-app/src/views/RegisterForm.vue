@@ -134,7 +134,7 @@
                                     style="width: 100%;"
 
                                     name="Пароль"
-                                    :rules="{ required: true, password: true }"
+                                    :rules="{ required: true, password: true, max: 8 }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -157,7 +157,7 @@
                                     style="width: 100%;"
 
                                     name="Подтверждение пароля"
-                                    :rules="{ required: true, password: true, password_match: password }"
+                                    :rules="{ required: true, password: true, password_match: password, max: 8 }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -186,6 +186,7 @@
                                             class="icon phone"
                                             v-model="phone_number"
                                             placeholder="Мобильный телефон"
+                                            v-mask="'+7(999)999-99-99'"
 
                                             :state="getValidationState(validationContext)"
                                             aria-describedby="phone_number-feedback"
@@ -214,6 +215,7 @@
                                     </b-form-group>
                                 </validation-provider>
 
+                                <!--
                                 <validation-provider
                                     style="width: 100%;"
 
@@ -233,7 +235,9 @@
                                         <b-form-invalid-feedback id="job_position-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
+                                -->
 
+                                <!--
                                 <validation-provider
                                     style="width: 100%;"
 
@@ -253,7 +257,9 @@
                                         <b-form-invalid-feedback id="job_place-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
+                                -->
 
+                                <!--
                                 <validation-provider
                                     style="width: 100%;"
 
@@ -274,6 +280,7 @@
                                         <b-form-invalid-feedback id="birthday-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
+                                -->
 
                                 <!-- TODO проверка валидации у адресов -->
                                 <!--  -->
@@ -435,6 +442,7 @@
                                             v-model="item.relationship"
                                             placeholder="Степень родства"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-relationship-feedback'"
                                         ></b-form-input>
@@ -460,6 +468,7 @@
                                             v-model="item.surname"
                                             placeholder="Фамилия"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-surname-feedback'"
                                         ></b-form-input>
@@ -479,6 +488,7 @@
                                             v-model="item.name"
                                             placeholder="Имя"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-name-feedback'"
                                         ></b-form-input>
@@ -498,6 +508,7 @@
                                             v-model="item.midname"
                                             placeholder="Отчество"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-midname-feedback'"
                                         ></b-form-input>
@@ -518,6 +529,7 @@
                                             v-model="item.email"
                                             placeholder="E-mail"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-email-feedback'"
                                         ></b-form-input>
@@ -528,7 +540,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true, password: true }"
+                                    :rules="{ required: true, password: true, max: 8 }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -540,6 +552,7 @@
                                             :ref="'cld-'+index+'-password'"
                                             :name="'cld-'+index+'-password'"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-password-feedback'"
                                         ></b-form-input>
@@ -550,7 +563,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true, password: true, password_match: item.password }"
+                                    :rules="{ required: true, password: true, password_match: item.password, max: 8 }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -560,6 +573,7 @@
                                             placeholder="Подтвердите пароль"
                                             type="password"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-password-matching-feedback'"
                                         ></b-form-input>
@@ -579,7 +593,9 @@
                                             class="icon phone"
                                             v-model="item.phone_number"
                                             placeholder="Мобильный телефон"
+                                            v-mask="'+7(999)999-99-99'"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-phone_number-feedback'"
                                         ></b-form-input>
@@ -599,12 +615,14 @@
                                             v-model="item.sex_options_selected"
                                             :options="sex_options"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-sex-feedback'"
                                         ></b-form-select>
                                         <b-form-invalid-feedback :id="'cld-'+index+'-sex-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
+
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -617,7 +635,9 @@
                                             class="icon"
                                             v-model="item.birthday"
                                             placeholder="Дата рождения"
+                                            v-mask="'9999-99-99'"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-birthday-feedback'"
                                         ></b-form-input>
@@ -625,6 +645,7 @@
                                         <b-form-invalid-feedback :id="'cld-'+index+'-birthday-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
+
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -638,6 +659,7 @@
                                             v-model="item.state"
                                             placeholder="Гражданство (государство)"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-state-feedback'"
                                         ></b-form-input>
@@ -662,6 +684,7 @@
                                             v-model="item.study_place"
                                             placeholder="Образовательное учреждение"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-study_place-feedback'"
                                         ></b-form-input>
@@ -681,6 +704,7 @@
                                             v-model="item.study_class"
                                             placeholder="Класс/группа"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-study_class-feedback'"
                                         ></b-form-input>
@@ -701,6 +725,7 @@
                                             v-model="item.registration_type"
                                             :options="registration_type"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-registration_type-feedback'"
                                         ></b-form-select>
@@ -719,6 +744,7 @@
                                             v-model="item.registration_address"
                                             placeholder="Адрес регистрации"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-registration_address-feedback'"
                                         />
@@ -743,6 +769,7 @@
                                             v-model="item.residence_address"
                                             placeholder="Адрес проживания"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-residence_address-feedback'" />
 <!--                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
@@ -766,6 +793,7 @@
                                             v-model="item.ovz"
                                             :options="ovz_type"
 
+                                            :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-ovz-feedback'"
                                         ></b-form-select>
@@ -779,7 +807,7 @@
 
                             <div>
                                 <b-link @click="children.push({...child_prototype})">Добавить ребенка</b-link>,
-                                <b-link @click="(children.length > 1) ? children.splice(-1,1) : false">удалить последнюю форму</b-link>
+                                <b-link @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false">удалить последнюю форму</b-link>
                             </div>
 
 
@@ -1000,7 +1028,9 @@
                 registration_type: null,
                 ovz: null,
 
-                associations_selected: []
+                associations_selected: [],
+
+                isDisabled: false
             };
 
             return {
@@ -1115,57 +1145,10 @@
 
         mounted: async function(){
             const page = (this.$route.query.page == undefined) ? 0 : parseInt(this.$route.query.page, 10);
-            this.$refs.wizard.currentStep = page;
+            this.setStep(page);
 
             const email = (this.$route.query.email == "") ? 0 : this.$route.query.email;
             this.email = email;
-
-            // Если шаг >= 4, то грузим информацию о детях
-            if(page >= 3){
-                await this.loadAssociations();
-                let data = await this.$graphql_client.request("query{ viewer{ getChildren{ id, name, surname, midname } } }");
-
-                for(var i in data.viewer.getChildren){
-                    let current = data.viewer.getChildren[i];
-
-                    this.children[i] = {
-                        ...this.child_prototype,
-                        id: parseInt(current.id, 10),
-                        name: current.name,
-                        surname: current.surname,
-                        midname: current.midname
-                    };
-
-                }
-                this.$forceUpdate();
-            }
-
-            // Если шаг >= 5, то грузим информацию о поданных заявлениях
-            if(page >= 4){
-                let data = await this.$graphql_client.request("query{ viewer{ getChildren{ getInProposals { getAssociation { id, name } } } } }");
-
-                for(var i in data.viewer.getChildren){
-                    let current = data.viewer.getChildren[i];
-
-                    let selected_associations = [];
-
-                    for(let y in current.getInProposals){
-                        let y_current = current.getInProposals[y];
-
-                        selected_associations.push({
-                            id: parseInt(y_current.getAssociation.id, 10),
-                            name: y_current.getAssociation.name,
-                        });
-                    }
-
-                    this.children[i] = {
-                        ...this.children[i],
-                        associations_selected: selected_associations
-                    };
-                }
-                this.$forceUpdate();
-            }
-
         },
 
         methods: {
@@ -1207,6 +1190,8 @@
                     return false;
                 }
 
+                this.stepChanged(currentPage);
+
                 return true;
             },
 
@@ -1233,10 +1218,108 @@
                 }
 
 
-                // if(currentPage >= 3)
-                //     return true; // Можем вернуться назад
+                if(currentPage >= 3)
+                    this.stepChanged(currentPage);
+                    return true; // Можем вернуться назад
 
                 return false;
+            },
+
+
+            stepChanged: async function(page){
+
+                history.replaceState(null, null, '/register/form?page='+page); //почему-то не работает?
+
+                // Если шаг >= 3, то грузим информацию о детях
+                if(page >= 2){
+                    await this.loadAssociations();
+                    let data = await this.$graphql_client.request("query{ viewer{ getChildren{ id, " +
+                        "name, " +
+                        "surname, " +
+                        "midname, " +
+                        "registration_address," +
+                        "residence_address," +
+                        "email," +
+                        "phone_number," +
+                        "sex," +
+                        "birthday," +
+                        "state," +
+                        "ovz," +
+                        "registration_type," +
+                        "study_place," +
+                        "study_class," +
+                        "relationship" +
+                        " } } }");
+
+                    for(var i in data.viewer.getChildren){
+                        let current = data.viewer.getChildren[i];
+
+                        this.children[i] = {
+                            ...this.child_prototype,
+                            id: parseInt(current.id, 10),
+                            name: current.name,
+                            surname: current.surname,
+                            midname: current.midname,
+                            registration_address: current.registration_address,
+                            residence_address: current.residence_address,
+                            email: current.email,
+                            phone_number: current.phone_number,
+                            sex_options_selected: current.sex,
+                            birthday: current.birthday,
+                            state: current.state,
+                            ovz: current.ovz,
+                            registration_type: current.registration_type,
+                            study_place: current.study_place,
+                            study_class: current.study_class,
+                            relationship: current.relationship,
+
+                            password: "12345678",
+                            password_matching: "12345678",
+
+                            isDisabled: true
+                        };
+
+                    }
+                    this.$forceUpdate();
+                }
+
+                // Если шаг >= 4, то грузим информацию о поданных заявлениях
+                if(page >= 3){
+                    let data = await this.$graphql_client.request("query{ viewer{ getChildren{ getInProposals { getAssociation { id, name } } } } }");
+
+                    for(var i in data.viewer.getChildren){
+                        let current = data.viewer.getChildren[i];
+
+                        let selected_associations = [];
+
+                        for(let y in current.getInProposals){
+                            let y_current = current.getInProposals[y];
+
+                            //TODO: прописать поле isAlreadyExists у selected_associations в прототипе (во избежания undefined, для того, чтобы было 100% не undefined)
+                            selected_associations.push({
+                                id: parseInt(y_current.getAssociation.id, 10),
+                                name: y_current.getAssociation.name,
+
+                                isAlreadyExists: true
+                            });
+                        }
+
+                        this.children[i] = {
+                            ...this.children[i],
+                            associations_selected: selected_associations
+                        };
+                    }
+                    this.$forceUpdate();
+                }
+            },
+
+            setStep(number){
+                this.$refs.wizard.currentStep = number;
+                this.stepChanged(number);
+            },
+
+            addStep(){
+                this.setStep(this.$refs.wizard.currentStep + 1);
             },
 
 
@@ -1392,6 +1475,9 @@
                     for(let i2 in current.associations_selected){
                         let current2 = current.associations_selected[i2];
 
+                        if(current2.isAlreadyExists)
+                            continue;
+
                         requests += `child`+i+`_assoc`+current2.id+`: selectChildAssociations (`+
                             `child_id: `+current["id"]+`,`+
                             `association_id: `+current2.id+``+
@@ -1401,7 +1487,11 @@
                 }
                 let request = 'mutation{' + requests + "}";
 
-                // TODO: проверка на наличие незаполненных (невыбранных) объединений у ребенка на клиент-сайде
+                // TODO: разбить на одну функцию успешные действия
+                if(requests == ''){
+                    this.addStep(); // объединить
+                    return
+                }
 
                 this.step3_error_notification = false;
                 this.is_sending_request = true;
@@ -1410,10 +1500,10 @@
 
                 this.$graphql_client.request(request, {}).then(function(data){
                     _component.is_sending_request = false;
-                    _component.$refs.wizard.currentStep++;
+                    _component.addStep(); // объединить
                     _component.graphql_errors = [];
                     // _component.$router.pushState({path: "/register/form?page=4"});
-                    history.replaceState(null, null, '/register/form?page=4');
+                    // history.replaceState(null, null, '/register/form?page=4');
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
@@ -1439,6 +1529,8 @@
 
                 for(let i in this.children){
                     let current = this.children[i];
+
+                    if(current.isDisabled) continue;
 
                     variables +=
                         `$relationship`+i+`: String!,`+
@@ -1506,6 +1598,12 @@
                 // console.log(request);
                 // console.log(data);
 
+                //TODO: объединить блоки при успешной отправке
+                if(variables == '' || requests == '' || data == {} ){
+                    this.addStep();
+                    this.loadAssociations();
+                    return;
+                }
 
                 this.is_sending_request = true;
 
@@ -1513,7 +1611,13 @@
 
                 this.$graphql_client.request(request, data).then(function(data){
                     _component.is_sending_request = false;
-                    _component.$refs.wizard.currentStep++;
+
+                    for(let i in _component.children){
+                        _component.children[i].isDisabled = true;
+                    }
+
+
+                    _component.addStep();
                     _component.graphql_errors = [];
 
                     let incr = 0;
@@ -1524,7 +1628,7 @@
 
                     _component.loadAssociations();
                     // _component.$router.pushState({path: "/register/form?page=3"});
-                    history.replaceState(null, null, '/register/form?page=3');
+
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
@@ -1567,10 +1671,10 @@
                     _component.is_sending_request = false;
                     _component.incorrect_code = false;
                     _component.$token = data.validateRegistration;
-                    _component.$refs.wizard.currentStep++;
+                    _component.addStep();
                     _component.graphql_errors = [];
                     // _component.$router.pushState({path: "/register/form?page=2"});
-                    history.replaceState(null, null, '/register/form?page=2');
+                    // history.replaceState(null, null, '/register/form?page=2');
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     // let errors = e.response.errors;
@@ -1598,11 +1702,8 @@
                         $password: Password!,
                         $phone_number: PhoneNumber!,
                         $sex: Sex!,
-                        $job_position: String!,
-                        $job_place: String!,
                         $registration_address: String!,
-                        $residence_address: String!,
-                        $birthday: Date!
+                        $residence_address: String!
                     ) {
                         register (
                             name: $name,
@@ -1612,14 +1713,16 @@
                             password: $password,
                             phone_number: $phone_number,
                             sex: $sex,
-                            job_position: $job_position,
-                            job_place: $job_place,
+
                             registration_address: $registration_address,
                             residence_address: $residence_address,
-                            birthday: $birthday
+
                         )
                     }
                 `;
+                // job_position: $job_position,
+                //     job_place: $job_place,
+                // birthday: $birthday
 
                 const data = {
                     name:                   this.name,
@@ -1629,11 +1732,11 @@
                     password:               this.password,
                     phone_number:           this.phone_number,
                     sex:                    this.sex_options_selected,
-                    job_position:           this.job_position,
-                    job_place:              this.job_place,
+                    // job_position:           this.job_position,
+                    // job_place:              this.job_place,
                     registration_address:   this.registration_address,
                     residence_address:      this.residence_address,
-                    birthday:               this.birthday
+                    // birthday:               this.birthday
                 };
 
                 this.is_sending_request = true;
@@ -1643,10 +1746,10 @@
 
                 this.$request(this.$request_endpoint, request, data).then(function(data){
                     _component.is_sending_request = false;
-                    _component.$refs.wizard.currentStep++;
+                    _component.addStep();
                     _component.graphql_errors = [];
                     // _component.$router.pushState({path: "/register/form?page=1&email="+_component.email});
-                    history.replaceState(null, null, "/register/form?page=1&email="+_component.email);
+                    // history.replaceState(null, null, "/register/form?page=1&email="+_component.email);
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     let errors = e.response.errors;

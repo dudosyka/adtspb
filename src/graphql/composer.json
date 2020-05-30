@@ -4,12 +4,21 @@
         "phing/phing": "2.*",
         "lcobucci/jwt": "^3.3",
         "ecodev/graphql-upload": "^4.1",
-        "mpdf/mpdf": "^8.0"
+        "mpdf/mpdf": "^8.0",
+        "tecnickcom/tc-lib-pdf": "dev-master",
+        "phpoffice/phpword": "^0.17.0",
+        "dompdf/dompdf": "^0.8.5"
     },
     "autoload": {
         "psr-0": {"": "src/"}
     },
     "require-dev": {
         "phpunit/phpunit": "9"
+    },
+    "repositories": [
+    {
+        "type": "vcs",
+        "url": "git@github.com:tecnickcom/tc-lib-pdf.git"
     }
+]
 }

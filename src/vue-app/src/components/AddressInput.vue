@@ -14,6 +14,7 @@
             style="width: 100%;"
             @input="handleInput"
             :state="state"
+            :disabled="(typeof disabled == 'boolean') ? disabled : false"
         />
         <!-- TODO отображать ошибки непосредственно в форме, а не в компоненте (сделать компонент адреса по-нормальному) -->
 <!--        <b-form-invalid-feedback v-if="!state">Данное поле должно быть заполнено</b-form-invalid-feedback>-->
@@ -42,6 +43,7 @@
             placeholder: String,
             is_required: Boolean,
             state: Boolean,
+            disabled: Boolean,
 
             value: String
         },
@@ -65,6 +67,9 @@
             // const suggestions = await res.json()
             // this.addresses = suggestions.suggestions
             // let test = await loadYmap();
+
+            this.$refs.field.$refs.input.disabled = (typeof this.disabled == 'boolean') ? this.disabled : false;
+            this.$refs.field.$refs.input.value = this.value;
 
             const baseComponent = this;
 

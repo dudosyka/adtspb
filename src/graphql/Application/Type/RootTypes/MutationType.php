@@ -63,11 +63,11 @@ class MutationType extends ObjectType
                         'password' => Types::nonNull(Types::password()),
                         'phone_number' => Types::nonNull(Types::phoneNumber()),
                         'sex' => Types::nonNull(Types::sex()),
-                        'job_position' => Types::nonNull(Types::string()),
-                        'job_place' => Types::nonNull(Types::string()),
+//                        'job_position' => Types::nonNull(Types::string()),
+//                        'job_place' => Types::nonNull(Types::string()),
                         'registration_address' => Types::nonNull(Types::string()),
                         'residence_address' => Types::nonNull(Types::string()),
-                        'birthday' => Types::nonNull(Types::date()),
+//                        'birthday' => Types::nonNull(Types::date()),
                     ]
                 ],
 
@@ -227,8 +227,8 @@ class MutationType extends ObjectType
             'password' => User::hashPassword($args['password']),
             'phone_number' => $args['phone_number'],
             'sex' => $args['sex'],
-            'job_position' => $args['job_position'],
-            'job_place' => $args['job_place'],
+            'job_position' => "", //$args['job_position'],
+            'job_place' => "", //$args['job_place'],
             'registration_address' => $args['registration_address'],
             'residence_address' => $args['residence_address'],
             'relationship' => "",
@@ -237,7 +237,7 @@ class MutationType extends ObjectType
             'date_registered' => DataSource::timeInMYSQLFormat(),
             'verification_key_email' => $key_code,
             'status_email' => User::EMAIL_PENDING,
-            "birthday" => $args["birthday"],
+            "birthday" => null, //$args["birthday"],
 
             "state" => "",
             "registration_type" => "-",
@@ -278,6 +278,7 @@ HTML;
         //TODO: защита от распространенных атак
         //TODO: запрет на регистрацию кириллического пароля
         //TODO: генерация особенного логина для ребенка логина
+        // TODO: провека на дубликаты по ФИО и ID родителя?
 
         $context->viewer->hasAccessOrError(4);
 
@@ -336,6 +337,7 @@ HTML;
         $context->viewer->hasAccessOrError(7);
 
         // Есть ли такая ассоциация
+        /** @var Association $findAssoc */
         $findAssoc = DataSource::find("Association", $args["association_id"]);
         if($findAssoc == null)
             throw new RequestError("Объединение не найдено!");
@@ -354,8 +356,23 @@ HTML;
             "child_id" => $args["child_id"],
             "association_id" => $args["association_id"]
         ]);
-        if($findProposal != null)
-            throw new RequestError("Заявление уже подано");
+        if($findProposal != null){
+
+            /** @var User $child */
+            $child = DataSource::find("User", $args["child_id"]);
+
+            $name = $child->name;
+            $surname = $child->surname;
+            $midname = $child->midname;
+
+            $full_name = "{$name} {$surname}";
+            if($midname != "") $full_name .= " {$midname}";
+
+            $title = $findAssoc->name;
+
+            throw new RequestError("Заявление в объединение {$title} на {$full_name} уже подано");
+        }
+
 
 
         // Проверка на количество часов

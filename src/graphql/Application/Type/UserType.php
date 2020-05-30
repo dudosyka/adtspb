@@ -23,7 +23,7 @@ class UserType extends ObjectType
 
                 return [
                     'id' => Types::id(),
-	                'password' => ['type' => Types::password()],
+//	                'password' => ['type' => Types::password()],
 	                'surname' => ['type' => Types::string()],
 	                'name' => ['type' => Types::string()],
 	                'midname' => ['type' => Types::string()],
@@ -38,7 +38,7 @@ class UserType extends ObjectType
 	                'residence_address' => ['type' => Types::string()],
 	                'job_place' => ['type' => Types::string()],
 	                'job_position' => ['type' => Types::string()],
-	                'relationship_id' => ['type' => Types::int()],
+	                'relationship' => ['type' => Types::string()],
 	                'study_place' => ['type' => Types::string()],
 	                'study_class' => ['type' => Types::string()],
 	                'date_registered' => ['type' => Types::date()],
