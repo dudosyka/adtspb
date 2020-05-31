@@ -6,6 +6,7 @@ use GraphQL\Application\Bearer;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\Association;
+use GraphQL\Application\Entity\Cooldown;
 use GraphQL\Application\Entity\PasswordRestore;
 use GraphQL\Application\Entity\Proposal;
 use GraphQL\Application\Entity\Upload;
@@ -148,6 +149,14 @@ class MutationType extends ObjectType
                     ]
                 ],
 
+                "resendCode" => [
+                    "type" => Types::string(),
+                    'description' => 'Повторная отправка кода регистрации',
+                    'args' => [
+                       "email" => Types::nonNull(Types::email())
+                    ]
+                ],
+
                 "restorePasswordSaveNew" => [
                     "type" => Types::boolean(),
                     'description' => 'Проверка кода на запрос на восстановление пароля',
@@ -207,7 +216,9 @@ class MutationType extends ObjectType
             ":phone_number" => $args["phone_number"]
         ]);
         if($found != null)
-            throw new RequestError("Данный e-mail или телефон уже зарегистрирован в базе. Пожалуйста, введите другой e-mail или телефон.");
+//            throw new RequestError("Данный e-mail или телефон уже зарегистрирован в базе. Пожалуйста, введите другой e-mail или телефон.");
+            throw new RequestError("Данный e-mail или телефон был указан ранее при регистрации.
+Если Вы уже регистрировались, то войдите в аккаунт на <a href=\"/login\">странице авторизации</a>");
 
 
 
@@ -246,20 +257,10 @@ class MutationType extends ObjectType
 
         DataSource::registerUser($instance, $context, User::PARENT);
 
-        $html = <<<HTML
-<p>Ваш код для подтверждения аккаунта:</p>
-<pre>{$key_code}</pre>
-HTML;
-//        <p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/register/form?code={$key_code}&email={$email}">ссылкой для восстановления</a>.</p>
-
-        //TODO: реализовать переход по ссылке
-
-
-        Application::sendMail($email, "Подтверждение аккаунта", $html);
+        $this->sendRegistrationEmail($email, $key_code);
 
         return true;
     }
-
 
     /**
      * Регистрация пользователя
@@ -324,6 +325,55 @@ HTML;
 
         return $id;
     }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @throws RequestError
+     */
+    public function resendCode($rootValue, $args, AppContext $context){
+        $email = $args["email"];
+
+
+
+        /** @var User $find */
+        $find = DataSource::findOne("User", "email = :email", [
+            ":email" => $email
+        ]);
+        if($find == null || $find->status_email != User::EMAIL_PENDING)
+            throw new RequestError("Некорректный пользователь");
+
+
+
+        /** @var Cooldown $findCooldown */
+        $findCooldown = DataSource::findOne("Cooldown", "user_id = :user_id AND type = :type ORDER BY id DESC", [
+            ":user_id" => $find->id,
+            ":type" => "1"
+        ]);
+        if($findCooldown != null && strtotime($findCooldown->date_created) + 1800 >= strtotime("now"))
+            throw new RequestError("Перед повторной отправкой запроса, пожалуйста, подождите 30 минут.");
+
+
+
+        $key_code = Application::generateValidationCode();
+
+        $find->verification_key_email = $key_code;
+        DataSource::update($find);
+
+        $this->sendRegistrationEmail($email, $key_code);
+
+
+
+        DataSource::insert(new Cooldown([
+            "user_id" => $find->id,
+            "type" => "1",
+            "date_created" => DataSource::timeInMYSQLFormat()
+        ]));
+
+        return "Код подтверждения отправлен повторно.";
+    }
+
 
     /**
      * @param $rootValue
@@ -780,6 +830,46 @@ HTML;
 
         return implode("\n", $registered);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function sendRegistrationEmail(string $email, string $code){
+        $html = <<<HTML
+<p>Ваш код для подтверждения аккаунта:</p>
+<pre>{$code}</pre>
+HTML;
+//        <p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/register/form?code={$key_code}&email={$email}">ссылкой для восстановления</a>.</p>
+
+        //TODO: реализовать переход по ссылке
+
+
+        Application::sendMail($email, "Подтверждение аккаунта", $html);
+    }
+
 
 
 }

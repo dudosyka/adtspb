@@ -316,8 +316,20 @@ button.theme-alt:active, button.theme-alt:focus{
     border-color: rgba(0,0,0,0) !important;
 }
 
+button.background-green{
+    background-color: #28a745;
+}
 
+button.background-red{
+    background-color: #c82333;
+}
 
+.btn-sm{
+    padding: 5px !important;
+    height: 30px !important;
+    //transform: scale(0.9);
+    font-size: 9pt !important;
+}
 
 
 

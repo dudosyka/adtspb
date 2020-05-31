@@ -70,7 +70,7 @@
 
 
 
-                        <b-button class="theme" type="submit" block :disabled="is_sending_request">Войти</b-button>
+                        <b-button style="background-color: #1862b6 !important;" class="theme" type="submit" block :disabled="is_sending_request">Войти</b-button>
 
                         <p class="theme text-muted mx-auto lost-password" style="width: 100%; text-align: center;">Забыли <router-link class="theme" to="/login/restore-password">Логин / Пароль</router-link>?</p>
 
@@ -83,7 +83,7 @@
 <!--                            <GoogleButton></GoogleButton>-->
 <!--                        </div>-->
 
-                        <b-button class="theme" style="background-color: #1862b6 !important; margin-top: 15px;" block @click="gotoRegistration()">Создать аккаунт</b-button>
+                        <b-button class="theme" style="margin-top: 15px;" block @click="gotoRegistration()">Создать аккаунт</b-button>
 
                         <!--
                         <p class="theme text-muted mx-auto register-account" style="width: 100%; text-align: center;">

@@ -106,14 +106,14 @@ extend("agreement",{
 });
 
 extend("date",{
-    message: "Дата должна быть действительной (формат: ГГГГ-ММ-ДД)",
+    message: "Дата должна быть действительной (формат: ДД-ММ-ГГГГ)",
     validate: function(value){
-        let input = value.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) !== null;
+        let input = value.match(/^[0-9]{2}-[0-9]{2}-[0-9]{4}$/) !== null; // тоже поменять
 
         let __data = value.split("-");
-        let year = parseInt(__data[0]);
-        let month = parseInt(__data[1]);
-        let day = parseInt(__data[2]);
+        let year = parseInt(__data[2]); //0
+        let month = parseInt(__data[1]); //1
+        let day = parseInt(__data[0]); //2
 
         let validation1 = year >= 1000 && year <= 9999;
         let validation2 = month >= 1 && month <= 12;

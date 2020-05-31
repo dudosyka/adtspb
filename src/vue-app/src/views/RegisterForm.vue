@@ -45,8 +45,9 @@
                                 <!--                            Или-->
                                 <!--                        </CenteredCaption>-->
 
+                                <!-- TODO: обезопасить вывод HTML ошибки? -->
                                 <b-alert variant="danger" v-bind:show="graphql_errors.length > 0" v-if="graphql_errors.length > 0" id="register_errors_container">
-                                    {{graphql_errors[0].message}}
+                                    <p v-html="graphql_errors[0].message"></p>
                                 </b-alert>
 
                                 <validation-provider
@@ -370,12 +371,21 @@
                     <p>Письмо может доставляться в течение 5 минут.<br>Если письмо не пришло, проверьте папку "Спам".</p>
 
                     <!-- dismissible -->
+
+                    <b-alert variant="primary" show>
+                        Если Вы обнаружили ошибку в своих данных или ребенка, то отправьте сообщение на почту <a href="mailto:lk_support@adtspb.ru">lk_support@adtspb.ru</a> для внесения изменений.
+                    </b-alert>
+
                     <b-alert :show="step1_back_notification" variant="warning">
                         Пожалуйста, введите код подтверждения.
                     </b-alert>
 
                     <b-alert variant="danger" v-bind:show="incorrect_code" v-if="incorrect_code" id="incorrect_code_message">
                         Неверный код подтверждения. Пожалуйста, проверьте введённый код.
+                    </b-alert>
+
+                    <b-alert variant="secondary" v-bind:show="resend_code_notice" v-if="resend_code_notice" id="resend_code_notice">
+                        {{resend_code_response}}
                     </b-alert>
 
                     <validation-provider
@@ -398,6 +408,8 @@
                         </b-form-group>
                     </validation-provider>
 
+                    <b-button @click="resendCode()" style="width: 100%;" :disabled="is_sending_request">Повторно отправить код подтверждения</b-button>
+
 
                 </div>
 
@@ -408,6 +420,10 @@
                     </div>
 
                     <!-- dismissible -->
+                    <b-alert variant="primary" show>
+                        Если Вы обнаружили ошибку в своих данных или ребенка, то отправьте сообщение на почту <a href="mailto:lk_support@adtspb.ru">lk_support@adtspb.ru</a> для внесения изменений.
+                    </b-alert>
+
                     <b-alert :show="step2_back_notification" variant="warning" id="back_to_code_warning">
                         Дополнительных действий по изменению регистрационных данных или кода подтверждения не требуется.
                     </b-alert>
@@ -448,8 +464,10 @@
                                         ></b-form-input>
 
                                         <div>
-                                            <b-link @click="item.relationship = 'Родитель'">Родитель</b-link>,
-                                            <b-link @click="item.relationship = 'Законный представитель'">законный представитель</b-link>
+                                            <b-button @click="item.relationship = 'Родитель'" size="sm" style="margin-right: 5px;">Родитель</b-button>
+                                            <b-button @click="item.relationship = 'Законный представитель'" size="sm">Законный представитель</b-button>
+<!--                                            <b-link @click="item.relationship = 'Родитель'">Родитель</b-link>,-->
+<!--                                            <b-link @click="item.relationship = 'Законный представитель'">законный представитель</b-link>-->
                                         </div>
 
                                         <b-form-invalid-feedback :id="'cld-'+index+'-relationship-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -631,11 +649,12 @@
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
+<!--                                        v-mask="'9999-99-99'"-->
                                         <b-form-input
                                             class="icon"
                                             v-model="item.birthday"
                                             placeholder="Дата рождения"
-                                            v-mask="'9999-99-99'"
+                                            v-mask="'99-99-9999'"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -665,7 +684,8 @@
                                         ></b-form-input>
 
                                         <div>
-                                            <b-link @click="item.state = 'РФ'">РФ</b-link>
+<!--                                            <b-link @click="item.state = 'РФ'">РФ</b-link>-->
+                                            <b-button @click="item.state = 'РФ'" size="sm">РФ</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback :id="'cld-'+index+'-state-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -750,7 +770,8 @@
                                         />
 <!--                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
                                         <div>
-                                            <b-link @click="getRegistrationAddressAsParentToChild(index)">Как у родителя</b-link>
+<!--                                            <b-link @click="getRegistrationAddressAsParentToChild(index)">Как у родителя</b-link>-->
+                                            <b-button @click="getRegistrationAddressAsParentToChild(index)" size="sm">Как у родителя</b-button>
                                         </div>
 
                                     </b-form-group>
@@ -774,7 +795,8 @@
                                             :aria-describedby="'cld-'+index+'-residence_address-feedback'" />
 <!--                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
                                         <div>
-                                            <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>
+<!--                                            <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>-->
+                                            <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm">Как у родителя</b-button>
                                         </div>
                                     </b-form-group>
                                 </validation-provider>
@@ -806,8 +828,12 @@
                             <hr style="width: 100%;">
 
                             <div>
-                                <b-link @click="children.push({...child_prototype})">Добавить ребенка</b-link>,
-                                <b-link @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false">удалить последнюю форму</b-link>
+<!--                                <b-link @click="children.push({...child_prototype})">Добавить ребенка</b-link>,-->
+<!--                                <b-link @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false">удалить последнюю форму</b-link>-->
+
+                                <b-button class="background-green" @click="children.push({...child_prototype})" size="sm" style="margin-right: 5px;">Добавить ребенка</b-button>
+                                <b-button class="background-red" @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false" size="sm">Удалить последнюю форму</b-button>
+
                             </div>
 
 
@@ -885,7 +911,9 @@
                             <template v-slot:cell(selected)="{ rowSelected }">
                                 <template v-if="rowSelected">
                                     <span aria-hidden="true">&check;</span>
-                                    <span class="sr-only">Выбрано</span>
+                                    <span class="sr-only">
+                                        Выбрано
+                                    </span>
                                 </template>
                                 <template v-else>
                                     <span aria-hidden="true">&nbsp;</span>
@@ -967,6 +995,8 @@
                         </b-table>
 
                     </div>
+
+                    <b-button class="background-green" @click="setStep(2)" style="width: 100%;">Добавить ребенка</b-button>
 
                 </div>
             </vue-good-wizard>
@@ -1072,6 +1102,8 @@
 
                 // Шаг 2
                 key_code: null,
+                resend_code_notice: false,
+                resend_code_response: "",
 
                 // Шаг 3
                 child_prototype: child_prototype,
@@ -1256,6 +1288,13 @@
                     for(var i in data.viewer.getChildren){
                         let current = data.viewer.getChildren[i];
 
+                        let bday = current.birthday.split("-");
+
+                        let tmp = bday[0];
+                        bday[0] = bday[2];
+                        bday[2] = tmp;
+
+
                         this.children[i] = {
                             ...this.child_prototype,
                             id: parseInt(current.id, 10),
@@ -1267,7 +1306,7 @@
                             email: current.email,
                             phone_number: current.phone_number,
                             sex_options_selected: current.sex,
-                            birthday: current.birthday,
+                            birthday: bday[0]+"-"+bday[1]+"-"+bday[2],
                             state: current.state,
                             ovz: current.ovz,
                             registration_type: current.registration_type,
@@ -1429,6 +1468,63 @@
 
 
 
+            resendCode(){
+                const request = `
+                    mutation(
+                        $email: Email!,
+                    ) {
+                        resendCode (
+                            email: $email
+                        )
+                    }
+                `;
+                // job_position: $job_position,
+                //     job_place: $job_place,
+                // birthday: $birthday
+
+                const data = {
+                    email: this.email
+                };
+
+                this.is_sending_request = true;
+                this.graphql_errors = [];
+                this.resend_code_notice = false;
+
+                const _component = this;
+
+                this.$request(this.$request_endpoint, request, data).then(function(data){
+                    _component.is_sending_request = false;
+                    _component.resend_code_response = data.resendCode;
+                    _component.resend_code_notice = true;
+
+                    _component.$nextTick(function(){
+                        _component.$scrollTo("#resend_code_notice");
+                    });
+                }).catch(function(e){
+                    _component.is_sending_request = false;
+                    let errors = e.response.errors;
+                    if(errors != undefined){
+                        _component.resend_code_response = errors[0].message;
+                        _component.resend_code_notice = true;
+                        _component.$nextTick(function(){
+                            _component.$scrollTo("#resend_code_notice");
+                        });
+                    }
+
+
+                });
+            },
+
+
+
+
+
+
+
+
+
+
+
             /* Шаг 4 */
 
             preSendProps(){
@@ -1582,7 +1678,13 @@
                     data["residence_address"+i] = current["residence_address"];
                     data["study_place"+i] = current["study_place"];
                     data["study_class"+i] = current["study_class"];
-                    data["birthday"+i] = current["birthday"];
+
+
+                    let bday = current["birthday"].split("-");
+                    data["birthday"+i] = bday[2]+"-"+bday[1]+"-"+bday[0];
+
+
+
                     data["registration_address"+i] = current["registration_address"];
                     data["email"+i] = (current["email"] == "") ? null : current["email"];
                     data["phone_number"+i] = (current["phone_number"] == "") ? null : current["phone_number"];
