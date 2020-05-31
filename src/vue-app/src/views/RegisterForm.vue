@@ -1206,6 +1206,7 @@
                     this.$nextTick(function(){
                         _this.$scrollTo("#incorrect_code_message");
                     });
+                    return false;
                 }
 
 
@@ -1215,6 +1216,7 @@
                     this.$nextTick(function(){
                         _this.$scrollTo("#back_to_code_warning");
                     });
+                    return false;
                 }
 
 
