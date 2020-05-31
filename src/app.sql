@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Май 29 2020 г., 00:30
+-- Время создания: Июн 01 2020 г., 00:39
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -279,6 +279,31 @@ CREATE TABLE `proposal` (
   `status_teacher_id` bigint(20) NOT NULL COMMENT 'Ответ от учителя'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `proposal`
+--
+
+INSERT INTO `proposal` (`id`, `timestamp`, `child_id`, `parent_id`, `association_id`, `status_admin_id`, `status_parent_id`, `status_teacher_id`) VALUES
+(1, '2020-05-29 22:18:30', 2, 1, 2, 1, 4, 1),
+(2, '2020-05-29 22:18:30', 2, 1, 3, 1, 4, 1),
+(3, '2020-05-30 22:55:49', 4, 3, 2, 1, 4, 1),
+(4, '2020-05-30 22:55:49', 4, 3, 3, 1, 4, 1),
+(5, '2020-05-30 22:55:49', 5, 3, 1, 1, 4, 1),
+(6, '2020-05-30 22:55:49', 5, 3, 3, 1, 4, 1),
+(7, '2020-05-30 22:55:49', 6, 3, 1, 1, 4, 1),
+(8, '2020-05-30 22:55:49', 6, 3, 3, 1, 4, 1),
+(9, '2020-05-30 22:55:49', 7, 3, 2, 1, 4, 1),
+(10, '2020-05-30 22:55:49', 7, 3, 3, 1, 4, 1),
+(11, '2020-05-30 23:05:44', 4, 3, 1, 1, 4, 1),
+(12, '2020-05-30 23:05:44', 7, 3, 1, 1, 4, 1),
+(13, '2020-05-30 23:09:12', 5, 3, 4, 1, 4, 1),
+(14, '2020-05-30 23:10:05', 4, 3, 4, 1, 4, 1),
+(15, '2020-05-30 23:10:05', 6, 3, 4, 1, 4, 1),
+(16, '2020-05-31 21:19:35', 9, 8, 2, 1, 4, 1),
+(17, '2020-05-31 21:19:35', 9, 8, 3, 1, 4, 1),
+(18, '2020-05-31 21:23:17', 9, 8, 1, 1, 4, 1),
+(19, '2020-05-31 21:30:21', 9, 8, 4, 1, 4, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -437,7 +462,16 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship`, `study_place`, `study_class`, `birthday`, `password`, `ovz`, `registration_type`, `state`) VALUES
-(0, '2020-05-28 22:57:15', 'anonymous', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', NULL, '', NULL, '', '', '', '', '', '2020-05-14', '', 'нет', 'нет', 'РФ');
+(0, '2020-05-28 22:57:15', 'anonymous', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', NULL, '', NULL, '', '', '', '', '', '2020-05-14', '', 'нет', 'нет', 'РФ'),
+(1, '2020-05-29 22:16:25', 'testovtt', 'Тестов', 'Тест', 'Тестович', 'м', '+7(444)111-12-55', 'admin@testov1.com', 'ожидание', '704ACC68', 'Россия, Москва, Центральный административный округ, Пресненский район, Московский международный деловой центр Москва-Сити ', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе ', 'Место работы', 'Должность', '', '', '', '1973-12-12', '$2y$12$mquPInmKFNxG95sNNwTR3.kCtatyS73ELk7PLOvhVcW9rOMAcXkjW', '-', '-', ''),
+(2, '2020-05-29 22:18:16', 'ivanovip', 'Иванов', 'Иван', 'Петрович', 'м', '+7(999)999-88-44', 'admin@testov.com', 'ожидание', '', 'Россия, Москва, Центральный административный округ, Пресненский район, Московский международный деловой центр Москва-Сити ', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе ', '', '', 'Родитель', 'Школа №123', '1а', '2003-12-12', '$2y$12$un4Ew/LMdZAhQqvplfgm4OUaYgW6XRIUOcteXHbcATgrIFDD6T.qi', 'нет', 'да', 'РФ'),
+(3, '2020-05-30 22:04:01', 'opqowiepoqiwepoiqweqp', 'opqowiepoqiw[epoiqwe', 'qwpeiuqwpoieu', 'pqwieuqpwoieupqwoi', 'м', '+7(123)123-12-31', 'qwpeiuqpwioeuqwpioe@qweqwer.ur', 'подтвержден', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', '', '', '', NULL, '$2y$12$.SviPDpR/Bx9sVYqJTaGFOCvXWEzVvKbi5JM6LbmKvVrJX/seo9KW', '-', '-', ''),
+(4, '2020-05-30 22:35:12', 'testovtt2', 'Тестов', 'Тест', 'Тестович', 'м', '+7(123)123-12-32', '', 'ожидание', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', 'Родитель', 'Школа 123', '1а', '2001-12-12', '$2y$12$AD5Jy7IFmvTfxVovwWdRjeP45IHpJbNrDJtXHFsCe9RUacCnDpvyK', 'нет', 'да', 'РФ'),
+(5, '2020-05-30 22:36:57', 'testovtt3', 'Тестов', 'Тест', 'Тестович', 'м', '+7(123)123-12-31', '', 'ожидание', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', 'Родитель', 'Школа 123', '1а', '2001-12-12', '$2y$12$jYsTmEIkawT3fckI0zP0vOeRSH.lIWDK33EM94tO1GftrLakFJrrm', 'нет', 'да', 'РФ'),
+(6, '2020-05-30 22:54:42', 'testovtt4', 'Тестов', 'Тест', 'Тестович', 'м', '+7(123)123-12-32', '', 'ожидание', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', 'Родитель', 'Школа 123', '1а', '2001-12-12', '$2y$12$4jcn2payQ/ADLc1mNCwbXef8VcUzm7FSbrsEEbEot0xwhwYRBKHve', 'нет', 'да', 'РФ'),
+(7, '2020-05-30 22:54:42', 'testovtt5', 'Тестов', 'Тест', 'Тестович', 'м', '+7(123)123-12-31', '', 'ожидание', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', 'Родитель', 'Школа 123', '1а', '2001-12-12', '$2y$12$a.K7TwsNwaKKJjCjDpzQDOIv9Bigxuq0BdidXUo7GnBRNhSxEUfwe', 'нет', 'да', 'РФ'),
+(8, '2020-05-31 21:05:21', 'iquwpeoiuqpwoieuiu', 'iquwpeoiuqpwoieu', 'iquwpeioquwepo', 'upoiquwpeoiquwpeoiquwiopepuq', 'м', '+7(519)725-08-12', 'adnnnnnnnn@qweuqoiwrpoquwrqwr.ru', 'подтвержден', '', '1247091827', '081724987102984', '', '', '', '', '', NULL, '$2y$12$lBh8TpuqHSO8mahGkOzKceClt9tTWrGS7FN6QETDIsvWHYoUjmZ0W', '-', '-', ''),
+(9, '2020-05-31 21:18:45', 'qweqq', 'qwe', 'qweqweqwe', 'qweqweqweqwe', 'м', '+7(152)180-97-51', 'admin1111@testov.com', 'ожидание', '', '1247091827', '081724987102984', '', '', 'Родитель', 'qwe', '123', '2003-12-12', '$2y$12$q/mFH4IbfiWJboRwUukR8.NR0xcJVG5ua6LKr/Yx7vC1LvYTTMJj.', 'нет', 'да', 'РФ');
 
 -- --------------------------------------------------------
 
@@ -450,6 +484,18 @@ CREATE TABLE `user_child` (
   `parent_id` bigint(20) NOT NULL COMMENT 'ID родителя',
   `child_id` bigint(20) NOT NULL COMMENT 'ID ребенка'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связка родителей с детьми';
+
+--
+-- Дамп данных таблицы `user_child`
+--
+
+INSERT INTO `user_child` (`id`, `parent_id`, `child_id`) VALUES
+(1, 1, 2),
+(2, 3, 4),
+(3, 3, 5),
+(4, 3, 6),
+(5, 3, 7),
+(6, 8, 9);
 
 -- --------------------------------------------------------
 
@@ -490,6 +536,21 @@ CREATE TABLE `user_role` (
   `user_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связка пользователей с ролями';
 
+--
+-- Дамп данных таблицы `user_role`
+--
+
+INSERT INTO `user_role` (`id`, `role_id`, `user_id`) VALUES
+(1, 2, 1),
+(2, 6, 2),
+(3, 2, 3),
+(4, 6, 4),
+(5, 6, 5),
+(6, 6, 6),
+(7, 6, 7),
+(8, 2, 8),
+(9, 6, 9);
+
 -- --------------------------------------------------------
 
 --
@@ -502,6 +563,16 @@ CREATE TABLE `user_token` (
   `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Время создания',
   `user_id` bigint(20) NOT NULL COMMENT 'ID пользователя, которому принадлежит токен'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Токены пользователей для доступа с API (выд. посл. авториз.)';
+
+--
+-- Дамп данных таблицы `user_token`
+--
+
+INSERT INTO `user_token` (`id`, `token`, `date_created`, `user_id`) VALUES
+(1, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMSJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMSIsImlhdCI6MTU5MDc5MDY0OCwibmJmIjoxNTkwNzk0MjQ4LCJleHAiOjE1OTA4NzcwNDgsInVpZCI6MSwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-29 22:17:28', 1),
+(2, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMyJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMyIsImlhdCI6MTU5MDg3NjMxMSwibmJmIjoxNTkwODc5OTExLCJleHAiOjE1OTA5NjI3MTEsInVpZCI6MywiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-30 22:05:12', 3),
+(3, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU5MDk1OTIxNSwibmJmIjoxNTkwOTYyODE1LCJleHAiOjE1OTEwNDU2MTUsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-31 21:06:55', 8),
+(4, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU5MDk1OTg5NCwibmJmIjoxNTkwOTYzNDk0LCJleHAiOjE1OTEwNDYyOTQsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-31 21:18:14', 8);
 
 --
 -- Индексы сохранённых таблиц
@@ -781,7 +852,7 @@ ALTER TABLE `passwordrestore`
 -- AUTO_INCREMENT для таблицы `proposal`
 --
 ALTER TABLE `proposal`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT для таблицы `role`
@@ -823,13 +894,13 @@ ALTER TABLE `upload`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=20;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
 --
 ALTER TABLE `user_child`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `user_doc`
@@ -847,7 +918,7 @@ ALTER TABLE `user_group`
 -- AUTO_INCREMENT для таблицы `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `user_token`
