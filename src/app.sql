@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Июн 01 2020 г., 00:39
+-- Время создания: Июн 02 2020 г., 01:35
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -47,7 +47,8 @@ INSERT INTO `action` (`id`, `name`, `description`) VALUES
 (6, 'PDF заявление', 'Генерация поданных заявлений на группу в PDF'),
 (7, 'Выбор групп ребенка', 'Выбор групп ребенка от лица родителя'),
 (8, 'Состояние регистрации формы детей', 'Просмотр состояния наличия регистрации детей родителя в системе.'),
-(9, 'Просмотр данных ребенка', 'Просмотр данных зарегистрированных детей (ребенка).');
+(9, 'Просмотр данных ребенка', 'Просмотр данных зарегистрированных детей (ребенка).'),
+(10, 'Вход в аккаунт', 'Доступ к входу в аккаунт');
 
 -- --------------------------------------------------------
 
@@ -79,7 +80,8 @@ INSERT INTO `action_list` (`id`, `list_id`, `role_id`, `action_id`, `sign`) VALU
 (9, 1, 2, 6, '+'),
 (10, 1, 2, 7, '+'),
 (11, 1, 2, 8, '+'),
-(12, 1, 2, 9, '+');
+(12, 1, 2, 9, '+'),
+(13, 1, 6, 10, '+');
 
 -- --------------------------------------------------------
 
@@ -118,6 +120,19 @@ CREATE TABLE `association_requiredassociation` (
   `association_id` bigint(20) NOT NULL COMMENT 'ID ассоциации',
   `required_association_id` bigint(20) NOT NULL COMMENT 'ID курса, который необходимо закончить'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `cooldown`
+--
+
+CREATE TABLE `cooldown` (
+  `id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `type` text NOT NULL,
+  `date_created` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Кулдаун к функциям';
 
 -- --------------------------------------------------------
 
@@ -302,7 +317,11 @@ INSERT INTO `proposal` (`id`, `timestamp`, `child_id`, `parent_id`, `association
 (16, '2020-05-31 21:19:35', 9, 8, 2, 1, 4, 1),
 (17, '2020-05-31 21:19:35', 9, 8, 3, 1, 4, 1),
 (18, '2020-05-31 21:23:17', 9, 8, 1, 1, 4, 1),
-(19, '2020-05-31 21:30:21', 9, 8, 4, 1, 4, 1);
+(19, '2020-05-31 21:30:21', 9, 8, 4, 1, 4, 1),
+(20, '2020-06-01 20:49:31', 11, 10, 1, 1, 4, 1),
+(21, '2020-06-01 20:49:31', 11, 10, 2, 1, 4, 1),
+(22, '2020-06-01 21:39:24', 11, 10, 4, 1, 4, 1),
+(23, '2020-06-01 21:50:14', 11, 10, 3, 1, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -471,7 +490,12 @@ INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midnam
 (6, '2020-05-30 22:54:42', 'testovtt4', 'Тестов', 'Тест', 'Тестович', 'м', '+7(123)123-12-32', '', 'ожидание', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', 'Родитель', 'Школа 123', '1а', '2001-12-12', '$2y$12$4jcn2payQ/ADLc1mNCwbXef8VcUzm7FSbrsEEbEot0xwhwYRBKHve', 'нет', 'да', 'РФ'),
 (7, '2020-05-30 22:54:42', 'testovtt5', 'Тестов', 'Тест', 'Тестович', 'м', '+7(123)123-12-31', '', 'ожидание', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', 'Родитель', 'Школа 123', '1а', '2001-12-12', '$2y$12$a.K7TwsNwaKKJjCjDpzQDOIv9Bigxuq0BdidXUo7GnBRNhSxEUfwe', 'нет', 'да', 'РФ'),
 (8, '2020-05-31 21:05:21', 'iquwpeoiuqpwoieuiu', 'iquwpeoiuqpwoieu', 'iquwpeioquwepo', 'upoiquwpeoiquwpeoiquwiopepuq', 'м', '+7(519)725-08-12', 'adnnnnnnnn@qweuqoiwrpoquwrqwr.ru', 'подтвержден', '', '1247091827', '081724987102984', '', '', '', '', '', NULL, '$2y$12$lBh8TpuqHSO8mahGkOzKceClt9tTWrGS7FN6QETDIsvWHYoUjmZ0W', '-', '-', ''),
-(9, '2020-05-31 21:18:45', 'qweqq', 'qwe', 'qweqweqwe', 'qweqweqweqwe', 'м', '+7(152)180-97-51', 'admin1111@testov.com', 'ожидание', '', '1247091827', '081724987102984', '', '', 'Родитель', 'qwe', '123', '2003-12-12', '$2y$12$q/mFH4IbfiWJboRwUukR8.NR0xcJVG5ua6LKr/Yx7vC1LvYTTMJj.', 'нет', 'да', 'РФ');
+(9, '2020-05-31 21:18:45', 'qweqq', 'qwe', 'qweqweqwe', 'qweqweqweqwe', 'м', '+7(152)180-97-51', 'admin1111@testov.com', 'ожидание', '', '1247091827', '081724987102984', '', '', 'Родитель', 'qwe', '123', '2003-12-12', '$2y$12$q/mFH4IbfiWJboRwUukR8.NR0xcJVG5ua6LKr/Yx7vC1LvYTTMJj.', 'нет', 'да', 'РФ'),
+(10, '2020-06-01 20:48:17', 'shchgishchztsshugzishchtsshugzshchg', 'щгйщзцшугзйщцшугз', 'щшгзйцщшугзйщшцгузщш', 'гзйщшцгузщшйцгузщш', 'м', '+7(189)509-28-15', 'qweiuqwoieupqowie@wqeoiuqweoipuqwir.ru', 'подтвержден', '', '8172049871209847', '7019284701298479124124', '', '', '', '', '', NULL, '$2y$12$A31dbwFVSikyOPR39w1iu.6wh9226vHUU4sv6pTBvaHkZY3LBx7Q.', '-', '-', ''),
+(11, '2020-06-01 20:49:27', 'testtt', 'Тест', 'Тестов', 'Тестович', 'м', '+7(815)092-80-12', 'admin@testov111.com', 'ожидание', '', '8172049871209847', '7019284701298479124124', '', '', 'Родитель', '123', '123', '2003-12-12', '$2y$12$CDe7PvQCpSBoZURSkUzsFugNHZBkkE/18VYImZdMJ/3BMto0iu1tu', 'нет', 'да', 'РФ'),
+(12, '2020-06-01 22:10:05', '12313', '123', '12312', '3123', 'м', '+7(158)701-92-87', 'admin@email.com', 'ожидание', 'B1750E60', 'Санкт-Петербург', 'qwe', '', '', '', '', '', NULL, '$2y$12$wYtwo9GP6hiy3JI/SQAG..sE3RgAiRMNub5Ki1uCMhcu8hFh9GlLe', '-', '-', ''),
+(13, '2020-06-01 22:11:37', 'h1f987y29837109287309812717', 'h1f987y298371092873098127', '1702398710298371098', '709817023987102983701', 'м', '+7(571)089-27-50', 'admin@qweqwe.ru', 'ожидание', '9B314E2A', 'qwe', 'qwe', '', '', '', '', '', NULL, '$2y$12$ioeq0oU4Boy9s/vGFx6S0.YOVzgfwkRACrADbDy2HiAeYq.dMQMRC', '-', '-', ''),
+(14, '2020-06-01 22:27:16', 'itsuii', 'йцу', 'йцу', 'йцу', 'м', '+7(195)278-09-12', 'admin@admin.com', 'ожидание', 'F5536E19', 'Россия, Санкт-Петербург, бульвар Новаторов, 98 ', 'Россия, Санкт-Петербург, бульвар Новаторов, 98 ', '', '', '', '', '', NULL, '$2y$12$WbfzvSReiCevt4oBRmVaWeBRc10RqF.F1gWZS5kPOyCqvfpCiwHaG', '-', '-', '');
 
 -- --------------------------------------------------------
 
@@ -495,7 +519,8 @@ INSERT INTO `user_child` (`id`, `parent_id`, `child_id`) VALUES
 (3, 3, 5),
 (4, 3, 6),
 (5, 3, 7),
-(6, 8, 9);
+(6, 8, 9),
+(7, 10, 11);
 
 -- --------------------------------------------------------
 
@@ -549,7 +574,12 @@ INSERT INTO `user_role` (`id`, `role_id`, `user_id`) VALUES
 (6, 6, 6),
 (7, 6, 7),
 (8, 2, 8),
-(9, 6, 9);
+(9, 6, 9),
+(10, 2, 10),
+(11, 6, 11),
+(12, 2, 12),
+(13, 2, 13),
+(14, 2, 14);
 
 -- --------------------------------------------------------
 
@@ -572,7 +602,8 @@ INSERT INTO `user_token` (`id`, `token`, `date_created`, `user_id`) VALUES
 (1, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMSJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMSIsImlhdCI6MTU5MDc5MDY0OCwibmJmIjoxNTkwNzk0MjQ4LCJleHAiOjE1OTA4NzcwNDgsInVpZCI6MSwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-29 22:17:28', 1),
 (2, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMyJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMyIsImlhdCI6MTU5MDg3NjMxMSwibmJmIjoxNTkwODc5OTExLCJleHAiOjE1OTA5NjI3MTEsInVpZCI6MywiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-30 22:05:12', 3),
 (3, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU5MDk1OTIxNSwibmJmIjoxNTkwOTYyODE1LCJleHAiOjE1OTEwNDU2MTUsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-31 21:06:55', 8),
-(4, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU5MDk1OTg5NCwibmJmIjoxNTkwOTYzNDk0LCJleHAiOjE1OTEwNDYyOTQsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-31 21:18:14', 8);
+(4, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU5MDk1OTg5NCwibmJmIjoxNTkwOTYzNDk0LCJleHAiOjE1OTEwNDYyOTQsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-31 21:18:14', 8),
+(5, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMTAifQ.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMTAiLCJpYXQiOjE1OTEwNDQ1MjIsIm5iZiI6MTU5MTA0ODEyMiwiZXhwIjoxNTkxMTMwOTIyLCJ1aWQiOjEwLCJpcCI6IjEyNy4wLjAuMSJ9.', '2020-06-01 20:48:43', 10);
 
 --
 -- Индексы сохранённых таблиц
@@ -605,6 +636,13 @@ ALTER TABLE `association_requiredassociation`
   ADD PRIMARY KEY (`id`),
   ADD KEY `association_id` (`association_id`),
   ADD KEY `required_association_id` (`required_association_id`);
+
+--
+-- Индексы таблицы `cooldown`
+--
+ALTER TABLE `cooldown`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Индексы таблицы `event`
@@ -774,13 +812,13 @@ ALTER TABLE `user_token`
 -- AUTO_INCREMENT для таблицы `action`
 --
 ALTER TABLE `action`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `action_list`
 --
 ALTER TABLE `action_list`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `association`
@@ -792,6 +830,12 @@ ALTER TABLE `association`
 -- AUTO_INCREMENT для таблицы `association_requiredassociation`
 --
 ALTER TABLE `association_requiredassociation`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `cooldown`
+--
+ALTER TABLE `cooldown`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
@@ -852,7 +896,7 @@ ALTER TABLE `passwordrestore`
 -- AUTO_INCREMENT для таблицы `proposal`
 --
 ALTER TABLE `proposal`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT для таблицы `role`
@@ -894,13 +938,13 @@ ALTER TABLE `upload`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=10;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
 --
 ALTER TABLE `user_child`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `user_doc`
@@ -918,13 +962,13 @@ ALTER TABLE `user_group`
 -- AUTO_INCREMENT для таблицы `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -943,6 +987,12 @@ ALTER TABLE `action_list`
 ALTER TABLE `association_requiredassociation`
   ADD CONSTRAINT `association_requiredassociation_ibfk_1` FOREIGN KEY (`association_id`) REFERENCES `association` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `association_requiredassociation_ibfk_2` FOREIGN KEY (`required_association_id`) REFERENCES `association` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `cooldown`
+--
+ALTER TABLE `cooldown`
+  ADD CONSTRAINT `cooldown_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Ограничения внешнего ключа таблицы `event_file`
