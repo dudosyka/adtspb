@@ -135,10 +135,11 @@
                                     style="width: 100%;"
 
                                     name="Пароль"
-                                    :rules="{ required: true, password: true, max: 8 }"
+                                    :rules="{ required: true, password: true, min: 8 }"
                                     v-slot="validationContext"
                                 >
-                                    <b-form-group>
+                                    <b-form-group
+                                        description="Пароль должен быть не короче 8 символов">
                                         <b-form-input
                                             class="icon lock-fill"
                                             v-model="password"
@@ -158,7 +159,7 @@
                                     style="width: 100%;"
 
                                     name="Подтверждение пароля"
-                                    :rules="{ required: true, password: true, password_match: password, max: 8 }"
+                                    :rules="{ required: true, password: true, password_match: password, min: 8 }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -288,7 +289,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true }"
+                                    :rules="{ required: true, valid_full_address: true }"
                                     name="Адрес регистрации"
                                     v-slot="validationContext"
                                 >
@@ -301,7 +302,7 @@
                                             aria-describedby="registration_address-feedback"
                                         />
 
-<!--                                        <b-form-invalid-feedback id="registration_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+                                        <b-form-invalid-feedback id="registration_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -310,7 +311,7 @@
                                     style="width: 100%;"
 
                                     name="Адрес проживания"
-                                    :rules="{ required: true }"
+                                    :rules="{ required: true, valid_full_address: true }"
                                     v-slot="validationContext"
                                 >
 
@@ -323,7 +324,7 @@
 
                                             :state="getValidationState(validationContext)"
                                             aria-describedby="residence_address-live-feedback" />
-<!--                                        <b-form-invalid-feedback id="residence_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+                                        <b-form-invalid-feedback id="residence_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -346,6 +347,7 @@
                                         class="accept"
 
                                         :state="getValidationState(validationContext)"
+
                                         aria-describedby="agreement-live-feedback"
                                     >
                                         Я согласен(-а) на обработку персональных данных в соответствии с п.&nbsp;4 ст.&nbsp;9 Федерального закона от 27.07.2006 №152-ФЗ "О персональных данных"
@@ -558,7 +560,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true, password: true, max: 8 }"
+                                    :rules="{ required: true, password: true, min: 8 }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -581,7 +583,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true, password: true, password_match: item.password, max: 8 }"
+                                    :rules="{ required: true, password: true, password_match: item.password, min: 8 }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -756,7 +758,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true }"
+                                    :rules="{ required: true, valid_full_address: true }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -768,7 +770,7 @@
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-registration_address-feedback'"
                                         />
-<!--                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                         <div>
 <!--                                            <b-link @click="getRegistrationAddressAsParentToChild(index)">Как у родителя</b-link>-->
                                             <b-button @click="getRegistrationAddressAsParentToChild(index)" size="sm">Как у родителя</b-button>
@@ -781,7 +783,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true }"
+                                    :rules="{ required: true, valid_full_address: true }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
@@ -793,7 +795,7 @@
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-residence_address-feedback'" />
-<!--                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                         <div>
 <!--                                            <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>-->
                                             <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm">Как у родителя</b-button>
@@ -977,22 +979,40 @@
 
                         <hr style="width: 100%;">
 
-                        <label class="text-center">{{item.name}} {{item.surname}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
+<!--                        <label class="text-center">{{item.name}} {{item.surname}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>-->
 
-                        <b-table
-                            :select-mode="'multi'"
-                            :items="item.associations_selected"
-                            :fields="associations_download_fields"
-                            @row-selected="onRowAssociationsSelected(index, $event)"
-                            responsive="sm"
+                        <b-button
+                            v-b-toggle="'collapse-proposal-child-' + index"
+                            style="width: 100%;"
                         >
-                            <template v-slot:cell(status)="row">
-                                Подано
-                            </template>
-                            <template v-slot:cell(actions)="row">
-                                <b-button @click="generateForm(item, row.item.id)" size="sm" style="width: 100%;">Скачать PDF</b-button>
-                            </template>
-                        </b-table>
+                            {{item.name}} {{item.surname}} {{(typeof item.midname != 'string') ? '' : item.midname}}
+                        </b-button>
+
+                        <b-collapse :id="'collapse-proposal-child-' + index" class="mt-2">
+                            <b-card>
+
+
+                                <b-table
+                                    :select-mode="'multi'"
+                                    :items="item.associations_selected"
+                                    :fields="associations_download_fields"
+                                    @row-selected="onRowAssociationsSelected(index, $event)"
+                                    responsive="sm"
+                                >
+                                    <template v-slot:cell(status)="row">
+                                        Подано
+                                    </template>
+                                    <template v-slot:cell(actions)="row">
+                                        <b-button @click="generateForm(item, row.item.id)" size="sm" style="width: 100%;">Скачать PDF</b-button>
+                                    </template>
+                                </b-table>
+
+
+
+                            </b-card>
+                        </b-collapse>
+
+
 
                     </div>
 
@@ -1321,6 +1341,7 @@
                         };
 
                     }
+                    this.status = true;
                     this.$forceUpdate();
                 }
 
@@ -1351,6 +1372,7 @@
                         };
                     }
                     this.$forceUpdate();
+                    this.childTick();
                 }
             },
 
@@ -1433,10 +1455,56 @@
                 await this.$graphql_client.request(request, {}).then(function(data){
                     _this.is_sending_request = false;
                     _this.associations = data.associations;
+
+                    _this.childTick();
+
+                    // _this.nextTick(function(){
+                    //     console.log("hey =(");
+
+                    // });
+
                 }).catch(function(e){
                     _this.is_sending_request = false;
                 });
             },
+
+
+
+
+
+
+
+
+            childTick(){
+                const _this = this;
+
+                for(let incr in _this.children){
+                    let child = _this.children[incr];
+
+                    for(let index in _this.associations){
+                        const __id =  parseInt(_this.associations[index].id, 10);
+                        const __index = index;
+
+                        const result = child.associations_selected.find(function(element, index, array){
+                            if(element.isAlreadyExists && parseInt(element.id, 10) == parseInt(__id, 10)){
+                                return element;
+                            } else
+                                return false;
+                        });
+                        if(result != undefined){
+                            this.$nextTick(function(){
+                                _this.$refs["associations_child_"+incr][0].selectRow(parseInt(__index, 10) - 1 + 1); // без - 1 + 1 почему-то не работает, возможно нужен был parseInt();
+                            });
+                        }
+                    }
+                }
+            },
+
+
+
+
+
+
 
             generateForm(child, association_id){
                 const _this = this;

@@ -145,6 +145,9 @@ class User extends EntityBase
 
             if($action_data != null AND $action_data->sign == "+")
                 return true;
+            
+            if($action_data->sign == "-")
+                return false;
         }
 
         return false;

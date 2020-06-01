@@ -50,8 +50,8 @@ class PasswordType extends ScalarType
 //            throw new \UnexpectedValueException("Cannot represent value as date: " . Utils::printSafe($value));
 //        }
 
-        if(mb_strlen($value) > 8)
-            throw new \UnexpectedValueException("Пароль имеет больше, чем 8 символов");
+        if(mb_strlen($value) < 8)
+            throw new \UnexpectedValueException("Пароль имеет меньше, чем 8 символов");
 
         return $value;
     }
@@ -75,8 +75,8 @@ class PasswordType extends ScalarType
             throw new Error("Not a valid password", [$valueNode]);
         }
 
-        if(mb_strlen($valueNode->value) > 8)
-            throw new \UnexpectedValueException("Пароль имеет больше, чем 8 символов");
+        if(mb_strlen($valueNode->value) < 8)
+            throw new \UnexpectedValueException("Пароль имеет меньше, чем 8 символов");
 
         return $valueNode->value;
     }

@@ -84,6 +84,11 @@ extend("max",{ //Есои не надо выводить наименовани�
     message: "Поле содержит слишком большое количество символов"
 });
 
+extend("min",{ //Есои не надо выводить наименование поля
+    ...vee_validate_rules.min,
+    message: "Поле содержит слишком малое количество символов"
+});
+
 extend("password",{
     message: "Пароль не должен содержать следующих символов: ` { } \[ \] : \" ; ' < > / ",
     validate: function(value){
@@ -138,7 +143,60 @@ extend('password_match', {
     message: 'Пароли не совпадают'
 });
 
+
+extend("valid_full_address",{
+    message: "Адрес не найден или требует уточнения",
+    validate: async function(value){
+
+        await loadYmap({
+            apiKey: '46740486-10c9-4828-9ffb-783dbdf451c6', //TODO: убрать дубликаты токена Яндекс Карт!
+            lang: 'ru_RU',
+            coordorder: 'latlong',
+            version: '2.1',
+            debug: true
+        });
+
+        let res = await ymaps.geocode(value);
+
+        let obj = res.geoObjects.get(0),
+            error;
+
+        if (obj) {
+            // Об оценке точности ответа геокодера можно прочитать тут: https://tech.yandex.ru/maps/doc/geocoder/desc/reference/precision-docpage/
+            switch (obj.properties.get('metaDataProperty.GeocoderMetaData.precision')) {
+                case 'exact':
+                    break;
+                case 'number':
+                case 'near':
+                case 'range':
+                    // error = 'Неточный адрес, требуется уточнение';
+                    error = true;
+                    break;
+                case 'street':
+                    // error = 'Неполный адрес, требуется уточнение';
+                    error = true;
+                    break;
+                case 'other':
+                default:
+                    // error = 'Неточный адрес, требуется уточнение';
+                    error = true;
+            }
+        } else {
+            // error = 'Адрес не найден';
+            error = true;
+        }
+
+        // Если геокодер возвращает пустой массив или неточный результат, то показываем ошибку.
+        if (error) {
+            return false;
+        }
+        return true;
+    }
+});
+
+
 import vee_validate_ru from "vee-validate/dist/locale/ru.json";
+import {loadYmap} from "vue-yandex-maps";
 localize("ru", vee_validate_ru);
 
 // Install VeeValidate components globally

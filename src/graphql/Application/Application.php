@@ -360,8 +360,10 @@ class Application
     public static function sendMail(string $recipient, string $subject, string $html_body){
 
         $headers = [];
-        $headers["From"] = "webmaster@example.com";
-//      $headers["Reply-To"] = "webmaster@example.com";
+        $headers["From"] = "Личный кабинет adtspb.ru <lk@adtspb.ru>";
+        $headers["MIME-Version"] = "1.0";
+        $headers["Content-type"] = "text/html; charset=utf-8";
+        $headers["Reply-To"] = "no-reply@lk.adtspb.ru";
         $headers["X-Mailer"] = 'PHP/' . phpversion();
 
         mail($recipient, $subject, $html_body, $headers);

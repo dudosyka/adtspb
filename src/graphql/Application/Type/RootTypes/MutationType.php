@@ -409,6 +409,7 @@ HTML;
         if($findProposal != null){
 
             /** @var User $child */
+            /*
             $child = DataSource::find("User", $args["child_id"]);
 
             $name = $child->name;
@@ -421,6 +422,9 @@ HTML;
             $title = $findAssoc->name;
 
             throw new RequestError("Заявление в объединение {$title} на {$full_name} уже подано");
+            */
+            // Ничего не говорим, всё ок.
+            return true;
         }
 
 
@@ -522,6 +526,10 @@ HTML;
 
         if($found == null || !User::validatePassword($args['password'], $found->password))
             throw new RequestError("Неверный логин или пароль");
+
+        if(!$found->hasAccess(10)){
+            throw new RequestError("Личный кабинет обучающегося в настоящее время находится в разработке");
+        }
 
         // Создание токена пользователя и сохранение в базу данных
         return [

@@ -18,7 +18,7 @@
         />
         <!-- TODO отображать ошибки непосредственно в форме, а не в компоненте (сделать компонент адреса по-нормальному) -->
 <!--        <b-form-invalid-feedback v-if="!state">Данное поле должно быть заполнено</b-form-invalid-feedback>-->
-        <div v-if="state != undefined && !state" class="error">Обязательно для заполнения</div>
+        <div v-if="state != undefined && !state" class="error">Обязательно для заполнения, требуется ввести существующий полный адрес</div>
 
     </div>
 
@@ -115,7 +115,11 @@
 
         watch: {
             addressSearch: _.debounce(function(addr) {
-                this.getAddresses(addr)
+                this.getAddresses(addr);
+
+
+
+
             }, 500),
             value: function(addr){
                 this.$refs.field.inputValue = addr;
