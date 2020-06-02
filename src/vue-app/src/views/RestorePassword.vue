@@ -1,8 +1,15 @@
 <template>
 
-    <div class="waving d-inline-flex justify-content-center align-items-center">
+    <div class="waving d-inline-flex justify-content-center align-items-center" v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'padding-top: 100px;'">
 
         <vue-headful title="Восстановление пароля | Личный кабинет"/>
+
+        <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''">
+            <router-link to="/login">
+                <b-button variant="dark" class="theme-alt top-panel-button"
+                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>
+            </router-link>
+        </div>
 
         <b-container class="form">
             <div>
@@ -175,6 +182,11 @@
         },
         data(){
             return {
+
+
+                windowWidth: window.innerWidth,
+
+
                 is_sending_request: false,
                 username: "",
                 key_code: "",
@@ -207,7 +219,19 @@
 
             };
         },
+
+        mounted(){
+            const _this = this;
+            window.addEventListener('resize', () => {
+                _this.windowWidth = window.innerWidth
+            });
+        },
+
         methods: {
+
+            enoughSpaceForTopButtons: function(){
+                return this.windowWidth >= 765;
+            },
 
             nextClicked(currentPage) {
                 // console.log('next clicked', currentPage);
@@ -411,6 +435,44 @@
         font-size: 10pt;
     }
 
+
+
+
+
+
+
+    .top-panel{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        padding: 10px 5%;
+    }
+
+    .top-panel-button, .top-panel-button-darker{
+        padding: 20px 40px !important;
+        width: max-content;
+        font-size: 16pt;
+        height: 80px !important;
+    }
+
+
+    .top-panel-button{
+        background-color: #1862b6 !important;
+    }
+
+    .top-panel-button-darker{
+        background-color: #16529d !important;
+    }
+
+    .top-panel-button:focus, .top-panel-button-darker:focus {
+        background-color: #12417c !important;
+    }
+
+    .top-panel-button:active, .top-panel-button-darker:active {
+        background-color: #0f3061 !important;
+    }
 
 
 </style>

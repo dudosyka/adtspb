@@ -1,18 +1,15 @@
 <template>
 
-    <div class="waving d-inline-flex justify-content-center align-items-center">
+    <div class="waving d-inline-flex justify-content-center align-items-center" v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'padding-top: 100px;'">
 
         <vue-headful title="Вход | Личный кабинет"/>
 
-<!--        <div class="top-panel d-flex">-->
-
-<!--            <div>-->
-<!--                <router-link class="theme" to="/">-->
-<!--                    <b-button variant="dark" class="theme-alt top-panel-button selected"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>-->
-<!--                </router-link>-->
-<!--            </div>-->
-
-<!--        </div>-->
+        <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''">
+            <router-link to="/">
+                <b-button variant="dark" class="theme-alt top-panel-button"
+                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>
+            </router-link>
+        </div>
 
         <b-container class="form">
             <div>
@@ -124,10 +121,25 @@
 
                 is_sending_request: false,
 
-                graphql_errors: []
+                graphql_errors: [],
+
+
+                windowWidth: window.innerWidth
             };
         },
+
+        mounted(){
+            const _this = this;
+            window.addEventListener('resize', () => {
+                _this.windowWidth = window.innerWidth
+            });
+        },
+
         methods: {
+
+            enoughSpaceForTopButtons: function(){
+                return this.windowWidth >= 765;
+            },
 
             getValidationState({ dirty, validated, valid = null }) {
                 return dirty || validated ? valid : null;
@@ -241,11 +253,28 @@
         /*pointer-events: none;*/
     }
 
-    .top-panel-button{
+    .top-panel-button, .top-panel-button-darker{
         padding: 20px 40px !important;
         width: max-content;
         font-size: 16pt;
         height: 80px !important;
+    }
+
+
+    .top-panel-button{
+        background-color: #1862b6 !important;
+    }
+
+    .top-panel-button-darker{
+        background-color: #16529d !important;
+    }
+
+    .top-panel-button:focus, .top-panel-button-darker:focus {
+        background-color: #12417c !important;
+    }
+
+    .top-panel-button:active, .top-panel-button-darker:active {
+        background-color: #0f3061 !important;
     }
 
 

@@ -6,6 +6,7 @@ use DateTimeZone;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Bearer;
 use GraphQL\Application\Database\DataSource;
+use GraphQL\Application\Log;
 use GraphQL\Server\RequestError;
 use GraphQL\Utils\Utils;
 use Lcobucci\JWT\Token;
@@ -146,7 +147,7 @@ class User extends EntityBase
             if($action_data != null AND $action_data->sign == "+")
                 return true;
             
-            if($action_data->sign == "-")
+            if($action_data != null AND $action_data->sign == "-")
                 return false;
         }
 

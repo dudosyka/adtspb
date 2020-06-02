@@ -270,6 +270,7 @@ class MutationType extends ObjectType
      * @param AppContext $context
      * @return bool
      * @throws RequestError
+     * @throws \Exception
      */
     public function registerChild($rootValue, $args, AppContext $context){
 
@@ -285,6 +286,7 @@ class MutationType extends ObjectType
 
         $email = $args['email'] ?? "";
 
+        /** @var User $instance */
         $instance = new User([
             'name' => $args['name'],
             'surname' => $args['surname'],
@@ -309,6 +311,10 @@ class MutationType extends ObjectType
             "registration_type" => $args["registration_type"],
             "ovz" => $args["ovz"]
         ]);
+
+        if($instance->getAge() < 6 || $instance->getAge() > 18){
+            throw new RequestError("Дата рождения не соответствует возрастным ограничениям");
+        }
 
         $id = DataSource::registerUser($instance, $context, User::CHILD);
 
@@ -527,8 +533,10 @@ HTML;
         if($found == null || !User::validatePassword($args['password'], $found->password))
             throw new RequestError("Неверный логин или пароль");
 
+        $found->status_email = User::EMAIL_VALIDATED;
+
         if(!$found->hasAccess(10)){
-            throw new RequestError("Личный кабинет обучающегося в настоящее время находится в разработке");
+            throw new RequestError("Личный кабинет обучающегося в настоящее время находится в разработке ".print_r($found->hasAccess(10), true));
         }
 
         // Создание токена пользователя и сохранение в базу данных

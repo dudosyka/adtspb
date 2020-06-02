@@ -1,18 +1,18 @@
 <template>
 
-    <div class="waving d-inline-flex justify-content-center align-items-center">
+    <div class="waving d-inline-flex justify-content-center align-items-center" v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'padding-top: 100px;'">
 
         <vue-headful title="Регистрация | Личный кабинет"/>
 
-<!--        <div class="top-panel d-flex">-->
-<!---->
-<!--            <div>-->
-<!--                <router-link class="theme" to="/register">-->
-<!--                    <b-button variant="dark" class="theme-alt top-panel-button selected"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>-->
-<!--                </router-link>-->
-<!--            </div>-->
-<!---->
-<!--        </div>-->
+        <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''">
+
+            <router-link to="/login">
+                <!-- v-bind:class="(topScroll > 0) ? 'selected' : ''" -->
+                <b-button variant="dark" class="theme-alt top-panel-button"
+                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>
+            </router-link>
+
+        </div>
 
         <b-container class="form">
 
@@ -608,7 +608,7 @@
                                     v-slot="validationContext"
                                 >
                                     <b-form-group
-                                        description="Необязательное поле">
+                                        description="Для экстренной связи">
                                         <b-form-input
                                             class="icon phone"
                                             v-model="item.phone_number"
@@ -647,10 +647,11 @@
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    :rules="{ required: true, date: true }"
+                                    :rules="{ required: true, date: true, kid_bdate: true }"
                                     v-slot="validationContext"
                                 >
-                                    <b-form-group>
+                                    <b-form-group
+                                        description="К занятиям допускаются дети от 6 до 18 лет">
 <!--                                        v-mask="'9999-99-99'"-->
                                         <b-form-input
                                             class="icon"
@@ -704,7 +705,7 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="item.study_place"
-                                            placeholder="Образовательное учреждение"
+                                            placeholder="Образовательное учреждение (школа, колледж и т.д.)"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -829,14 +830,15 @@
 
                             <hr style="width: 100%;">
 
-                            <div>
 <!--                                <b-link @click="children.push({...child_prototype})">Добавить ребенка</b-link>,-->
 <!--                                <b-link @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false">удалить последнюю форму</b-link>-->
 
-                                <b-button class="background-green" @click="children.push({...child_prototype})" size="sm" style="margin-right: 5px;">Добавить ребенка</b-button>
-                                <b-button class="background-red" @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false" size="sm">Удалить последнюю форму</b-button>
+<!--                                size="sm"-->
 
-                            </div>
+                            <b-button class="background-green" @click="children.push({...child_prototype})"  style="width: 100%;">Добавить ребенка</b-button>
+                            <b-button class="background-red" @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false"
+                                  style="width: 100%;">Удалить последнюю форму</b-button>
+
 
 
 
@@ -889,7 +891,7 @@
 
                         <hr style="width: 100%;">
 
-                        <label class="text-center">{{item.name}} {{item.surname}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
+                        <label class="text-center">{{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
 
                         <b-table :busy="associations.length <= 0" class="mt-3" outlined>
                             <template v-slot:table-busy>
@@ -973,7 +975,9 @@
                         <h3 class="form-title">Заявления</h3>
                     </div>
 
-
+                    <b-alert variant="success" show>
+                        Регистрация успешно пройдена. Ваше заявление принято к рассмотрению. Очный (обязательный) прием заявлений пройдет с 24 по 31 августа в Академии цифровых технологий
+                    </b-alert>
 
                     <div v-for="(item, index) in children" style="width: 100%;">
 
@@ -1192,10 +1196,23 @@
 
                 incorrect_code: false,
 
+
+
+
+
+
+                windowWidth: window.innerWidth
+
             };
         },
 
         mounted: async function(){
+
+            const _this = this;
+            window.addEventListener('resize', () => {
+                _this.windowWidth = window.innerWidth
+            });
+
             const page = (this.$route.query.page == undefined) ? 0 : parseInt(this.$route.query.page, 10);
             this.setStep(page);
 
@@ -1204,6 +1221,18 @@
         },
 
         methods: {
+
+
+
+            enoughSpaceForTopButtons: function(){
+                return this.windowWidth >= 765;
+            },
+
+
+
+
+
+
 
             onRowAssociationsSelected(i, items) {
                 this.children[i].associations_selected = items;
@@ -1972,11 +2001,34 @@
         /*pointer-events: none;*/
     }
 
-    .top-panel-button{
+    .top-panel-button, .top-panel-button-darker{
         padding: 20px 40px !important;
         width: max-content;
         font-size: 16pt;
         height: 80px !important;
     }
+
+
+    .top-panel-button{
+        background-color: #1862b6 !important;
+    }
+
+    .top-panel-button-darker{
+        background-color: #16529d !important;
+    }
+
+    .top-panel-button:focus, .top-panel-button-darker:focus {
+        background-color: #12417c !important;
+    }
+
+    .top-panel-button:active, .top-panel-button-darker:active {
+        background-color: #0f3061 !important;
+    }
+
+
+
+
+
+
 
 </style>
