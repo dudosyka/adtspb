@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Июн 02 2020 г., 01:35
+-- Время создания: Июн 03 2020 г., 02:06
 -- Версия сервера: 5.7.25-log
 -- Версия PHP: 7.3.9
 
@@ -81,7 +81,8 @@ INSERT INTO `action_list` (`id`, `list_id`, `role_id`, `action_id`, `sign`) VALU
 (10, 1, 2, 7, '+'),
 (11, 1, 2, 8, '+'),
 (12, 1, 2, 9, '+'),
-(13, 1, 6, 10, '+');
+(13, 1, 6, 10, '-'),
+(14, 1, 2, 10, '+');
 
 -- --------------------------------------------------------
 
@@ -321,7 +322,9 @@ INSERT INTO `proposal` (`id`, `timestamp`, `child_id`, `parent_id`, `association
 (20, '2020-06-01 20:49:31', 11, 10, 1, 1, 4, 1),
 (21, '2020-06-01 20:49:31', 11, 10, 2, 1, 4, 1),
 (22, '2020-06-01 21:39:24', 11, 10, 4, 1, 4, 1),
-(23, '2020-06-01 21:50:14', 11, 10, 3, 1, 4, 1);
+(23, '2020-06-01 21:50:14', 11, 10, 3, 1, 4, 1),
+(24, '2020-06-02 22:27:22', 15, 2, 1, 1, 4, 1),
+(25, '2020-06-02 22:27:22', 15, 2, 2, 1, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -483,7 +486,7 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midname`, `sex`, `phone_number`, `email`, `status_email`, `verification_key_email`, `registration_address`, `residence_address`, `job_place`, `job_position`, `relationship`, `study_place`, `study_class`, `birthday`, `password`, `ovz`, `registration_type`, `state`) VALUES
 (0, '2020-05-28 22:57:15', 'anonymous', 'Аноним', 'Аноним', 'Аноним', 'м', '+7(000)000-00-00', 'anonymous@localhost', 'ожидание', NULL, '', NULL, '', '', '', '', '', '2020-05-14', '', 'нет', 'нет', 'РФ'),
 (1, '2020-05-29 22:16:25', 'testovtt', 'Тестов', 'Тест', 'Тестович', 'м', '+7(444)111-12-55', 'admin@testov1.com', 'ожидание', '704ACC68', 'Россия, Москва, Центральный административный округ, Пресненский район, Московский международный деловой центр Москва-Сити ', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе ', 'Место работы', 'Должность', '', '', '', '1973-12-12', '$2y$12$mquPInmKFNxG95sNNwTR3.kCtatyS73ELk7PLOvhVcW9rOMAcXkjW', '-', '-', ''),
-(2, '2020-05-29 22:18:16', 'ivanovip', 'Иванов', 'Иван', 'Петрович', 'м', '+7(999)999-88-44', 'admin@testov.com', 'ожидание', '', 'Россия, Москва, Центральный административный округ, Пресненский район, Московский международный деловой центр Москва-Сити ', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе ', '', '', 'Родитель', 'Школа №123', '1а', '2003-12-12', '$2y$12$un4Ew/LMdZAhQqvplfgm4OUaYgW6XRIUOcteXHbcATgrIFDD6T.qi', 'нет', 'да', 'РФ'),
+(2, '2020-05-29 22:18:16', 'ivanovip', 'Иванов', 'Иван', 'Петрович', 'м', '+7(999)999-88-44', 'admin@testov.com', 'подтвержден', '', 'Россия, Москва, Центральный административный округ, Пресненский район, Московский международный деловой центр Москва-Сити ', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе ', '', '', 'Родитель', 'Школа №123', '1а', '2003-12-12', '$2y$12$un4Ew/LMdZAhQqvplfgm4OUaYgW6XRIUOcteXHbcATgrIFDD6T.qi', 'нет', 'да', 'РФ'),
 (3, '2020-05-30 22:04:01', 'opqowiepoqiwepoiqweqp', 'opqowiepoqiw[epoiqwe', 'qwpeiuqwpoieu', 'pqwieuqpwoieupqwoi', 'м', '+7(123)123-12-31', 'qwpeiuqpwioeuqwpioe@qweqwer.ur', 'подтвержден', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', '', '', '', NULL, '$2y$12$.SviPDpR/Bx9sVYqJTaGFOCvXWEzVvKbi5JM6LbmKvVrJX/seo9KW', '-', '-', ''),
 (4, '2020-05-30 22:35:12', 'testovtt2', 'Тестов', 'Тест', 'Тестович', 'м', '+7(123)123-12-32', '', 'ожидание', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', 'Родитель', 'Школа 123', '1а', '2001-12-12', '$2y$12$AD5Jy7IFmvTfxVovwWdRjeP45IHpJbNrDJtXHFsCe9RUacCnDpvyK', 'нет', 'да', 'РФ'),
 (5, '2020-05-30 22:36:57', 'testovtt3', 'Тестов', 'Тест', 'Тестович', 'м', '+7(123)123-12-31', '', 'ожидание', '', 'owqiepqowie', '[oqiwe[poqwie', '', '', 'Родитель', 'Школа 123', '1а', '2001-12-12', '$2y$12$jYsTmEIkawT3fckI0zP0vOeRSH.lIWDK33EM94tO1GftrLakFJrrm', 'нет', 'да', 'РФ'),
@@ -495,7 +498,8 @@ INSERT INTO `user` (`id`, `date_registered`, `login`, `surname`, `name`, `midnam
 (11, '2020-06-01 20:49:27', 'testtt', 'Тест', 'Тестов', 'Тестович', 'м', '+7(815)092-80-12', 'admin@testov111.com', 'ожидание', '', '8172049871209847', '7019284701298479124124', '', '', 'Родитель', '123', '123', '2003-12-12', '$2y$12$CDe7PvQCpSBoZURSkUzsFugNHZBkkE/18VYImZdMJ/3BMto0iu1tu', 'нет', 'да', 'РФ'),
 (12, '2020-06-01 22:10:05', '12313', '123', '12312', '3123', 'м', '+7(158)701-92-87', 'admin@email.com', 'ожидание', 'B1750E60', 'Санкт-Петербург', 'qwe', '', '', '', '', '', NULL, '$2y$12$wYtwo9GP6hiy3JI/SQAG..sE3RgAiRMNub5Ki1uCMhcu8hFh9GlLe', '-', '-', ''),
 (13, '2020-06-01 22:11:37', 'h1f987y29837109287309812717', 'h1f987y298371092873098127', '1702398710298371098', '709817023987102983701', 'м', '+7(571)089-27-50', 'admin@qweqwe.ru', 'ожидание', '9B314E2A', 'qwe', 'qwe', '', '', '', '', '', NULL, '$2y$12$ioeq0oU4Boy9s/vGFx6S0.YOVzgfwkRACrADbDy2HiAeYq.dMQMRC', '-', '-', ''),
-(14, '2020-06-01 22:27:16', 'itsuii', 'йцу', 'йцу', 'йцу', 'м', '+7(195)278-09-12', 'admin@admin.com', 'ожидание', 'F5536E19', 'Россия, Санкт-Петербург, бульвар Новаторов, 98 ', 'Россия, Санкт-Петербург, бульвар Новаторов, 98 ', '', '', '', '', '', NULL, '$2y$12$WbfzvSReiCevt4oBRmVaWeBRc10RqF.F1gWZS5kPOyCqvfpCiwHaG', '-', '-', '');
+(14, '2020-06-01 22:27:16', 'itsuii', 'йцу', 'йцу', 'йцу', 'м', '+7(195)278-09-12', 'admin@admin.com', 'ожидание', 'F5536E19', 'Россия, Санкт-Петербург, бульвар Новаторов, 98 ', 'Россия, Санкт-Петербург, бульвар Новаторов, 98 ', '', '', '', '', '', NULL, '$2y$12$WbfzvSReiCevt4oBRmVaWeBRc10RqF.F1gWZS5kPOyCqvfpCiwHaG', '-', '-', ''),
+(15, '2020-06-02 22:10:03', 'qweqweruqweqq', 'qwe@qwe.ruqwe', 'qwe@qwe.ruqwe', 'qwe@qwe.ruqwe', 'м', '+7(512)978-01-28', 'qwe@qwe.ruqwe', 'ожидание', '', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе, 10 ', 'Россия, Санкт-Петербург, Петродворцовый район, посёлок Стрельна, Санкт-Петербургское шоссе, 10 ', '', '', 'Родитель', '123', '123', '2001-06-04', '$2y$12$UwqgadkeEVSWmo7CLFRK.eDhhDkYdxz/UK02fAVJlFgSs0maaNDrC', 'нет', 'да', 'РФ');
 
 -- --------------------------------------------------------
 
@@ -520,7 +524,8 @@ INSERT INTO `user_child` (`id`, `parent_id`, `child_id`) VALUES
 (4, 3, 6),
 (5, 3, 7),
 (6, 8, 9),
-(7, 10, 11);
+(7, 10, 11),
+(8, 2, 15);
 
 -- --------------------------------------------------------
 
@@ -567,7 +572,7 @@ CREATE TABLE `user_role` (
 
 INSERT INTO `user_role` (`id`, `role_id`, `user_id`) VALUES
 (1, 2, 1),
-(2, 6, 2),
+(2, 2, 2),
 (3, 2, 3),
 (4, 6, 4),
 (5, 6, 5),
@@ -579,7 +584,8 @@ INSERT INTO `user_role` (`id`, `role_id`, `user_id`) VALUES
 (11, 6, 11),
 (12, 2, 12),
 (13, 2, 13),
-(14, 2, 14);
+(14, 2, 14),
+(15, 6, 15);
 
 -- --------------------------------------------------------
 
@@ -603,7 +609,12 @@ INSERT INTO `user_token` (`id`, `token`, `date_created`, `user_id`) VALUES
 (2, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMyJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMyIsImlhdCI6MTU5MDg3NjMxMSwibmJmIjoxNTkwODc5OTExLCJleHAiOjE1OTA5NjI3MTEsInVpZCI6MywiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-30 22:05:12', 3),
 (3, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU5MDk1OTIxNSwibmJmIjoxNTkwOTYyODE1LCJleHAiOjE1OTEwNDU2MTUsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-31 21:06:55', 8),
 (4, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkOCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkOCIsImlhdCI6MTU5MDk1OTg5NCwibmJmIjoxNTkwOTYzNDk0LCJleHAiOjE1OTEwNDYyOTQsInVpZCI6OCwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-05-31 21:18:14', 8),
-(5, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMTAifQ.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMTAiLCJpYXQiOjE1OTEwNDQ1MjIsIm5iZiI6MTU5MTA0ODEyMiwiZXhwIjoxNTkxMTMwOTIyLCJ1aWQiOjEwLCJpcCI6IjEyNy4wLjAuMSJ9.', '2020-06-01 20:48:43', 10);
+(5, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMTAifQ.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMTAiLCJpYXQiOjE1OTEwNDQ1MjIsIm5iZiI6MTU5MTA0ODEyMiwiZXhwIjoxNTkxMTMwOTIyLCJ1aWQiOjEwLCJpcCI6IjEyNy4wLjAuMSJ9.', '2020-06-01 20:48:43', 10),
+(6, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMiIsImlhdCI6MTU5MTEzMzM4MCwibmJmIjoxNTkxMTM2OTgwLCJleHAiOjE1OTEyMTk3ODAsInVpZCI6MiwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-06-02 21:29:41', 2),
+(7, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMiIsImlhdCI6MTU5MTEzMzUzNiwibmJmIjoxNTkxMTM3MTM2LCJleHAiOjE1OTEyMTk5MzYsInVpZCI6MiwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-06-02 21:32:16', 2),
+(8, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMiIsImlhdCI6MTU5MTEzNDc0NiwibmJmIjoxNTkxMTM4MzQ2LCJleHAiOjE1OTEyMjExNDYsInVpZCI6MiwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-06-02 21:52:26', 2),
+(9, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMiIsImlhdCI6MTU5MTEzNDc1OSwibmJmIjoxNTkxMTM4MzU5LCJleHAiOjE1OTEyMjExNTksInVpZCI6MiwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-06-02 21:52:39', 2),
+(10, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIiwianRpIjoidWlkMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NSIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDg1IiwianRpIjoidWlkMiIsImlhdCI6MTU5MTEzNjgzMywibmJmIjoxNTkxMTQwNDMzLCJleHAiOjE1OTEyMjMyMzMsInVpZCI6MiwiaXAiOiIxMjcuMC4wLjEifQ.', '2020-06-02 22:27:13', 2);
 
 --
 -- Индексы сохранённых таблиц
@@ -818,7 +829,7 @@ ALTER TABLE `action`
 -- AUTO_INCREMENT для таблицы `action_list`
 --
 ALTER TABLE `action_list`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT для таблицы `association`
@@ -896,7 +907,7 @@ ALTER TABLE `passwordrestore`
 -- AUTO_INCREMENT для таблицы `proposal`
 --
 ALTER TABLE `proposal`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT для таблицы `role`
@@ -938,13 +949,13 @@ ALTER TABLE `upload`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Уникальный ID', AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT для таблицы `user_child`
 --
 ALTER TABLE `user_child`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `user_doc`
@@ -962,13 +973,13 @@ ALTER TABLE `user_group`
 -- AUTO_INCREMENT для таблицы `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT для таблицы `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
