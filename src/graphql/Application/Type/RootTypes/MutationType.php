@@ -535,9 +535,9 @@ HTML;
 
         $found->status_email = User::EMAIL_VALIDATED;
 
-        if(!$found->hasAccess(10)){
-            throw new RequestError("Личный кабинет обучающегося в настоящее время находится в разработке ".print_r($found->hasAccess(10), true));
-        }
+//         if(!$found->hasAccess(10)){
+//             throw new RequestError("Личный кабинет обучающегося в настоящее время находится в разработке ".print_r($found->hasAccess(10), true));
+//         }
 
         // Создание токена пользователя и сохранение в базу данных
         return [

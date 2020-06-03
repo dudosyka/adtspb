@@ -976,7 +976,7 @@
                     </div>
 
                     <b-alert variant="success" show>
-                        Регистрация успешно пройдена. Ваше заявление принято к рассмотрению. Очный (обязательный) прием заявлений пройдет с 24 по 31 августа в Академии цифровых технологий
+                        Регистрация успешно пройдена. Ваше заявление принято к рассмотрению. Очный (обязательный) прием заявлений пройдет с 24 по 31 августа в Академии цифровых технологий.
                     </b-alert>
 
                     <div v-for="(item, index) in children" style="width: 100%;">
@@ -989,12 +989,11 @@
                             v-b-toggle="'collapse-proposal-child-' + index"
                             style="width: 100%;"
                         >
-                            {{item.name}} {{item.surname}} {{(typeof item.midname != 'string') ? '' : item.midname}}
+                            {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}
                         </b-button>
 
                         <b-collapse :id="'collapse-proposal-child-' + index" class="mt-2">
                             <b-card>
-
 
                                 <b-table
                                     :select-mode="'multi'"
@@ -1011,7 +1010,7 @@
                                     </template>
                                 </b-table>
 
-
+                                <b-button @click="generateResolutionForm(item)" size="sm" style="width: 100%;">Cогласие на обработку персональных данных</b-button>
 
                             </b-card>
                         </b-collapse>
@@ -1534,6 +1533,27 @@
 
 
 
+
+            generateResolutionForm(child)
+            {
+                fetch(this.$request_endpoint+"?__module=ResolutionGenerate&child_id="+child.id, {
+                    method: 'GET',
+                    headers: new Headers({
+                        "Authorization": "Bearer " + this.$token
+                    })
+                })
+                    .then(response => response.blob())
+                    .then(blob => {
+                        let url = window.URL.createObjectURL(blob);
+                        let a = document.createElement('a');
+                        a.href = url;
+                        // a.download = "Заявление "++"("+child.name+" "+child.surname+").pdf";
+                        a.download = "Согласие_"+child.surname + "_" + child.name + "_" + child.midname + ".pdf";
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    });
+            },
 
             generateForm(child, association_id){
                 const _this = this;
