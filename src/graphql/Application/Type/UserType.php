@@ -35,7 +35,9 @@ class UserType extends ObjectType
 	                'email' => Types::email(),
 
 	                'registration_address' => ['type' => Types::string()],
+	                'registration_flat' => ['type' => Types::string()],
 	                'residence_address' => ['type' => Types::string()],
+	                'residence_flat' => ['type' => Types::string()],
 	                'job_place' => ['type' => Types::string()],
 	                'job_position' => ['type' => Types::string()],
 	                'relationship' => ['type' => Types::string()],

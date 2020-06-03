@@ -306,6 +306,36 @@
                                     </b-form-group>
                                 </validation-provider>
 
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            class="icon"
+                                            v-model="registration_flat"
+                                            placeholder="Номер квартиры адреса регистрации"
+
+                                            :state="getValidationState(validationContext)"
+                                            aria-describedby="registration_flat-feedback"
+                                        />
+
+                                        <div>
+                                            <b-button @click="registration_flat = 'Нет квартиры'" size="sm" style="margin-right: 5px;">Нет квартиры</b-button>
+                                        </div>
+
+                                        <b-form-invalid-feedback id="registration_flat-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+
+
+
+
+
+
                                 <!-- :rules="{ required: true }" -->
                                 <validation-provider
                                     style="width: 100%;"
@@ -330,7 +360,29 @@
 
 
 
+                                <validation-provider
+                                    style="width: 100%;"
 
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            class="icon"
+                                            v-model="residence_flat"
+                                            placeholder="Номер квартиры адреса проживания"
+
+                                            :state="getValidationState(validationContext)"
+                                            aria-describedby="registration_flat-feedback"
+                                        />
+
+                                        <div>
+                                            <b-button @click="residence_flat = 'Нет квартиры'" size="sm" style="margin-right: 5px;">Нет квартиры</b-button>
+                                        </div>
+
+                                        <b-form-invalid-feedback id="residence_flat-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
 
 
                                 <!-- TODO: Разделить иконки стрелочки и иконки у инпута (через 2 фона) -->
@@ -557,6 +609,7 @@
                                     </b-form-group>
                                 </validation-provider>
 
+                                <!--
                                 <validation-provider
                                     style="width: 100%;"
 
@@ -600,6 +653,7 @@
                                         <b-form-invalid-feedback :id="'cld-'+index+'-password-matching-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
+                                -->
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -780,6 +834,45 @@
                                     </b-form-group>
                                 </validation-provider>
 
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            class="icon"
+                                            v-model="item.registration_flat"
+                                            placeholder="Номер квартиры адреса регистрации"
+
+                                            :disabled="item.isDisabled"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-registration_flat-feedback'"
+                                        />
+
+                                        <div>
+                                            <b-button @click="item.registration_flat = 'Нет квартиры'" size="sm" style="margin-right: 5px;">Нет квартиры</b-button>
+                                        </div>
+
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                 <!-- :rules="{ required: true }" -->
                                 <validation-provider
                                     style="width: 100%;"
@@ -803,6 +896,38 @@
                                         </div>
                                     </b-form-group>
                                 </validation-provider>
+
+
+
+
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            class="icon"
+                                            v-model="item.residence_flat"
+                                            placeholder="Номер квартиры адреса проживания"
+
+                                            :disabled="item.isDisabled"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-residence_flat-feedback'"
+                                        />
+
+                                        <div>
+                                            <b-button @click="item.residence_flat = 'Нет квартиры'" size="sm" style="margin-right: 5px;">Нет квартиры</b-button>
+                                        </div>
+
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+
+
 
 
                                 <validation-provider
@@ -1066,10 +1191,14 @@
                 midname: null,
                 sex_options_selected: null,
                 residence_address: null,
+                residence_flat: null,
                 study_place: null,
                 study_class: null,
                 birthday: null,
+
                 registration_address: null,
+                registration_flat: null,
+
                 email: null,
                 phone_number: null,
 
@@ -1121,7 +1250,9 @@
                 birthday: null,
 
                 registration_address: null,
+                registration_flat: null,
                 residence_address: null,
+                residence_flat: null,
 
                 // Шаг 2
                 key_code: null,
@@ -1320,7 +1451,9 @@
                         "surname, " +
                         "midname, " +
                         "registration_address," +
+                        "registration_flat," +
                         "residence_address," +
+                        "residence_flat," +
                         "email," +
                         "phone_number," +
                         "sex," +
@@ -1350,7 +1483,9 @@
                             surname: current.surname,
                             midname: current.midname,
                             registration_address: current.registration_address,
+                            registration_flat: current.registration_flat,
                             residence_address: current.residence_address,
+                            residence_flat: current.residence_flat,
                             email: current.email,
                             phone_number: current.phone_number,
                             sex_options_selected: current.sex,
@@ -1367,9 +1502,9 @@
 
                             isDisabled: true
                         };
-
+                        this.status = true;
                     }
-                    this.status = true;
+
                     this.$forceUpdate();
                 }
 
@@ -1524,6 +1659,7 @@
                                 _this.$refs["associations_child_"+incr][0].selectRow(parseInt(__index, 10) - 1 + 1); // без - 1 + 1 почему-то не работает, возможно нужен был parseInt();
                             });
                         }
+
                     }
                 }
             },
@@ -1754,18 +1890,20 @@
                         `$midname`+i+`: String,`+
                         `$sex`+i+`: Sex!,`+
                         `$residence_address`+i+`: String!,`+
+                        `$residence_flat`+i+`: String!,`+
                         `$study_place`+i+`: String!,`+
                         `$study_class`+i+`: String!,`+
                         `$birthday`+i+`: Date!,`+
                         `$registration_address`+i+`: String!,`+
+                        `$registration_flat`+i+`: String!,`+
                         `$email`+i+`: Email,`+
                         `$phone_number`+i+`: PhoneNumber,`+
 
                         `$registration_type`+i+`: YesNo!,`+
                         `$ovz`+i+`: YesNo!,`+
                         `$state`+i+`: String!,`+
-
-                        `$password`+i+`: Password!,`;
+                        '';
+                        // `$password`+i+`: Password!,`;
 
                     requests += `child`+i+`: registerChild (`+
                             `relationship: $relationship`+i+`,`+
@@ -1774,13 +1912,15 @@
                             `midname: $midname`+i+`,`+
                             `sex: $sex`+i+`,`+
                             `residence_address: $residence_address`+i+`,`+
+                            `residence_flat: $residence_flat`+i+`,`+
                             `study_place: $study_place`+i+`,`+
                             `study_class: $study_class`+i+`,`+
                             `birthday: $birthday`+i+`,`+
                             `registration_address: $registration_address`+i+`,`+
+                            `registration_flat: $registration_flat`+i+`,`+
                             `email: $email`+i+`,`+
                             `phone_number: $phone_number`+i+`,`+
-                            `password: $password`+i+`,`+
+                            // `password: $password`+i+`,`+
 
                             `registration_type: $registration_type`+i+`,`+
                             `ovz: $ovz`+i+`,`+
@@ -1793,6 +1933,7 @@
                     data["midname"+i] = current["midname"];
                     data["sex"+i] = current["sex_options_selected"];
                     data["residence_address"+i] = current["residence_address"];
+                    data["residence_flat"+i] = current["residence_flat"];
                     data["study_place"+i] = current["study_place"];
                     data["study_class"+i] = current["study_class"];
 
@@ -1803,9 +1944,10 @@
 
 
                     data["registration_address"+i] = current["registration_address"];
+                    data["registration_flat"+i] = current["registration_flat"];
                     data["email"+i] = (current["email"] == "") ? null : current["email"];
                     data["phone_number"+i] = (current["phone_number"] == "") ? null : current["phone_number"];
-                    data["password"+i] = current["password"];
+                    // data["password"+i] = current["password"];
 
                     data["registration_type"+i] = current["registration_type"];
                     data["ovz"+i] = current["ovz"];
@@ -1924,7 +2066,9 @@
                         $phone_number: PhoneNumber!,
                         $sex: Sex!,
                         $registration_address: String!,
-                        $residence_address: String!
+                        $registration_flat: String!,
+                        $residence_address: String!,
+                        $residence_flat: String!
                     ) {
                         register (
                             name: $name,
@@ -1936,8 +2080,9 @@
                             sex: $sex,
 
                             registration_address: $registration_address,
+                            registration_flat: $registration_flat,
                             residence_address: $residence_address,
-
+                            residence_flat: $residence_flat,
                         )
                     }
                 `;
@@ -1956,7 +2101,9 @@
                     // job_position:           this.job_position,
                     // job_place:              this.job_place,
                     registration_address:   this.registration_address,
+                    registration_flat:      this.registration_flat,
                     residence_address:      this.residence_address,
+                    residence_flat:         this.residence_flat,
                     // birthday:               this.birthday
                 };
 

@@ -38,7 +38,9 @@ class User extends EntityBase
     public $phone_number;
     public $email;
     public $registration_address;
+    public $registration_flat;
     public $residence_address;
+    public $residence_flat;
     public $job_position;
     public $job_place;
     public $relationship;

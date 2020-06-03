@@ -21,6 +21,8 @@
                 Пароль успешно изменен.
             </b-alert>
 
+            <b-button @click="performLogin()" v-if="succeeded_restore" style="width: 100%;">Войти</b-button>
+
             <vue-good-wizard
                 v-bind:show="!succeeded_restore"
                 v-if="!succeeded_restore"
@@ -261,6 +263,52 @@
             getValidationState({ dirty, validated, valid = null }) {
                 return dirty || validated ? valid : null;
             },
+
+
+
+
+
+            performLogin(){
+
+                const request = `
+                    mutation(
+                        $username: String!,
+                        $password: String!
+                    ) {
+                        login (
+                            username: $username,
+                            password: $password,
+                        )
+                    }
+                `;
+
+                const data = {
+                    username: this.username,
+                    password: this.password
+                };
+
+                this.is_sending_request = true;
+
+                const _component = this;
+
+                this.$request(this.$request_endpoint, request, data)
+                    .then(function(data){
+                        _component.is_sending_request = false;
+                        _component.$token = data.login[0];
+                        _component.$nextTick(function () {
+                            _component.$router.push({path: "/login"});
+                        });
+                    })
+                    .catch(function(e){
+                        let errors = e.response.errors;
+                        console.log(errors);
+                    });
+            },
+
+
+
+
+
 
             /* Шаг 3 */
             async sendNewPassword(){

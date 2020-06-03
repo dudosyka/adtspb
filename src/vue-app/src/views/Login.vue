@@ -133,6 +133,11 @@
             window.addEventListener('resize', () => {
                 _this.windowWidth = window.innerWidth
             });
+
+            if(this.$token != undefined){
+                this.checkUps();
+            }
+
         },
 
         methods: {
@@ -147,6 +152,31 @@
 
             gotoRegistration(){
                 this.$router.push({path: "/register/form"});
+            },
+
+            async checkUps(){
+
+                let data = await this.$graphql_client.request(`query{viewer{email, status_email, hasAnyChildrenAdded, hasAnyProposals}}`, {});
+
+                // На шаг подтверждения e-mail
+                if(data.viewer.status_email == "ожидание"){
+                    this.$router.push({path: "/register/form?page=1&email="+data.viewer.email});
+                    return;
+                }
+
+                // На шаг добавления детей
+                if(!data.viewer.hasAnyChildrenAdded){
+                    this.$router.push({path: "/register/form?page=2"});
+                    return;
+                }
+
+                // На шаг регистрации детей в объединение
+                if(!data.viewer.hasAnyProposals){
+                    this.$router.push({path: "/register/form?page=3"});
+                    return;
+                }
+
+                this.$router.push({path: "/register/form?page=4"});
             },
 
             onSubmit(){
@@ -179,28 +209,7 @@
                     _component.$token = data.login[0];
 
                     _component.$nextTick(async function(){
-
-                        let data = await _component.$graphql_client.request(`query{viewer{email, status_email, hasAnyChildrenAdded, hasAnyProposals}}`, {});
-
-                        // На шаг подтверждения e-mail
-                        if(data.viewer.status_email == "ожидание"){
-                            this.$router.push({path: "/register/form?page=1&email="+data.viewer.email});
-                            return;
-                        }
-
-                        // На шаг добавления детей
-                        if(!data.viewer.hasAnyChildrenAdded){
-                            this.$router.push({path: "/register/form?page=2"});
-                            return;
-                        }
-
-                        // На шаг регистрации детей в объединение
-                        if(!data.viewer.hasAnyProposals){
-                            this.$router.push({path: "/register/form?page=3"});
-                            return;
-                        }
-
-                        this.$router.push({path: "/register/form?page=4"});
+                        _component.checkUps();
                     });
                 }).catch(function(e){
                     let errors = e.response.errors;

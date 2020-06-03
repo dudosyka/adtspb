@@ -67,7 +67,9 @@ class MutationType extends ObjectType
 //                        'job_position' => Types::nonNull(Types::string()),
 //                        'job_place' => Types::nonNull(Types::string()),
                         'registration_address' => Types::nonNull(Types::string()),
+                        'registration_flat' => Types::nonNull(Types::string()),
                         'residence_address' => Types::nonNull(Types::string()),
+                        'residence_flat' => Types::nonNull(Types::string()),
 //                        'birthday' => Types::nonNull(Types::date()),
                     ]
                 ],
@@ -82,13 +84,15 @@ class MutationType extends ObjectType
                         'midname' => Types::string(),
                         'sex' => Types::nonNull(Types::sex()),
                         'residence_address' => Types::nonNull(Types::string()),
+                        'residence_flat' => Types::nonNull(Types::string()),
                         'study_place' => Types::nonNull(Types::string()),
                         'study_class' => Types::nonNull(Types::string()),
                         'birthday' => Types::nonNull(Types::date()),
                         'registration_address' => Types::nonNull(Types::string()),
+                        'registration_flat' => Types::nonNull(Types::string()),
                         'email' => Types::email(),
                         'phone_number' => Types::phoneNumber(),
-                        'password' => Types::nonNull(Types::password()),
+//                        'password' => Types::nonNull(Types::password()),
 
                         "state" => Types::nonNull(Types::string()),
                         "registration_type" => [
@@ -241,7 +245,9 @@ class MutationType extends ObjectType
             'job_position' => "", //$args['job_position'],
             'job_place' => "", //$args['job_place'],
             'registration_address' => $args['registration_address'],
+            "registration_flat" => $args["registration_flat"],
             'residence_address' => $args['residence_address'],
+            "residence_flat" => $args["residence_flat"],
             'relationship' => "",
             'study_place' => '',
             'study_class' => '',
@@ -292,13 +298,16 @@ class MutationType extends ObjectType
             'surname' => $args['surname'],
             'midname' => $args['midname'],
             'email' => $email,
-            'password' => User::hashPassword($args['password']),
+//            'password' => User::hashPassword($args['password']),
+            "password" => "",
             'phone_number' => $args['phone_number'] ?? "",
             'sex' => $args['sex'],
             'job_position' => "",
             'job_place' => "",
             'registration_address' => $args['registration_address'],
+            "registration_flat" => $args["registration_flat"],
             'residence_address' => $args['residence_address'],
+            "residence_flat" => $args["residence_flat"],
             'relationship' => $args['relationship'],
             'study_place' => $args['study_place'],
             'study_class' => $args['study_class'], //TODO: парсер класса
@@ -530,10 +539,10 @@ HTML;
             ':username' => $args['username']
         ]);
 
-        if($found == null || !User::validatePassword($args['password'], $found->password))
+        if($found == null || $found->password == "" || $found->email == "" || $found->phone_number == "" || !User::validatePassword($args['password'], $found->password))
             throw new RequestError("Неверный логин или пароль");
 
-        $found->status_email = User::EMAIL_VALIDATED;
+//        $found->status_email = User::EMAIL_VALIDATED;
 
 //         if(!$found->hasAccess(10)){
 //             throw new RequestError("Личный кабинет обучающегося в настоящее время находится в разработке ".print_r($found->hasAccess(10), true));
