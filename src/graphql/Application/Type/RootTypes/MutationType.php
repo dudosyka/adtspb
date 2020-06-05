@@ -612,10 +612,8 @@ HTML;
         $html = <<<HTML
 <p>Ваш код для восстановления пароля:</p>
 <pre>{$key_code}</pre>
-
+<p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/login/restore-password?username={$email}&key_code={$key_code}">ссылкой для восстановления</a>.</p>
 HTML;
-//        <p>Или Вы можете воспользоваться <a href="//lk.adtspb.ru/login/restore-password?code={$key_code}">ссылкой для восстановления</a>.</p>
-//TODO реализовать переход по ссылке из письма
 
         Application::sendMail($email, "Восстановление пароля", $html);
 

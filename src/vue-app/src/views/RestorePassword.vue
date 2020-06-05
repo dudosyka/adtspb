@@ -33,7 +33,7 @@
                 :onBack="backClicked"
                 :nextStepLabel="'Далее'"
                 :previousStepLabel="'Назад'"
-                :finalStepLabel="'Изменить пароль'">
+                :finalStepLabel="'Изменить'">
                 <div slot="page1">
                     <h4>Ввод информации об аккаунте</h4>
                     <p>Введите e-mail, номер телефона или логин аккаунта, доступ к которому требуется восстановить. На Вашу электронную почту будет выслано письмо со ссылкой для восстановления пароля.</p>
@@ -105,6 +105,10 @@
                 <div slot="page3">
                     <h4>Введите новый пароль</h4>
                     <p>Введите новый пароль. Повторите введенный пароль.</p>
+
+                    <b-alert variant="success" v-bind:show="link_success" v-if="link_success">
+                        Аккаунт был подтвержден
+                    </b-alert>
 
                     <b-alert variant="danger" v-bind:show="restore_graphql_errors.length > 0" v-if="restore_graphql_errors.length > 0" id="restore_account_errors_container">
                         {{restore_graphql_errors[0].message}}
@@ -201,6 +205,7 @@
                 password: "",
                 password_matching: "",
 
+                link_success: false,
 
                 succeeded_restore: false,
 
@@ -227,6 +232,17 @@
             window.addEventListener('resize', () => {
                 _this.windowWidth = window.innerWidth
             });
+
+            if(this.$route.query.username != undefined && this.$route.query.key_code != undefined){
+                this.username = this.$route.query.username;
+                this.key_code = this.$route.query.key_code;
+                this.$refs.wizard.currentStep = 1;
+                this.link_success = true;
+                this.$nextTick(function(){
+                    this.validateKeyCode();
+                });
+            }
+
         },
 
         methods: {

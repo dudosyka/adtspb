@@ -12,6 +12,13 @@
                           v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>
             </router-link>
 
+            <div class="spacer" v-if="enoughSpaceForTopButtons()"></div>
+
+            <!-- v-bind:class="(topScroll > 0) ? 'selected' : ''" -->
+            <b-button v-if="this.$token != '' && this.$token != null" variant="dark" class="theme-alt top-panel-button"
+                      v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'" @click="exit()">Выход</b-button>
+
+
         </div>
 
         <b-container class="form">
@@ -488,10 +495,24 @@
                         <!--                        <b-form @submit.stop.prevent="passes(submitAccountRegistration)">-->
                         <b-form-row>
 
-                            <!-- Форма для каждого ребенка -->
                             <div v-for="(item, index) in children" style="width: 100%;">
 
-                                <hr style="width: 100%;">
+                            <b-button
+                                v-b-toggle="'collapse-child-' + index"
+                                style="width: 100%; border-radius: 2px !important;"
+                            >
+                                {{((item.surname == '' || item.surname == null) && (item.name == '' || item.name == null) && (item.midname == '' || item.midname == null)) ? 'Форма #'+(index + 1) : ''}}
+
+                                {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}
+                            </b-button>
+
+                            <b-collapse :id="'collapse-child-' + index" class="mt-2" visible>
+                                <b-card>
+
+                                <!-- Форма для каждого ребенка -->
+
+
+<!--                                <hr style="width: 100%;">-->
 
                                 <b-alert variant="danger"
                                          v-bind:show="graphql_errors.length > 0 && graphql_errors[index] != null"
@@ -951,18 +972,22 @@
                                     </b-form-group>
                                 </validation-provider>
 
-                            </div>
 
-                            <hr style="width: 100%;">
+
+                                </b-card>
+                            </b-collapse>
+
+                            </div>
+<!--                            <hr style="width: 100%;">-->
 
 <!--                                <b-link @click="children.push({...child_prototype})">Добавить ребенка</b-link>,-->
 <!--                                <b-link @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false">удалить последнюю форму</b-link>-->
 
 <!--                                size="sm"-->
 
-                            <b-button class="background-green" @click="children.push({...child_prototype})"  style="width: 100%;">Добавить ребенка</b-button>
+                            <b-button class="background-green" @click="children.push({...child_prototype})"  style="width: 100%; margin-top: 35px;">Добавить ребенка</b-button>
                             <b-button class="background-red" @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false"
-                                  style="width: 100%;">Удалить последнюю форму</b-button>
+                                  style="width: 100%;" v-if="children.length > 1">Отменить добавление</b-button>
 
 
 
@@ -1112,7 +1137,7 @@
 
                         <b-button
                             v-b-toggle="'collapse-proposal-child-' + index"
-                            style="width: 100%;"
+                            style="width: 100%; border-radius: 2px !important;"
                         >
                             {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}
                         </b-button>
@@ -1144,7 +1169,7 @@
 
                     </div>
 
-                    <b-button class="background-green" @click="setStep(2)" style="width: 100%;">Добавить ребенка</b-button>
+                    <b-button class="background-green" @click="setStep(2)" style="width: 100%; margin-top: 35px;">Добавить ребенка</b-button>
 
                 </div>
             </vue-good-wizard>
@@ -2129,7 +2154,20 @@
                     });
 
                 });
-            }
+            },
+
+
+            exit(){
+
+                this.$graphql_client.request(`mutation{ logout }`)
+                    .then(this.clearToken)
+                    .catch(this.clearToken);
+
+            },
+            clearToken(){
+                this.$token = "";
+                this.$router.push({ path: '/login' });
+            },
         }
     }
 </script>
@@ -2192,7 +2230,9 @@
         background-color: #0f3061 !important;
     }
 
-
+    .spacer{
+        margin: auto;
+    }
 
 
 
