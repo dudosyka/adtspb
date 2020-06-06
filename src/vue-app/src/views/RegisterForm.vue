@@ -1041,8 +1041,6 @@
 
                         <hr style="width: 100%;">
 
-                        <label class="text-center">{{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
-
                         <b-table :busy="associations.length <= 0" class="mt-3" outlined>
                             <template v-slot:table-busy>
                                 <div class="text-center text-danger my-2">
@@ -1052,30 +1050,50 @@
                             </template>
                         </b-table>
 
+                        <label class="text-center">{{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
+                        <b-form-input :type="'search'" v-model="associations_filter[index]" placeholder="Поиск объединения"></b-form-input>
                         <b-table
+                            class="table table-responsive"
                             :ref="'associations_child_'+index"
-                            selectable
-                            :select-mode="'multi'"
-                            :items="associations"
+                            :items="childAssociations[index]"
                             :fields="association_list_fields"
-                            @row-selected="onRowAssociationsSelected(index, $event)"
+                            :filter="associations_filter[index]"
+                            :filter-included-fields="['name']"
+                            :tbody-tr-class="rowStyler"
+                            @filtered="onAssociationsFiltered"
+                            @sort-changed="onAssociationsFiltered"
+                            @refreshed="onAssociationsFiltered"
                             responsive="sm"
+                            style="display:block;
+                                   max-height:400px;
+                                   overflow-y:auto;"
                         >
                             <!-- Example scoped slot for select state illustrative purposes -->
-                            <template v-slot:cell(selected)="{ rowSelected }">
-                                <template v-if="rowSelected">
-                                    <span aria-hidden="true">&check;</span>
-                                    <span class="sr-only">
-                                        Выбрано
-                                    </span>
-                                </template>
-                                <template v-else>
-                                    <span aria-hidden="true">&nbsp;</span>
-                                    <span class="sr-only">Не выбрано</span>
-                                </template>
+                            <template v-slot:cell(selected)="row">
+                                <b-form-checkbox
+                                    :ref="'checkbox_'+index+'_'+row.item.id"
+                                    :id="'checkbox_'+index+'_'+row.item.id"
+                                    v-model="selected_associations[index]"
+                                    :name="'checkbox-'+ index +'-'+row.item.id"
+                                    :value="row.item"
+                                    @change="onRowAssociationsSelected($event, row, index)"
+                                >
+                                </b-form-checkbox>
+                            </template>
+
+                            <template v-slot:cell(controls)="row">
+                                <b-button size="sm" @click="row.toggleDetails">
+                                    {{ row.detailsShowing ? 'Скрыть' : 'Подробнее' }}
+                                </b-button>
+                            </template>
+
+                            <template v-slot:row-details="row">
+                                <b-card v-html="row.item.description"></b-card>
                             </template>
                         </b-table>
-
+                        <b-badge pill variant="success" class="m-2">Соответствует возрасту</b-badge>
+                        <b-badge pill variant="light" class="border border-dark">Доступно к записи</b-badge>
+                        <b-badge pill variant="light">Мин - Минимальный возраст. Макс - Максимальный возраст. Час/нед - Часов в неделю</b-badge>
                     </div>
 
                     <b-modal id="step4-warning" title="Предупреждение" v-model="step4_warning" :centered="true">
@@ -1293,17 +1311,24 @@
                 //Шаг 4
                 associations: [],
                 association_list_fields: [
-                    {key: 'selected', label: 'Выбрано', sortable: false},
+                    {key: 'selected', label: 'Выбрано', thClass: 'th-sm', tdClass:'td-sm', sortable: false},
                     // thClass: 'd-none', tdClass: 'd-none' = для скрытия столбца
                     {key: 'id', label: 'ID', thClass: 'd-none', tdClass: 'd-none', sortable: false},
-                    {key: 'name', label: 'Наименование', sortable: true},
-                    {key: 'min_age', label: 'Мин. возраст', sortable: true},
-                    {key: 'max_age', label: 'Макс. возраст', sortable: true},
-                    {key: 'study_hours_week', label: 'Часов в неделю', sortable: true},
+                    {key: 'name', label: 'Наименование', thClass: 'th-lg', sortable: true},
+                    {key: 'min_age', label: 'Мин.', sortable: true},
+                    {key: 'max_age', label: 'Макс.', sortable: true},
+                    {key: 'study_hours_week', label: 'Час/нед', sortable: true},
+                    {key: 'controls', label: 'Описание', sortable: false},
+                    {key: 'description', label: 'Описание',thClass: 'd-none', tdClass: 'd-none', sortable: false},
                 ],
                 step3_error_notification: false,
                 step4_warning: false,
                 step4_fatal: false,
+                selected_associations: [],
+                associations_filter: [],
+                childAssociations: [],
+                associationCurrentPage: [],
+                childAssociationsTotalRows: [],
 
                 // Шаг 5
                 associations_download_fields: [
@@ -1378,19 +1403,50 @@
         methods: {
 
 
-
-            enoughSpaceForTopButtons: function(){
+            enoughSpaceForTopButtons: function () {
                 return this.windowWidth >= 765;
             },
 
 
+            onRowAssociationsSelected(association, row, childId) {
+                if (association == null) {
+                    let onDelete = false;
+                    this.children[childId].associations_selected = this.children[childId].associations_selected.map((el, i) => {
+                        if (el.id == row.item.id)
+                            onDelete = i;
+                        return el;
+                    });
+                    if (onDelete !== false)
+                        this.children[childId].associations_selected.splice(onDelete, 1);
+                } else {
+                    let exists = false;
+                    let associations = this.children[childId].associations_selected.map(el => {
+                        if (el.id == row.item.id) {
+                            return association;
+                            exists = true;
+                        } else
+                            return el;
+                    });
+                    if (exists)
+                        this.children[childId].associations_selected = associations;
+                    else
+                        this.children[childId].associations_selected.push(association);
+                }
+            },
 
+            onAssociationsFiltered() {
+                setTimeout(() => {
+                    this.childTick()
+                }, 1);
+                /*
+                  Событие @filtered срабатывает перед тем как отрендерить строки в таблице.
+                  Поэтому нужна эта "задержка", чтобы чекбоксы проставлялись после отрисовки
+               */
+            },
 
-
-
-
-            onRowAssociationsSelected(i, items) {
-                this.children[i].associations_selected = items;
+            rowStyler(item, type) {
+                if (!item || type !== 'row') return;
+                if (item.isGoodAssociation) return 'table-success';
             },
 
             nextClicked(currentPage) {
@@ -1620,6 +1676,17 @@
                 this.residence_address = response.viewer.residence_address;
             },
 
+            getChildAge(child)
+            {
+                let date = child.birthday.split("-").reverse().join("-") + " 00:00:00";
+                var now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                now = now.toISOString().substr(0, 19).replace('T',' ');
+                var age = now.substr(0, 4) - date.substr(0, 4);
+                if(now.substr(5) < date.substr(5)) --age;
+                return age;
+            },
+
             async loadAssociations(){
                 // TODO: оптимизировать выгрузку списка доступных объединений
 
@@ -1631,7 +1698,8 @@
                             name,
                             min_age,
                             max_age,
-                            study_hours_week
+                            study_hours_week,
+                            description
                         }
                     }
                 `;
@@ -1643,7 +1711,39 @@
                 await this.$graphql_client.request(request, {}).then(function(data){
                     _this.is_sending_request = false;
                     _this.associations = data.associations;
-
+                    _this.childAssociations = _this.children.map(child=>{
+                        let associations = [];
+                        for (let i in _this.associations) {
+                            let el = _this.associations[i];
+                            let age = _this.getChildAge(child);
+                            if (age <= el.max_age + 1 && age >= el.min_age - 1)
+                            {
+                                el.isGoodAssociation = false;
+                                if (age == el.max_age)
+                                    el.isGoodAssociation = true;
+                                if (age == el.min_age)
+                                    el.isGoodAssociation = true;
+                                console.log(el);
+                                associations.push(el);
+                            }
+                        }
+                        return associations;
+                    });
+                    _this.associationsIds = _this.associations.map(el=>{
+                       return el.id;
+                    });
+                    _this.selected_associations = _this.children.map((el, i) => {
+                        _this.associations_filter.push("");
+                        return el.associations_selected;
+                    });
+                    for (let i in _this.childAssociations)
+                    {
+                        _this.associationCurrentPage.push(1);
+                        _this.childAssociationsTotalRows.push(_this.childAssociations[i].length);
+                    }
+                    _this.associationCurrentPage = _this.children.map(el => {
+                        return 1;
+                    })
                     _this.childTick();
 
                     // _this.nextTick(function(){
@@ -1657,13 +1757,27 @@
             },
 
 
-
-
-
-
-
-
-            childTick(){
+            childTick()
+            {
+                for (let i in this.children)
+                {
+                    for (let j in this.childAssociations[i])
+                    {
+                        let _id = this.childAssociations[i][j].id;
+                        if (this.$refs['checkbox_'+i+"_"+_id].length)
+                            this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = false;
+                    }
+                }
+                for (let i in this.children)
+                {
+                    let el = this.children[i];
+                    for (let j in el.associations_selected)
+                    {
+                        let _id = el.associations_selected[j].id;
+                        if (this.$refs['checkbox_'+i+"_"+_id].length)
+                            this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = true;
+                    }
+                }
                 const _this = this;
 
                 for(let incr in _this.children){
@@ -1823,8 +1937,9 @@
                     // TODO: оптимизировать провеку количества часов
                     for (let i2 in child.associations_selected) {
                         let selected = child.associations_selected[i2];
-                        hours += parseInt(selected.study_hours_week, 10);
+                        hours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
                     }
+                    console.log(hours);
 
                     if (hours >= 8 && hours <= 9) {
                         this.step4_warning = true;
