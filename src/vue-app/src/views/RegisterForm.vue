@@ -503,7 +503,7 @@
                             >
                                 {{((item.surname == '' || item.surname == null) && (item.name == '' || item.name == null) && (item.midname == '' || item.midname == null)) ? 'Форма #'+(index + 1) : ''}}
 
-                                {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}
+                                {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
                             </b-button>
 
                             <b-collapse :id="'collapse-child-' + index" class="mt-2" visible>
@@ -1024,6 +1024,7 @@
 
 
                 </div>
+
                 <div slot="page4">
                     <div>
                         <h3 class="form-title">Выбор объединений</h3>
@@ -1073,7 +1074,7 @@
                                 <b-form-checkbox
                                     :ref="'checkbox_'+index+'_'+row.item.id"
                                     :id="'checkbox_'+index+'_'+row.item.id"
-                                    v-model="selected_associations[index]"
+                                    v-model="children[index].associations_selected[index]"
                                     :name="'checkbox-'+ index +'-'+row.item.id"
                                     :value="row.item"
                                     @change="onRowAssociationsSelected($event, row, index)"
@@ -1138,6 +1139,7 @@
 
 
                 </div>
+
                 <div slot="page5">
                     <div>
                         <h3 class="form-title">Заявления</h3>
@@ -1157,7 +1159,7 @@
                             v-b-toggle="'collapse-proposal-child-' + index"
                             style="width: 100%; border-radius: 2px !important;"
                         >
-                            {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}
+                            {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
                         </b-button>
 
                         <b-collapse :id="'collapse-proposal-child-' + index" class="mt-2">
@@ -1375,7 +1377,7 @@
                 step2_back_notification: false,
 
                 incorrect_code: false,
-
+                collapseArrows: {},
 
 
 
@@ -1403,35 +1405,21 @@
         methods: {
 
 
+            collapseOpened(collapseId){
+                this.collapseArrows[collapseId] = true;
+            },
+
+            collapseClosed(collapseId){
+                this.collapseArrows[collapseId] = undefined;
+            },
+
             enoughSpaceForTopButtons: function () {
                 return this.windowWidth >= 765;
             },
 
 
             onRowAssociationsSelected(association, row, childId) {
-                if (association == null) {
-                    let onDelete = false;
-                    this.children[childId].associations_selected = this.children[childId].associations_selected.map((el, i) => {
-                        if (el.id == row.item.id)
-                            onDelete = i;
-                        return el;
-                    });
-                    if (onDelete !== false)
-                        this.children[childId].associations_selected.splice(onDelete, 1);
-                } else {
-                    let exists = false;
-                    let associations = this.children[childId].associations_selected.map(el => {
-                        if (el.id == row.item.id) {
-                            return association;
-                            exists = true;
-                        } else
-                            return el;
-                    });
-                    if (exists)
-                        this.children[childId].associations_selected = associations;
-                    else
-                        this.children[childId].associations_selected.push(association);
-                }
+                // console.log(this.children[childId].associations_selected);
             },
 
             onAssociationsFiltered() {
@@ -1526,7 +1514,6 @@
 
                 // Если шаг >= 3, то грузим информацию о детях
                 if(page >= 2){
-                    await this.loadAssociations();
                     let data = await this.$graphql_client.request("query{ viewer{ getChildren{ id, " +
                         "name, " +
                         "surname, " +
@@ -1585,7 +1572,7 @@
                         };
                         this.status = true;
                     }
-
+                    await this.loadAssociations();
                     this.$forceUpdate();
                 }
 
@@ -1593,7 +1580,8 @@
                 if(page >= 3){
                     let data = await this.$graphql_client.request("query{ viewer{ getChildren{ getInProposals { getAssociation { id, name } } } } }");
 
-                    for(var i in data.viewer.getChildren){
+                    for(var i in data.viewer.getChildren)
+                    {
                         let current = data.viewer.getChildren[i];
 
                         let selected_associations = [];
@@ -1679,12 +1667,16 @@
             getChildAge(child)
             {
                 let date = child.birthday.split("-").reverse().join("-") + " 00:00:00";
-                var now = new Date();
+                let now = new Date();
                 now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
                 now = now.toISOString().substr(0, 19).replace('T',' ');
-                var age = now.substr(0, 4) - date.substr(0, 4);
+                let age = now.substr(0, 4) - date.substr(0, 4);
                 if(now.substr(5) < date.substr(5)) --age;
                 return age;
+            },
+
+            getValidAssociations(childId) {
+
             },
 
             async loadAssociations(){
@@ -1712,45 +1704,25 @@
                     _this.is_sending_request = false;
                     _this.associations = data.associations;
                     _this.childAssociations = _this.children.map(child=>{
+                        _this.associations_filter.push("");
                         let associations = [];
                         for (let i in _this.associations) {
-                            let el = _this.associations[i];
+                            let el = {..._this.associations[i]};
                             let age = _this.getChildAge(child);
                             if (age <= el.max_age + 1 && age >= el.min_age - 1)
                             {
                                 el.isGoodAssociation = false;
-                                if (age == el.max_age)
+                                if (age <= el.max_age && age >= el.min_age)
                                     el.isGoodAssociation = true;
-                                if (age == el.min_age)
-                                    el.isGoodAssociation = true;
-                                console.log(el);
                                 associations.push(el);
                             }
                         }
                         return associations;
                     });
                     _this.associationsIds = _this.associations.map(el=>{
-                       return el.id;
+                        return el.id;
                     });
-                    _this.selected_associations = _this.children.map((el, i) => {
-                        _this.associations_filter.push("");
-                        return el.associations_selected;
-                    });
-                    for (let i in _this.childAssociations)
-                    {
-                        _this.associationCurrentPage.push(1);
-                        _this.childAssociationsTotalRows.push(_this.childAssociations[i].length);
-                    }
-                    _this.associationCurrentPage = _this.children.map(el => {
-                        return 1;
-                    })
                     _this.childTick();
-
-                    // _this.nextTick(function(){
-                    //     console.log("hey =(");
-
-                    // });
-
                 }).catch(function(e){
                     _this.is_sending_request = false;
                 });
@@ -1764,7 +1736,7 @@
                     for (let j in this.childAssociations[i])
                     {
                         let _id = this.childAssociations[i][j].id;
-                        if (this.$refs['checkbox_'+i+"_"+_id].length)
+                        if (this.$refs['checkbox_'+i+"_"+_id] != undefined)
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = false;
                     }
                 }
@@ -1774,31 +1746,8 @@
                     for (let j in el.associations_selected)
                     {
                         let _id = el.associations_selected[j].id;
-                        if (this.$refs['checkbox_'+i+"_"+_id].length)
+                        if (this.$refs['checkbox_'+i+"_"+_id] != undefined)
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = true;
-                    }
-                }
-                const _this = this;
-
-                for(let incr in _this.children){
-                    let child = _this.children[incr];
-
-                    for(let index in _this.associations){
-                        const __id =  parseInt(_this.associations[index].id, 10);
-                        const __index = index;
-
-                        const result = child.associations_selected.find(function(element, index, array){
-                            if(element.isAlreadyExists && parseInt(element.id, 10) == parseInt(__id, 10)){
-                                return element;
-                            } else
-                                return false;
-                        });
-                        if(result != undefined){
-                            this.$nextTick(function(){
-                                _this.$refs["associations_child_"+incr][0].selectRow(parseInt(__index, 10) - 1 + 1); // без - 1 + 1 почему-то не работает, возможно нужен был parseInt();
-                            });
-                        }
-
                     }
                 }
             },
@@ -1847,7 +1796,7 @@
                         let a = document.createElement('a');
                         a.href = url;
                         // a.download = "Заявление "++"("+child.name+" "+child.surname+").pdf";
-                        a.download = "Заявление.pdf";
+                        a.download = "Заявление("+child.surname + "_" + child.name + "_" + child.midname + ").pdf";
                         document.body.appendChild(a);
                         a.click();
                         a.remove();
