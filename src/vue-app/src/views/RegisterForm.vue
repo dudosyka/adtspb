@@ -6,11 +6,13 @@
 
         <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''">
 
-            <router-link to="/login">
-                <!-- v-bind:class="(topScroll > 0) ? 'selected' : ''" -->
-                <b-button variant="dark" class="theme-alt top-panel-button"
-                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>
-            </router-link>
+<!-- TODO: Раскоментить (когда будет функционал для педагога ребенка и учебного отдела) -->
+
+<!--            <router-link to="/login">-->
+<!--                &lt;!&ndash; v-bind:class="(topScroll > 0) ? 'selected' : ''" &ndash;&gt;-->
+<!--                <b-button variant="dark" class="theme-alt top-panel-button"-->
+<!--                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>-->
+<!--            </router-link>-->
 
             <div class="spacer" v-if="enoughSpaceForTopButtons()"></div>
 
@@ -29,10 +31,12 @@
                 :onNext="nextClicked"
                 :onBack="backClicked"
 
-                :nextStepLabel="'Далее'"
                 :previousStepLabel="'Назад'"
+                :nextStepLabel="'Далее'"
                 :finalStepLabel="'Завершить'"
             >
+
+                <!--                -->
                 <!-- Шаг 1 -->
                 <div slot="page1">
                     <div>
@@ -323,14 +327,14 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="registration_flat"
-                                            placeholder="Номер квартиры адреса регистрации"
+                                            placeholder="Номер квартиры по адресу регистрации"
 
                                             :state="getValidationState(validationContext)"
                                             aria-describedby="registration_flat-feedback"
                                         />
 
                                         <div>
-                                            <b-button @click="registration_flat = 'Нет квартиры'" size="sm" style="margin-right: 5px;">Нет квартиры</b-button>
+                                            <b-button @click="registration_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback id="registration_flat-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -363,6 +367,10 @@
                                             aria-describedby="residence_address-live-feedback" />
                                         <b-form-invalid-feedback id="residence_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
+
+                                    <div>
+                                        <b-button @click="residence_address = registration_address; residence_flat = registration_flat" size="sm" style="margin-right: 5px;">По адресу регистрации</b-button>
+                                    </div>
                                 </validation-provider>
 
 
@@ -377,14 +385,14 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="residence_flat"
-                                            placeholder="Номер квартиры адреса проживания"
+                                            placeholder="Номер квартиры по адресу проживания"
 
                                             :state="getValidationState(validationContext)"
                                             aria-describedby="registration_flat-feedback"
                                         />
 
                                         <div>
-                                            <b-button @click="residence_flat = 'Нет квартиры'" size="sm" style="margin-right: 5px;">Нет квартиры</b-button>
+                                            <b-button @click="residence_flat = 'Без номер квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback id="residence_flat-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -428,7 +436,7 @@
                     <div>
                         <h3 class="form-title">Подтверждение аккаунта</h3>
                     </div>
-                    <p>На Ваш e-mail, указанный при регистрации, был отправлен код подтверждения. Введите его в поле ниже.</p>
+                    <p>На Ваш e-mail ({{ email }}), был отправлен код подтверждения. Введите его в поле ниже.</p>
                     <p>Письмо может доставляться в течение 5 минут.<br>Если письмо не пришло, проверьте папку "Спам".</p>
 
                     <!-- dismissible -->
@@ -469,7 +477,7 @@
                         </b-form-group>
                     </validation-provider>
 
-                    <b-button @click="resendCode()" style="width: 100%;" :disabled="is_sending_request">Повторно отправить код подтверждения</b-button>
+                    <b-button @click="resendCode()" style="width: 100%;" class="btn-light" :disabled="is_sending_request">Повторно отправить код подтверждения</b-button>
 
 
                 </div>
@@ -482,7 +490,7 @@
 
                     <!-- dismissible -->
                     <b-alert variant="primary" show>
-                        Если Вы обнаружили ошибку в своих данных или ребенка, то отправьте сообщение на почту <a href="mailto:lk_support@adtspb.ru">lk_support@adtspb.ru</a> для внесения изменений.
+                        Если Вы обнаружили ошибку в своих данных или ребенка, то отправьте сообщение на почту <a class="alert-link" href="mailto:lk_support@adtspb.ru">lk_support@adtspb.ru</a> для внесения изменений.
                     </b-alert>
 
                     <b-alert :show="step2_back_notification" variant="warning" id="back_to_code_warning">
@@ -499,6 +507,7 @@
 
                             <b-button
                                 v-b-toggle="'collapse-child-' + index"
+                                class="custom-btn"
                                 style="width: 100%; border-radius: 2px !important;"
                             >
                                 {{((item.surname == '' || item.surname == null) && (item.name == '' || item.name == null) && (item.midname == '' || item.midname == null)) ? 'Форма #'+(index + 1) : ''}}
@@ -506,7 +515,7 @@
                                 {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
                             </b-button>
 
-                            <b-collapse :id="'collapse-child-' + index" class="mt-2" visible>
+                            <b-collapse :id="'collapse-child-' + index" class="mt-2" :visible="item.id == 0">
                                 <b-card>
 
                                 <!-- Форма для каждого ребенка -->
@@ -531,7 +540,7 @@
                                         <b-form-input
                                             class="icon person-lines-fill"
                                             v-model="item.relationship"
-                                            placeholder="Степень родства"
+                                            placeholder="Степень родства с ребенком"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -559,7 +568,7 @@
                                         <b-form-input
                                             class="icon person-lines-fill"
                                             v-model="item.surname"
-                                            placeholder="Фамилия"
+                                            placeholder="Фамилия ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -579,7 +588,7 @@
                                         <b-form-input
                                             class="icon person-lines-fill"
                                             v-model="item.name"
-                                            placeholder="Имя"
+                                            placeholder="Имя ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -599,7 +608,7 @@
                                         <b-form-input
                                             class="icon person-lines-fill"
                                             v-model="item.midname"
-                                            placeholder="Отчество"
+                                            placeholder="Отчество ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -620,7 +629,7 @@
                                         <b-form-input
                                             class="icon envelope"
                                             v-model="item.email"
-                                            placeholder="E-mail"
+                                            placeholder="E-mail ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -687,7 +696,7 @@
                                         <b-form-input
                                             class="icon phone"
                                             v-model="item.phone_number"
-                                            placeholder="Мобильный телефон"
+                                            placeholder="Мобильный телефон ребенка"
                                             v-mask="'+7(999)999-99-99'"
 
                                             :disabled="item.isDisabled"
@@ -706,7 +715,7 @@
                                 >
                                     <b-form-group>
                                         <b-form-select
-                                            placeholder="Пол"
+                                            placeholder="Пол ребенка"
                                             v-model="item.sex_options_selected"
                                             :options="sex_options"
 
@@ -731,7 +740,7 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="item.birthday"
-                                            placeholder="Дата рождения"
+                                            placeholder="Дата рождения ребенка"
                                             v-mask="'99-99-9999'"
 
                                             :disabled="item.isDisabled"
@@ -754,7 +763,7 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="item.state"
-                                            placeholder="Гражданство (государство)"
+                                            placeholder="Гражданство (государство) ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -819,7 +828,7 @@
                                 >
                                     <b-form-group>
                                         <b-form-select
-                                            placeholder="Тип регистрации"
+                                            placeholder="Тип регистрации ребенка"
                                             v-model="item.registration_type"
                                             :options="registration_type"
 
@@ -840,7 +849,7 @@
                                     <b-form-group>
                                         <AddressInput
                                             v-model="item.registration_address"
-                                            placeholder="Адрес регистрации"
+                                            placeholder="Адрес регистрации ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -865,7 +874,7 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="item.registration_flat"
-                                            placeholder="Номер квартиры адреса регистрации"
+                                            placeholder="Номер квартиры по адресу регистрации ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -873,26 +882,12 @@
                                         />
 
                                         <div>
-                                            <b-button @click="item.registration_flat = 'Нет квартиры'" size="sm" style="margin-right: 5px;">Нет квартиры</b-button>
+                                            <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                                 <!-- :rules="{ required: true }" -->
                                 <validation-provider
@@ -905,7 +900,7 @@
                                         <!-- @input="getValidationState(validationContext)" -->
                                         <AddressInput
                                             v-model="item.residence_address"
-                                            placeholder="Адрес проживания"
+                                            placeholder="Адрес проживания ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -913,7 +908,8 @@
                                         <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                         <div>
 <!--                                            <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>-->
-                                            <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm">Как у родителя</b-button>
+                                            <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm" class="mr-3">Как у родителя</b-button>
+                                            <b-button @click="item.residence_address = item.registration_address; item.residence_flat = item.registration_flat;" size="sm">По адресу регистрации</b-button>
                                         </div>
                                     </b-form-group>
                                 </validation-provider>
@@ -932,7 +928,7 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="item.residence_flat"
-                                            placeholder="Номер квартиры адреса проживания"
+                                            placeholder="Номер квартиры по адресу проживания ребенка"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -940,7 +936,7 @@
                                         />
 
                                         <div>
-                                            <b-button @click="item.residence_flat = 'Нет квартиры'" size="sm" style="margin-right: 5px;">Нет квартиры</b-button>
+                                            <b-button @click="item.residence_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback :id="'cld-'+index+'-residence_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -958,9 +954,9 @@
                                     v-slot="validationContext"
                                 >
                                     <b-form-group
-                                        description="В целях возможности создания соответствующих условий при организации образовательного процесса">
+                                        description="В целях возможности создания соответствующих условий при организации образовательного процесса для категории лиц из числа ОВЗ.">
                                         <b-form-select
-                                            placeholder="Относится ли ребёнок к категории лиц из числа ОВЗ"
+                                            placeholder="Относится ли ребёнок к категории лиц из числа ОВЗ?"
                                             v-model="item.ovz"
                                             :options="ovz_type"
 
@@ -985,9 +981,9 @@
 
 <!--                                size="sm"-->
 
-                            <b-button class="background-green" @click="children.push({...child_prototype})"  style="width: 100%; margin-top: 35px;">Добавить ребенка</b-button>
-                            <b-button class="background-red" @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false"
-                                  style="width: 100%;" v-if="children.length > 1">Отменить добавление</b-button>
+                            <b-button class="btn-light" @click="children.push({...child_prototype})"  style="width: 49%; margin-top: 35px;">Добавить ребенка</b-button>
+                            <b-button class="btn-light btn-outline-danger delete_btn" :disabled="children[children.length - 1].id != 0" @click="(children.length > 1 && !children[children.length - 1].isDisabled) ? children.splice(-1,1) : false"
+                                  style="width: 49%;margin-top: 35px;margin-left: 2%;" v-if="children.length > 1">Отменить добавление</b-button>
 
 
 
@@ -1030,6 +1026,8 @@
                         <h3 class="form-title">Выбор объединений</h3>
                     </div>
 
+                    <b-alert show>Действуют ограничения на подачу заявлений: нагрузка на одного ребенка не более 10 часов в неделю.</b-alert>
+
                     <b-alert :show="step3_error_notification" variant="warning" id="associations_selecting_error">
                         Пожалуйста, проверьте заполненность всех полей выбора объединений.
                     </b-alert>
@@ -1051,8 +1049,11 @@
                             </template>
                         </b-table>
 
-                        <label class="text-center">{{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}</label>
+                        <h5 class="font-weight-bold text-center">{{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}</h5>
                         <b-form-input :type="'search'" v-model="associations_filter[index]" placeholder="Поиск объединения"></b-form-input>
+                        <div>
+                            <b-badge pill variant="light">Мин - Минимальный возраст. Макс - Максимальный возраст. Час/нед - Часов в неделю</b-badge>
+                        </div>
                         <b-table
                             class="table table-responsive"
                             :ref="'associations_child_'+index"
@@ -1061,6 +1062,7 @@
                             :filter="associations_filter[index]"
                             :filter-included-fields="['name']"
                             :tbody-tr-class="rowStyler"
+                            :sticky-header="true"
                             @filtered="onAssociationsFiltered"
                             @sort-changed="onAssociationsFiltered"
                             @refreshed="onAssociationsFiltered"
@@ -1074,27 +1076,28 @@
                                 <b-form-checkbox
                                     :ref="'checkbox_'+index+'_'+row.item.id"
                                     :id="'checkbox_'+index+'_'+row.item.id"
-                                    v-model="children[index].associations_selected[index]"
+                                    v-model="children[index].associations_selected[row.item.id]"
                                     :name="'checkbox-'+ index +'-'+row.item.id"
                                     :value="row.item"
+                                    :disabled="children[index].associations_selected[row.item.id]!=null"
                                     @change="onRowAssociationsSelected($event, row, index)"
+                                    style="padding-right: 0 !important;"
                                 >
                                 </b-form-checkbox>
                             </template>
 
                             <template v-slot:cell(controls)="row">
-                                <b-button size="sm" @click="row.toggleDetails">
+                                <b-button class="custom-btn" size="sm" @click="row.toggleDetails">
                                     {{ row.detailsShowing ? 'Скрыть' : 'Подробнее' }}
                                 </b-button>
                             </template>
 
                             <template v-slot:row-details="row">
-                                <b-card v-html="row.item.description"></b-card>
+                                <div v-html="row.item.description"></div>
                             </template>
                         </b-table>
                         <b-badge pill variant="success" class="m-2">Соответствует возрасту</b-badge>
                         <b-badge pill variant="light" class="border border-dark">Доступно к записи</b-badge>
-                        <b-badge pill variant="light">Мин - Минимальный возраст. Макс - Максимальный возраст. Час/нед - Часов в неделю</b-badge>
                     </div>
 
                     <b-modal id="step4-warning" title="Предупреждение" v-model="step4_warning" :centered="true">
@@ -1103,7 +1106,7 @@
                         <template v-slot:modal-footer>
                             <div class="w-100">
                                 <b-button
-                                    class="float-right"
+                                    class="float-right btn-light btn-outline-success"
                                     @click="step4_warning=false"
                                 >
                                     Изменить выбор
@@ -1111,7 +1114,7 @@
 
                                 <b-button
                                     style="margin-right: 10px;"
-                                    class="float-right"
+                                    class="float-right btn-light"
                                     @click="sendProps(); step4_warning=false"
                                 >
                                     Все равно продолжить
@@ -1127,7 +1130,7 @@
                         <template v-slot:modal-footer>
                             <div class="w-100">
                                 <b-button
-                                    class="float-right"
+                                    class="float-right btn-light btn-outline-success"
                                     @click="step4_fatal=false"
                                 >
                                     Изменить выбор
@@ -1146,7 +1149,7 @@
                     </div>
 
                     <b-alert variant="success" show>
-                        Регистрация успешно пройдена. Ваше заявление принято к рассмотрению. Очный (обязательный) прием заявлений пройдет с 24 по 31 августа в Академии цифровых технологий.
+                        Регистрация успешно пройдена.<br> Ваше заявление принято к рассмотрению.<br> Очный (обязательный) прием заявлений пройдет с 24 по 31 августа {{new Date().getFullYear()}} года в ГБНОУ Академии цифровых технологий по адресу: Санкт-Петербург, Большой проспект П.С., д.29/2 (ориентир черные ворота).
                     </b-alert>
 
                     <div v-for="(item, index) in children" style="width: 100%;">
@@ -1157,7 +1160,8 @@
 
                         <b-button
                             v-b-toggle="'collapse-proposal-child-' + index"
-                            style="width: 100%; border-radius: 2px !important;"
+                            class="custom-btn"
+                            style="width: 100%; border-radius: 2px !important; custom-btn"
                         >
                             {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
                         </b-button>
@@ -1167,7 +1171,7 @@
 
                                 <b-table
                                     :select-mode="'multi'"
-                                    :items="item.associations_selected"
+                                    :items="item.proposal"
                                     :fields="associations_download_fields"
                                     @row-selected="onRowAssociationsSelected(index, $event)"
                                     responsive="sm"
@@ -1176,11 +1180,11 @@
                                         Подано
                                     </template>
                                     <template v-slot:cell(actions)="row">
-                                        <b-button @click="generateForm(item, row.item.id)" size="sm" style="width: 100%;">Скачать PDF</b-button>
+                                        <b-button class="custom-btn" @click="generateForm(item, row.item.id)" size="sm" style="width: 100%;">Скачать</b-button>
                                     </template>
                                 </b-table>
 
-                                <b-button @click="generateResolutionForm(item)" size="sm" style="width: 100%;">Cогласие на обработку персональных данных</b-button>
+                                <b-button class="custom-btn" @click="generateResolutionForm(item)" size="sm" style="width: 100%;">Cогласие на обработку персональных данных</b-button>
 
                             </b-card>
                         </b-collapse>
@@ -1189,7 +1193,7 @@
 
                     </div>
 
-                    <b-button class="background-green" @click="setStep(2)" style="width: 100%; margin-top: 35px;">Добавить ребенка</b-button>
+                    <b-button  class="btn-light" @click="setStep(2)" style="width: 100%; margin-top: 35px;">Добавить ребенка</b-button>
 
                 </div>
             </vue-good-wizard>
@@ -1256,6 +1260,8 @@
                 ovz: null,
 
                 associations_selected: [],
+                associations_selectedIds: [],
+                proposal: [],
 
                 isDisabled: false
             };
@@ -1266,7 +1272,7 @@
                 status: false,
                 sex_options_selected: null,
                 sex_options: [
-                    { value: null, text: 'Пол', disabled: true },
+                    { value: null, text: 'Пол ребенка', disabled: true },
                     { value: "м", text: 'Мужской' },
                     { value: "ж", text: 'Женский' },
                 ],
@@ -1313,10 +1319,10 @@
                 //Шаг 4
                 associations: [],
                 association_list_fields: [
-                    {key: 'selected', label: 'Выбрано', thClass: 'th-sm', tdClass:'td-sm', sortable: false},
+                    {key: 'selected', label: 'Выбор', thClass: 'th-sm', tdClass:'td-sm', sortable: false},
                     // thClass: 'd-none', tdClass: 'd-none' = для скрытия столбца
                     {key: 'id', label: 'ID', thClass: 'd-none', tdClass: 'd-none', sortable: false},
-                    {key: 'name', label: 'Наименование', thClass: 'th-lg', sortable: true},
+                    {key: 'name', label: 'Название', thClass: 'th-lg', sortable: true},
                     {key: 'min_age', label: 'Мин.', sortable: true},
                     {key: 'max_age', label: 'Макс.', sortable: true},
                     {key: 'study_hours_week', label: 'Час/нед', sortable: true},
@@ -1419,7 +1425,13 @@
 
 
             onRowAssociationsSelected(association, row, childId) {
-                // console.log(this.children[childId].associations_selected);
+                console.log(this.children[childId].associations_selected);
+                console.log(this.children[childId].associations_selected[row.item.id]);
+                setTimeout(
+                    () => {
+                        console.log(this.children[childId].associations_selected);
+                        console.log(this.children[childId].associations_selected[row.item.id]);
+                        }, 1);
             },
 
             onAssociationsFiltered() {
@@ -1507,6 +1519,18 @@
                 return false;
             },
 
+            async sendProposalNotify()
+            {
+                const request = `
+                    mutation {
+                        proposalCreatingNotification
+                    }
+                `;
+
+                await this.$graphql_client.request(request, {}).catch(e=>{
+                    console.log(e);
+                });
+            },
 
             stepChanged: async function(page){
 
@@ -1585,26 +1609,48 @@
                         let current = data.viewer.getChildren[i];
 
                         let selected_associations = [];
+                        let selected_associationsIds = [];
+                        let proposal = [];
 
                         for(let y in current.getInProposals){
                             let y_current = current.getInProposals[y];
 
                             //TODO: прописать поле isAlreadyExists у selected_associations в прототипе (во избежания undefined, для того, чтобы было 100% не undefined)
-                            selected_associations.push({
+                            selected_associationsIds.push(parseInt(y_current.getAssociation.id, 10))
+                            proposal.push({
                                 id: parseInt(y_current.getAssociation.id, 10),
                                 name: y_current.getAssociation.name,
-
                                 isAlreadyExists: true
-                            });
+                            })
                         }
-
+                        console.log(selected_associationsIds.indexOf());
+                        this.associations.map(association => {
+                            if (selected_associationsIds.indexOf(parseInt(association.id)) != -1)
+                            {
+                                selected_associations[association.id] = {
+                                    ...association,
+                                    isAlreadyExists: true
+                                };
+                            }
+                            else
+                            {
+                                selected_associations[association.id] = null;
+                            }
+                        });
+                        console.log(selected_associations);
                         this.children[i] = {
                             ...this.children[i],
-                            associations_selected: selected_associations
+                            associations_selected: selected_associations,
+                            proposal: proposal
                         };
                     }
                     this.$forceUpdate();
                     this.childTick();
+                }
+
+                if (page == 4)
+                {
+                    await this.sendProposalNotify();
                 }
             },
 
@@ -1616,7 +1662,6 @@
             addStep(){
                 this.setStep(this.$refs.wizard.currentStep + 1);
             },
-
 
             getValidationState({ dirty, validated, valid = null }) {
                 return dirty || validated ? valid : null;
@@ -1633,13 +1678,15 @@
                 const request = `
                     query {
                         viewer {
-                            registration_address
+                            registration_address,
+                            registration_flat
                         }
                     }
                 `;
 
                 let response = await this.$graphql_client.request(request, {});
                 this.children[child_id].registration_address = response.viewer.registration_address;
+                this.children[child_id].registration_flat    = response.viewer.registration_flat
                 this.registration_address = response.viewer.registration_address;
             },
 
@@ -1654,13 +1701,15 @@
                 const request = `
                     query {
                         viewer {
-                            residence_address
+                            residence_address,
+                            residence_flat
                         }
                     }
                 `;
 
                 let response = await this.$graphql_client.request(request, {});
                 this.children[child_id].residence_address = response.viewer.residence_address;
+                this.children[child_id].residence_flat = response.viewer.residence_flat;
                 this.residence_address = response.viewer.residence_address;
             },
 
@@ -1675,11 +1724,8 @@
                 return age;
             },
 
-            getValidAssociations(childId) {
-
-            },
-
-            async loadAssociations(){
+            async loadAssociations()
+            {
                 // TODO: оптимизировать выгрузку списка доступных объединений
 
 
@@ -1703,10 +1749,12 @@
                 await this.$graphql_client.request(request, {}).then(function(data){
                     _this.is_sending_request = false;
                     _this.associations = data.associations;
-                    _this.childAssociations = _this.children.map(child=>{
+                    _this.childAssociations = _this.children.map(child => {
+                        child.associations_selected = [false, false];
                         _this.associations_filter.push("");
                         let associations = [];
-                        for (let i in _this.associations) {
+                        for (let i in _this.associations)
+                        {
                             let el = {..._this.associations[i]};
                             let age = _this.getChildAge(child);
                             if (age <= el.max_age + 1 && age >= el.min_age - 1)
@@ -1728,35 +1776,32 @@
                 });
             },
 
-
             childTick()
             {
+                console.log(this.$refs);
                 for (let i in this.children)
                 {
                     for (let j in this.childAssociations[i])
                     {
                         let _id = this.childAssociations[i][j].id;
                         if (this.$refs['checkbox_'+i+"_"+_id] != undefined)
+                            if (this.$refs['checkbox_'+i+"_"+_id][0] != undefined)
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = false;
                     }
                 }
+                console.log(this.children);
                 for (let i in this.children)
                 {
                     let el = this.children[i];
-                    for (let j in el.associations_selected)
+                    for (let j in el.proposal)
                     {
-                        let _id = el.associations_selected[j].id;
+                        let _id = el.proposal[j].id;
+                        console.log('checkbox_'+i+"_"+_id);
                         if (this.$refs['checkbox_'+i+"_"+_id] != undefined)
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = true;
                     }
                 }
             },
-
-
-
-
-
-
 
             generateResolutionForm(child)
             {
@@ -1803,11 +1848,6 @@
                     });
 
             },
-
-
-
-
-
 
             resendCode(){
                 const request = `
@@ -1886,16 +1926,18 @@
                     // TODO: оптимизировать провеку количества часов
                     for (let i2 in child.associations_selected) {
                         let selected = child.associations_selected[i2];
+                        if (selected == null || selected == false)
+                            continue;
                         hours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
                     }
                     console.log(hours);
 
-                    if (hours >= 8 && hours <= 9) {
+                    if (hours >= 8 && hours <= 10) {
                         this.step4_warning = true;
                         return;
                     }
 
-                    if (hours >= 10) {
+                    if (hours > 10) {
                         this.step4_fatal = true;
                         return;
                     }
@@ -1915,6 +1957,8 @@
                     for(let i2 in current.associations_selected){
                         let current2 = current.associations_selected[i2];
 
+                        if (current2 == null || current2 == false)
+                            continue;
                         if(current2.isAlreadyExists)
                             continue;
 

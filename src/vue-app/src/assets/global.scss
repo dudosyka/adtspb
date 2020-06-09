@@ -132,16 +132,16 @@ div.custom-control.custom-checkbox{
 /* TODO: фикс уменьшения кнопки после расфокуса */
 /* TODO: фикс затемнение текста */
 
-button.btn[type="submit"], button.btn.submit{
+button.custom-btn[type="submit"], button.custom-btn.submit{
     margin-top: calc(43px / 2) !important;
     margin-bottom: calc(43px / 2) !important;
 }
 
-button.btn{
+button.custom-btn{
     text-transform: uppercase;
 }
 
-button.btn{
+button.custom-btn{
     border-color: rgba(0,0,0,0) !important;
     border-radius: 20px !important;
     height: 43px;
@@ -149,7 +149,7 @@ button.btn{
     background-color: #6c757d; /*  !important */
 }
 
-button.btn:active{
+button.custom-btn:active{
     color: #FFFFFF !important;
     outline: inherit !important;
     -webkit-box-shadow: inset 0px 0px 5px rgba(0,0,0,0.3) !important;
@@ -158,7 +158,7 @@ button.btn:active{
     border-color: rgba(0,0,0,0) !important;
 }
 
-button.btn:focus{
+button.custom-btn:focus{
     color: #FFFFFF !important;
     outline: inherit !important;
     -webkit-box-shadow: none;
@@ -166,20 +166,40 @@ button.btn:focus{
     border-color: rgba(0,0,0,0) !important;
 }
 
-button.btn:hover{
+button.custom-btn:hover{
     border-color: rgba(0,0,0,0) !important;
 }
 
-button.btn.info-block-button{
+button.custom-btn.info-block-button{
     margin-bottom: 0 !important;
 }
 
+button.delete_btn
+{
+    color: #dc3545;
+    background-color: transparent;
+    opacity: .65;
+    border-color: #dc3545;
+}
+button.delete_btn.disabled, button.delete_btn:disabled
+{
+    color: #f8f9fa;
+    background-color: transparent;
+    opacity: .65;
+    border-color: #f8f9fa;
+}
+button.delete_btn:hover
+{
+    color: white;
+    border-color: #dc3545;
+}
+button.delete_btn.disabled:hover
+{
+    border-color: transparent;
+    cursor: auto;
+}
 
-
-
-
-
-/* Ссылки */
+    /* Ссылки */
 
 a{
     color: #757575;

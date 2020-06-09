@@ -60,8 +60,8 @@ class ProposalGenerateModule implements Module {
         $child_midname = $child->midname;
         $child_birthday = date("d.m.Y",strtotime($child->birthday));
         $child_residence_address = $child->residence_address;
-        $child_residence_flat = ($child->residence_flat == "Нет квартиры") ? "-" : $child->residence_flat;
-        $child_registration_flat = ($child->registration_flat == "Нет квартиры") ? "-" : $child->registration_flat;
+        $child_residence_flat = ($child->residence_flat == "Без номера квартиры") ? "-" : $child->residence_flat;
+        $child_registration_flat = ($child->registration_flat == "Без номера квартиры") ? "-" : $child->registration_flat;
         $child_registration_address = $child->registration_address;
         $child_phone_number = $child->phone_number ?? "";
         $child_study_place = $child->study_place;
