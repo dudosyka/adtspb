@@ -3,12 +3,15 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
-
 const routes = [
     {
         path: '/',
-        name: 'Home',
-        component: Home
+        name: 'Login',
+        //TODO: Вернуть (когда будет функционал для педагога ребенка и учебного отдела)
+
+        // name: 'Home',
+        // component: Home
+        component: () => import('../views/Login.vue')
     },
     {
         path: '/about',

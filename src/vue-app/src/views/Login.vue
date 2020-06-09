@@ -4,12 +4,14 @@
 
         <vue-headful title="Вход | Личный кабинет"/>
 
-        <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''">
-            <router-link to="/">
-                <b-button variant="dark" class="theme-alt top-panel-button"
-                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>
-            </router-link>
-        </div>
+<!-- TODO: Раскоментить (когда будет функционал для педагога ребенка и учебного отдела) -->
+
+<!--        <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''">-->
+<!--            <router-link to="/">-->
+<!--                <b-button variant="dark" class="theme-alt top-panel-button"-->
+<!--                          v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'width: 100% !important;'"><b-icon-chevron-double-left></b-icon-chevron-double-left> Назад</b-button>-->
+<!--            </router-link>-->
+<!--        </div>-->
 
         <b-container class="form">
             <div>
@@ -67,7 +69,7 @@
 
 
 
-                        <b-button style="background-color: #1862b6 !important;" class="theme" type="submit" block :disabled="is_sending_request">Войти</b-button>
+                        <b-button style="background-color: #1862b6 !important;" class="custom-btn theme" type="submit" block :disabled="is_sending_request">Войти</b-button>
 
                         <p class="theme text-muted mx-auto lost-password" style="width: 100%; text-align: center;">Забыли <router-link class="theme" to="/login/restore-password">Логин / Пароль</router-link>?</p>
 
@@ -80,7 +82,7 @@
 <!--                            <GoogleButton></GoogleButton>-->
 <!--                        </div>-->
 
-                        <b-button class="theme" style="margin-top: 15px;" block @click="gotoRegistration()">Создать аккаунт</b-button>
+                        <b-button class="custom-btn theme" style="margin-top: 15px;" block @click="gotoRegistration()">Создать аккаунт</b-button>
 
                         <!--
                         <p class="theme text-muted mx-auto register-account" style="width: 100%; text-align: center;">

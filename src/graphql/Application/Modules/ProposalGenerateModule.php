@@ -60,6 +60,8 @@ class ProposalGenerateModule implements Module {
         $child_midname = $child->midname;
         $child_birthday = date("d.m.Y",strtotime($child->birthday));
         $child_residence_address = $child->residence_address;
+        $child_residence_flat = ($child->residence_flat == "Без номера квартиры") ? "-" : $child->residence_flat;
+        $child_registration_flat = ($child->registration_flat == "Без номера квартиры") ? "-" : $child->registration_flat;
         $child_registration_address = $child->registration_address;
         $child_phone_number = $child->phone_number ?? "";
         $child_study_place = $child->study_place;
@@ -324,7 +326,7 @@ class ProposalGenerateModule implements Module {
                 <p style='font-size: 8pt; margin-top: 0;text-align: center; padding-top: 0;'>(ФИО родителя полностью)</p>
             </div>
             
-            <div style='padding-top: 140px; width: 100%;'>
+            <div style='padding-top: 100px; width: 100%;'>
                 <h2 style='text-align: center;'>ЗАЯВЛЕНИЕ</h2>
                 <p style='padding-bottom: 0; margin-bottom: 0;'>Я, <u>{$parent_surname} {$parent_name} {$parent_midname}</u>,</p>
                 <p style='font-size: 8pt; margin-left: 40px; padding-bottom: 0; padding-top: 0; margin-top: 0; margin-bottom: 0;'>(ФИО родителя полностью)</p>
@@ -342,8 +344,8 @@ class ProposalGenerateModule implements Module {
                     <li><b>Дата рождения:</b> 															<u>{$child_birthday}</u></li>
                     <li><b>Гражданство</b> <i>(государство)</i><b>:</b> 								<u>{$child_state}</u></li>
                     <li><b>Регистрация</b> <i>(постоянная/временная)</i><b>:</b> 						<u>{$child_registration_type}</u></li>
-                    <li><b>Адрес фактического проживания:</b> 											<u>{$child_residence_address}</u></li>
-                    <li><b>Адрес регистрации по месту жительства:</b> 									<u>{$child_registration_address}</u></li>
+                    <li><b>Адрес фактического проживания:</b> 											<u>{$child_residence_address}, кв. {$child_registration_flat}</u></li>
+                    <li><b>Адрес регистрации по месту жительства:</b> 									<u>{$child_registration_address}, кв. {$child_registration_flat}</u></li>
                     <li><b>Контактный телефон ребенка:</b> 												<u>{$child_phone_number}</u></li>
                     <li><b>Контактный телефон родителя (законного представителя):</b> 					<u>{$parent_phone_number}</u></li>
                     <li><b>Адрес электронной почты:</b> 												<u>{$parent_email}</u></li>

@@ -169,6 +169,11 @@ class MutationType extends ObjectType
                         "key_code" => Type::nonNull(Types::string())
                     ]
                 ],
+                "proposalCreatingNotification" => [
+                    "type" => Types::boolean(),
+                    "description" => "Уведомление о создании заявки (отправляет только 1 раз конкретному пользователю)",
+                    "args" => []
+                ],
 
 
 
@@ -621,7 +626,35 @@ HTML;
 
         return $insert_request;
     }
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     */
+    public function proposalCreatingNotification($rootValue, $args, AppContext $context)
+    {
+        $found = DataSource::findOne("user", "id= :id", [":id" => $context->viewer->id]);
 
+        if($found == null)
+            throw new RequestError("Неверный логин, e-mail или телефон");
+        if($found->proposal_notify == 1)
+            return;
+
+        $found->proposal_notify = 1;
+        DataSource::update($found);
+
+        $email = $found->email;
+
+        $html = "
+        Регистрация успешно пройдена.<br>
+        Ваше заявление принято к рассмотрению.<br>
+        Очный (обязательный) прием заявлений пройдет с 24 по 31 августа 2020 года в ГБНОУ Академии цифровых технологий по адресу: Санкт-Петербург, Большой проспект П.С., д.29/2 (ориентир черные ворота).<br>";
+
+        Application::sendMail($email, "Ваша заявка была получена", $html);
+
+        return true;
+    }
 
     /**
      * @param $rootValue

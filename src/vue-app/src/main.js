@@ -8,6 +8,7 @@ import VueHeadful from 'vue-headful';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText } from '@fortawesome/vue-fontawesome';
 import { fab, faGoogle } from '@fortawesome/free-brands-svg-icons'; //TODO: выяснить, почему не подключается сразу все (почему не работает с fab)
+import { faHandPointUp } from '@fortawesome/free-solid-svg-icons';
 import { dom } from '@fortawesome/fontawesome-svg-core'; //TODO import all icons
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
 import {GraphQLClient, request} from 'graphql-request';
@@ -24,6 +25,7 @@ Vue.use(VueInputMask);
 dom.watch();
 
 library.add(fab, faGoogle);
+library.add(faHandPointUp);
 
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
@@ -90,9 +92,9 @@ extend("min",{ //Есои не надо выводить наименовани�
 });
 
 extend("password",{
-    message: "Пароль не должен содержать следующих символов: ` { } \[ \] : \" ; ' < > / ",
+    message: "Пароль не должен содержать следующих символов: ` { } \[ \] : \" ; ' < > /. Пароль должен быть длиннее 8 символов.",
     validate: function(value){
-        return value.match(/[`{}\[\]:";'<>\/]/) === null; //TODO: пофиксить проверку пароля
+        return (value.match(/[`{}\[\]:";'<>\/]/) === null && value.length >= 8); //TODO: пофиксить проверку пароля
     }
 });
 
