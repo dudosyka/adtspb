@@ -4,7 +4,7 @@
 
         <vue-headful title="Регистрация | Личный кабинет"/>
 
-        <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''">
+        <div class="top-panel" v-bind:class="(enoughSpaceForTopButtons()) ? 'd-flex' : ''" style="position: absolute !important;">
 
 <!-- TODO: Раскоментить (когда будет функционал для педагога ребенка и учебного отдела) -->
 
