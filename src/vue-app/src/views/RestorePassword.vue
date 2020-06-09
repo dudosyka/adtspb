@@ -237,7 +237,7 @@
                 this.username = this.$route.query.username;
                 this.key_code = this.$route.query.key_code;
                 this.$refs.wizard.currentStep = 1;
-                this.link_success = true;
+                // this.link_success = true;
                 this.$nextTick(function(){
                     this.validateKeyCode();
                 });

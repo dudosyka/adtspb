@@ -40,7 +40,7 @@
                 <!-- Шаг 1 -->
                 <div slot="page1">
                     <div>
-                        <h3 class="form-title">Регистрация</h3>
+                        <h3 class="form-title">Регистрация родителя / законного представителя</h3>
                     </div>
 
                     <!-- v-slot="{ passes }" -->
@@ -1039,7 +1039,7 @@
                         <h5 class="font-weight-bold text-center">{{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}</h5>
                         <b-form-input :type="'search'" v-model="associations_filter[index]" placeholder="Поиск объединения"></b-form-input>
                         <div>
-                            <b-badge pill variant="light">Мин - Минимальный возраст. Макс - Максимальный возраст. Час/нед - Часов в неделю</b-badge>
+                            <b-badge pill variant="light" style="white-space: normal;">Мин - Минимальный возраст. Макс - Максимальный возраст. Час/нед - Часов в неделю</b-badge>
                         </div>
                         <b-table
                             class="table table-responsive"
@@ -1420,13 +1420,13 @@
             },
 
             onRowAssociationsSelected(association, row, childId) {
-                console.log(this.children[childId].associations_selected);
-                console.log(this.children[childId].associations_selected[row.item.id]);
-                setTimeout(
-                    () => {
-                        console.log(this.children[childId].associations_selected);
-                        console.log(this.children[childId].associations_selected[row.item.id]);
-                        }, 1);
+                // console.log(this.children[childId].associations_selected);
+                // console.log(this.children[childId].associations_selected[row.item.id]);
+                // setTimeout(
+                //     () => {
+                        // console.log(this.children[childId].associations_selected);
+                        // console.log(this.children[childId].associations_selected[row.item.id]);
+                        // }, 1);
             },
 
             onAssociationsFiltered() {
@@ -1523,7 +1523,7 @@
                 `;
 
                 await this.$graphql_client.request(request, {}).catch(e=>{
-                    console.log(e);
+                    // console.log(e);
                 });
             },
 
@@ -1618,7 +1618,7 @@
                                 isAlreadyExists: true
                             })
                         }
-                        console.log(selected_associationsIds.indexOf());
+                        // console.log(selected_associationsIds.indexOf());
                         this.associations.map(association => {
                             if (selected_associationsIds.indexOf(parseInt(association.id)) != -1)
                             {
@@ -1632,7 +1632,7 @@
                                 selected_associations[association.id] = null;
                             }
                         });
-                        console.log(selected_associations);
+                        // console.log(selected_associations);
                         this.children[i] = {
                             ...this.children[i],
                             associations_selected: selected_associations,
@@ -1773,7 +1773,7 @@
 
             childTick()
             {
-                console.log(this.$refs);
+                // console.log(this.$refs);
                 for (let i in this.children)
                 {
                     for (let j in this.childAssociations[i])
@@ -1784,14 +1784,14 @@
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = false;
                     }
                 }
-                console.log(this.children);
+                // console.log(this.children);
                 for (let i in this.children)
                 {
                     let el = this.children[i];
                     for (let j in el.proposal)
                     {
                         let _id = el.proposal[j].id;
-                        console.log('checkbox_'+i+"_"+_id);
+                        // console.log('checkbox_'+i+"_"+_id);
                         if (this.$refs['checkbox_'+i+"_"+_id] != undefined)
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = true;
                     }
@@ -1915,11 +1915,13 @@
                             continue;
                         hours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
                     }
-                    console.log(hours);
+                    // console.log(hours);
 
                     if (hours > 10) {
                         this.step4_fatal = true;
+                        this.step4_warning = false;
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
+                        return;
                     }
 
                     if (hours >= 8 && hours <= 10) {
@@ -1927,11 +1929,6 @@
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
                     }
 
-                }
-                if (this.step4_fatal)
-                {
-                    this.step4_warning = false;
-                    return;
                 }
                 if (this.step4_warning)
                     return;
