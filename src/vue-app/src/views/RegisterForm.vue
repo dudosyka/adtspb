@@ -727,7 +727,6 @@
                                     </b-form-group>
                                 </validation-provider>
 
-
                                 <validation-provider
                                     style="width: 100%;"
 
@@ -751,7 +750,6 @@
                                         <b-form-invalid-feedback :id="'cld-'+index+'-birthday-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
-
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -809,7 +807,7 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="item.study_class"
-                                            placeholder="Класс/группа"
+                                            :placeholder="'Класс/группа (на 1 сентября '+(new Date()).getFullYear()+' года)'"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
@@ -818,7 +816,6 @@
                                         <b-form-invalid-feedback :id="'cld-'+index+'-study_class-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
-
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -909,14 +906,10 @@
                                         <div>
 <!--                                            <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>-->
                                             <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm" class="mr-3">Как у родителя</b-button>
-                                            <b-button @click="item.residence_address = item.registration_address; item.residence_flat = item.registration_flat;" size="sm">По адресу регистрации</b-button>
+                                            <b-button @click="item.residence_address = item.registration_address; item.residence_flat = item.registration_flat" size="sm">По адресу регистрации</b-button>
                                         </div>
                                     </b-form-group>
                                 </validation-provider>
-
-
-
-
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -943,10 +936,6 @@
                                     </b-form-group>
                                 </validation-provider>
 
-
-
-
-
                                 <validation-provider
                                     style="width: 100%;"
 
@@ -967,8 +956,6 @@
                                         <b-form-invalid-feedback :id="'cld-'+index+'-ovz-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
-
-
 
                                 </b-card>
                             </b-collapse>
@@ -1079,7 +1066,7 @@
                                     v-model="children[index].associations_selected[row.item.id]"
                                     :name="'checkbox-'+ index +'-'+row.item.id"
                                     :value="row.item"
-                                    :disabled="children[index].associations_selected[row.item.id]!=null"
+                                    :disabled="isDisabled(index, row.item.id)"
                                     @change="onRowAssociationsSelected($event, row, index)"
                                     style="padding-right: 0 !important;"
                                 >
@@ -1101,13 +1088,13 @@
                     </div>
 
                     <b-modal id="step4-warning" title="Предупреждение" v-model="step4_warning" :centered="true">
-                        <p class="my-4">Обратите внимание на общее число академических часов в неделю по всем объединениям. У одного или нескольких детей сумма часов в неделю составляет 8 или более, что является большой нагрузкой.</p>
+                        <p class="my-4">Обратите внимание на общее число академических часов в неделю по всем объединениям. {{ step4_error_author }} имеет сумму часов в неделю составляющую 8 или более, что является большой нагрузкой.</p>
 
                         <template v-slot:modal-footer>
                             <div class="w-100">
                                 <b-button
                                     class="float-right btn-light btn-outline-success"
-                                    @click="step4_warning=false"
+                                    @click="step4_warning=false;"
                                 >
                                     Изменить выбор
                                 </b-button>
@@ -1125,13 +1112,13 @@
                     </b-modal>
 
                     <b-modal id="step4-fatal" title="Ограничение на подачу заявлений" v-model="step4_fatal" :centered="true">
-                        <p class="my-4">Один или несколько детей имеют количество часов в неделю, превышающее допустимое. Согласно СанПиН максимально допустимый объем нагрузки внеучебной деятельности составляет 10 часов. <br>Пожалуйста, проверьте нагрузку детей и остановите выбор на объединениях, соответствующих этому требованию.</p>
+                        <p class="my-4">{{ step4_error_author }} имеет количество часов в неделю, превышающее допустимое. Согласно СанПиН максимально допустимый объем нагрузки внеучебной деятельности составляет 10 часов. <br>Пожалуйста, проверьте нагрузку детей и остановите выбор на объединениях, соответствующих этому требованию.</p>
 
                         <template v-slot:modal-footer>
                             <div class="w-100">
                                 <b-button
                                     class="float-right btn-light btn-outline-success"
-                                    @click="step4_fatal=false"
+                                    @click="step4_fatal=false;"
                                 >
                                     Изменить выбор
                                 </b-button>
@@ -1189,11 +1176,9 @@
                             </b-card>
                         </b-collapse>
 
-
-
                     </div>
 
-                    <b-button  class="btn-light" @click="setStep(2)" style="width: 100%; margin-top: 35px;">Добавить ребенка</b-button>
+                    <b-button  class="btn-light" @click="setStep(2); children.push({...child_prototype})" style="width: 100%; margin-top: 35px;">Добавить ребенка</b-button>
 
                 </div>
             </vue-good-wizard>
@@ -1272,7 +1257,7 @@
                 status: false,
                 sex_options_selected: null,
                 sex_options: [
-                    { value: null, text: 'Пол ребенка', disabled: true },
+                    { value: null, text: 'Пол', disabled: true },
                     { value: "м", text: 'Мужской' },
                     { value: "ж", text: 'Женский' },
                 ],
@@ -1332,11 +1317,13 @@
                 step3_error_notification: false,
                 step4_warning: false,
                 step4_fatal: false,
+                step4_error_author: "",
                 selected_associations: [],
                 associations_filter: [],
                 childAssociations: [],
                 associationCurrentPage: [],
                 childAssociationsTotalRows: [],
+
 
                 // Шаг 5
                 associations_download_fields: [
@@ -1389,6 +1376,7 @@
 
 
 
+
                 windowWidth: window.innerWidth
 
             };
@@ -1423,6 +1411,13 @@
                 return this.windowWidth >= 765;
             },
 
+            isDisabled(childId, associationId)
+            {
+                if (this.children[childId].associations_selected[associationId] != null)
+                    if (this.children[childId].associations_selected[associationId].isAlreadyExists)
+                        return true;
+                return false;
+            },
 
             onRowAssociationsSelected(association, row, childId) {
                 console.log(this.children[childId].associations_selected);
@@ -1896,16 +1891,6 @@
                 });
             },
 
-
-
-
-
-
-
-
-
-
-
             /* Шаг 4 */
 
             preSendProps(){
@@ -1932,17 +1917,24 @@
                     }
                     console.log(hours);
 
-                    if (hours >= 8 && hours <= 10) {
-                        this.step4_warning = true;
-                        return;
-                    }
-
                     if (hours > 10) {
                         this.step4_fatal = true;
-                        return;
+                        this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
+                    }
+
+                    if (hours >= 8 && hours <= 10) {
+                        this.step4_warning = true;
+                        this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
                     }
 
                 }
+                if (this.step4_fatal)
+                {
+                    this.step4_warning = false;
+                    return;
+                }
+                if (this.step4_warning)
+                    return;
                 this.sendProps();
             },
 
@@ -1991,7 +1983,6 @@
                 }).catch(function(e){
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
-
                     _component.$nextTick(function(){
                         _component.$scrollTo("#associations_selecting_graphql_errors");
                     });

@@ -29,14 +29,14 @@
                         <validation-provider
                             style="width: 100%;"
 
-                            name="E-mail, номер телефона или логин"
+                            name="E-mail"
                             :rules="{ required: true }"
                             v-slot="validationContext"
                         >
                             <b-form-group>
                                 <b-form-input
                                     class="theme icon envelope"
-                                    placeholder="E-mail, номер телефона или логин"
+                                    placeholder="E-mail"
                                     v-model="username"
 
                                     :state="getValidationState(validationContext)"
@@ -71,7 +71,7 @@
 
                         <b-button style="background-color: #1862b6 !important;" class="custom-btn theme" type="submit" block :disabled="is_sending_request">Войти</b-button>
 
-                        <p class="theme text-muted mx-auto lost-password" style="width: 100%; text-align: center;">Забыли <router-link class="theme" to="/login/restore-password">Логин / Пароль</router-link>?</p>
+                        <p class="theme text-muted mx-auto lost-password" style="width: 100%; text-align: center;">Забыли <router-link class="theme" to="/login/restore-password">Пароль</router-link>?</p>
 
 <!--                        <CenteredCaption>-->
 <!--                            Или войти через-->

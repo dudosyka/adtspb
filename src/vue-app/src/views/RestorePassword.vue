@@ -36,7 +36,7 @@
                 :finalStepLabel="'Изменить'">
                 <div slot="page1">
                     <h4>Ввод информации об аккаунте</h4>
-                    <p>Введите e-mail, номер телефона или логин аккаунта, доступ к которому требуется восстановить. На Вашу электронную почту будет выслано письмо со ссылкой для восстановления пароля.</p>
+                    <p>Введите e-mail аккаунта, доступ к которому требуется восстановить. На Вашу электронную почту будет выслано письмо со ссылкой для восстановления пароля.</p>
 
                     <validation-observer ref="observer" v-slot="{ passes }">
                         <b-form @submit.stop.prevent="passes(onSubmit)">
@@ -50,14 +50,14 @@
                                     style="width: 100%;"
 
                                     ref="username_obs"
-                                    name="E-mail, номер телефона или логин"
+                                    name="E-mail"
                                     :rules="{ required: true }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
                                         <b-form-input
                                             class="theme icon envelope"
-                                            placeholder="E-mail, номер телефона или логин"
+                                            placeholder="E-mail"
                                             v-model="username"
 
                                             :state="getValidationState(validationContext)"
