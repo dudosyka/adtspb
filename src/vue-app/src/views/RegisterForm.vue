@@ -1,6 +1,6 @@
 <template>
 
-    <div class="waving d-inline-flex justify-content-center align-items-center" v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'padding-top: 100px;'">
+    <div class="waving d-inline-flex justify-content-center align-items-center" v-bind:style="(enoughSpaceForTopButtons()) ? 'padding-top: 100px;' : 'padding-top: 100px;'">
 
         <vue-headful title="Регистрация | Личный кабинет"/>
 
@@ -40,7 +40,7 @@
                 <!-- Шаг 1 -->
                 <div slot="page1">
                     <div>
-                        <h3 class="form-title">Регистрация родителя / законного представителя</h3>
+                        <h3 class="form-title">Регистрация</h3>
                     </div>
 
                     <!-- v-slot="{ passes }" -->
@@ -1039,7 +1039,7 @@
                         <h5 class="font-weight-bold text-center">{{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}}</h5>
                         <b-form-input :type="'search'" v-model="associations_filter[index]" placeholder="Поиск объединения"></b-form-input>
                         <div>
-                            <b-badge pill variant="light" style="white-space: normal;">Мин - Минимальный возраст. Макс - Максимальный возраст. Час/нед - Часов в неделю</b-badge>
+                            <b-badge pill variant="light">Мин - Минимальный возраст. Макс - Максимальный возраст. Час/нед - Часов в неделю</b-badge>
                         </div>
                         <b-table
                             class="table table-responsive"
@@ -1148,7 +1148,7 @@
                         <b-button
                             v-b-toggle="'collapse-proposal-child-' + index"
                             class="custom-btn"
-                            style="width: 100%; border-radius: 2px !important; custom-btn"
+                            style="width: 100%; border-radius: 2px !important;"
                         >
                             {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
                         </b-button>
@@ -1394,6 +1394,28 @@
 
             const email = (this.$route.query.email == "") ? 0 : this.$route.query.email;
             this.email = email;
+
+
+            // TODO: оптимизация
+            document.getElementsByClassName("wizard__step__label").forEach(function(item, i){
+                const _i = i;
+
+                item.style.cssText = "cursor: pointer;";
+                item.onclick = async function(){
+
+                    let current_step = _this.$refs.wizard.currentStep;
+
+                    if(_i > current_step){
+                        if(await _this.backClicked()) _this.setStep(i);
+                    }
+                    if(_i < current_step){
+                        if(await _this.nextClicked()) _this.setStep(i);
+                    }
+
+
+                };
+            });
+
         },
 
         methods: {
@@ -1420,19 +1442,23 @@
             },
 
             onRowAssociationsSelected(association, row, childId) {
-                // console.log(this.children[childId].associations_selected);
-                // console.log(this.children[childId].associations_selected[row.item.id]);
+                console.log(this.children[childId].associations_selected);
+                console.log(this.children[childId].associations_selected[row.item.id]);
                 // setTimeout(
                 //     () => {
-                        // console.log(this.children[childId].associations_selected);
-                        // console.log(this.children[childId].associations_selected[row.item.id]);
+                this.$nextTick(function () {
+                        console.log(this.children[childId].associations_selected);
+                        console.log(this.children[childId].associations_selected[row.item.id]);
                         // }, 1);
+                });
             },
 
             onAssociationsFiltered() {
-                setTimeout(() => {
-                    this.childTick()
-                }, 1);
+                // setTimeout(() => {
+                this.$nextTick(function () {
+                    this.childTick();
+                });
+                // }, 1);
                 /*
                   Событие @filtered срабатывает перед тем как отрендерить строки в таблице.
                   Поэтому нужна эта "задержка", чтобы чекбоксы проставлялись после отрисовки
@@ -1523,7 +1549,7 @@
                 `;
 
                 await this.$graphql_client.request(request, {}).catch(e=>{
-                    // console.log(e);
+                    console.log(e);
                 });
             },
 
@@ -1618,7 +1644,7 @@
                                 isAlreadyExists: true
                             })
                         }
-                        // console.log(selected_associationsIds.indexOf());
+                        console.log(selected_associationsIds.indexOf());
                         this.associations.map(association => {
                             if (selected_associationsIds.indexOf(parseInt(association.id)) != -1)
                             {
@@ -1632,7 +1658,7 @@
                                 selected_associations[association.id] = null;
                             }
                         });
-                        // console.log(selected_associations);
+                        console.log(selected_associations);
                         this.children[i] = {
                             ...this.children[i],
                             associations_selected: selected_associations,
@@ -1773,7 +1799,7 @@
 
             childTick()
             {
-                // console.log(this.$refs);
+                console.log(this.$refs);
                 for (let i in this.children)
                 {
                     for (let j in this.childAssociations[i])
@@ -1784,14 +1810,14 @@
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = false;
                     }
                 }
-                // console.log(this.children);
+                console.log(this.children);
                 for (let i in this.children)
                 {
                     let el = this.children[i];
                     for (let j in el.proposal)
                     {
                         let _id = el.proposal[j].id;
-                        // console.log('checkbox_'+i+"_"+_id);
+                        console.log('checkbox_'+i+"_"+_id);
                         if (this.$refs['checkbox_'+i+"_"+_id] != undefined)
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = true;
                     }
@@ -1915,13 +1941,11 @@
                             continue;
                         hours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
                     }
-                    // console.log(hours);
+                    console.log(hours);
 
                     if (hours > 10) {
                         this.step4_fatal = true;
-                        this.step4_warning = false;
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
-                        return;
                     }
 
                     if (hours >= 8 && hours <= 10) {
@@ -1929,6 +1953,11 @@
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
                     }
 
+                }
+                if (this.step4_fatal)
+                {
+                    this.step4_warning = false;
+                    return;
                 }
                 if (this.step4_warning)
                     return;
@@ -1993,7 +2022,7 @@
                 if(!isValid) return false;
 
 
-                // TODO: оптимизировать отправку нескольких детей
+                // TODO: оптимизировать отправку нескольких детей (возможно, можно посылать сразу весь объект вместо полей?)
 
                 let variables = ``;
                 let requests = ``;
