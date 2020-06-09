@@ -1,6 +1,6 @@
 <template>
 
-    <div class="waving d-inline-flex justify-content-center align-items-center" v-bind:style="(enoughSpaceForTopButtons()) ? '' : 'padding-top: 100px;'">
+    <div class="waving d-inline-flex justify-content-center align-items-center" v-bind:style="(enoughSpaceForTopButtons()) ? 'padding-top: 100px;' : 'padding-top: 100px;'">
 
         <vue-headful title="Регистрация | Личный кабинет"/>
 
@@ -1161,7 +1161,7 @@
                         <b-button
                             v-b-toggle="'collapse-proposal-child-' + index"
                             class="custom-btn"
-                            style="width: 100%; border-radius: 2px !important; custom-btn"
+                            style="width: 100%; border-radius: 2px !important;"
                         >
                             {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
                         </b-button>
@@ -1406,6 +1406,28 @@
 
             const email = (this.$route.query.email == "") ? 0 : this.$route.query.email;
             this.email = email;
+
+
+            // TODO: оптимизация
+            document.getElementsByClassName("wizard__step__label").forEach(function(item, i){
+                const _i = i;
+
+                item.style.cssText = "cursor: pointer;";
+                item.onclick = async function(){
+
+                    let current_step = _this.$refs.wizard.currentStep;
+
+                    if(_i > current_step){
+                        if(await _this.backClicked()) _this.setStep(i);
+                    }
+                    if(_i < current_step){
+                        if(await _this.nextClicked()) _this.setStep(i);
+                    }
+
+
+                };
+            });
+
         },
 
         methods: {
@@ -1427,17 +1449,21 @@
             onRowAssociationsSelected(association, row, childId) {
                 console.log(this.children[childId].associations_selected);
                 console.log(this.children[childId].associations_selected[row.item.id]);
-                setTimeout(
-                    () => {
+                // setTimeout(
+                //     () => {
+                this.$nextTick(function () {
                         console.log(this.children[childId].associations_selected);
                         console.log(this.children[childId].associations_selected[row.item.id]);
-                        }, 1);
+                        // }, 1);
+                });
             },
 
             onAssociationsFiltered() {
-                setTimeout(() => {
-                    this.childTick()
-                }, 1);
+                // setTimeout(() => {
+                this.$nextTick(function () {
+                    this.childTick();
+                });
+                // }, 1);
                 /*
                   Событие @filtered срабатывает перед тем как отрендерить строки в таблице.
                   Поэтому нужна эта "задержка", чтобы чекбоксы проставлялись после отрисовки
@@ -2005,7 +2031,7 @@
                 if(!isValid) return false;
 
 
-                // TODO: оптимизировать отправку нескольких детей
+                // TODO: оптимизировать отправку нескольких детей (возможно, можно посылать сразу весь объект вместо полей?)
 
                 let variables = ``;
                 let requests = ``;
