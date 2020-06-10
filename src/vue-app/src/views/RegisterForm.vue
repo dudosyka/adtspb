@@ -296,10 +296,10 @@
                                 -->
 
                                 <!-- TODO проверка валидации у адресов -->
-                                <!--  -->
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    mode="lazy"
                                     :rules="{ required: true, valid_full_address: true }"
                                     name="Адрес регистрации"
                                     v-slot="validationContext"
@@ -348,11 +348,13 @@
 
 
                                 <!-- :rules="{ required: true }" -->
+                                <!--   -->
                                 <validation-provider
                                     style="width: 100%;"
 
                                     name="Адрес проживания"
                                     :rules="{ required: true, valid_full_address: true }"
+                                    mode="lazy"
                                     v-slot="validationContext"
                                 >
 
@@ -840,6 +842,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    mode="lazy"
                                     :rules="{ required: true, valid_full_address: true }"
                                     v-slot="validationContext"
                                 >
@@ -890,6 +893,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    mode="lazy"
                                     :rules="{ required: true, valid_full_address: true }"
                                     v-slot="validationContext"
                                 >
