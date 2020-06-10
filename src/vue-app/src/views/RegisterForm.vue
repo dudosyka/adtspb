@@ -394,7 +394,7 @@
                                         />
 
                                         <div>
-                                            <b-button @click="residence_flat = 'Без номер квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
+                                            <b-button @click="residence_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback id="residence_flat-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
