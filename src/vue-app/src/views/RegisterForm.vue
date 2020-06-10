@@ -1178,7 +1178,7 @@
 
                     </div>
 
-                    <b-button  class="btn-light" @click="setStep(2); children.push({...child_prototype})" style="width: 100%; margin-top: 35px;">Добавить ребенка</b-button>
+                    <b-button  class="btn-light" @click="setStep(2); children.push({...child_prototype})" style="width: 100%; margin-top: 35px;">Добавить ещё одного ребенка</b-button>
 
                 </div>
             </vue-good-wizard>
@@ -1665,6 +1665,7 @@
             async getRegistrationAddressAsParentToChild(child_id){
                 if(this.registration_address != null){
                     this.children[child_id].registration_address = this.registration_address;
+                    this.children[child_id].registration_flat    = this.registration_flat;
                     return;
                 }
 
@@ -1681,13 +1682,15 @@
 
                 let response = await this.$graphql_client.request(request, {});
                 this.children[child_id].registration_address = response.viewer.registration_address;
-                this.children[child_id].registration_flat    = response.viewer.registration_flat
+                this.children[child_id].registration_flat    = response.viewer.registration_flat;
                 this.registration_address = response.viewer.registration_address;
+                this.registration_flat    = response.viewer.registration_flat;
             },
 
             async getResidenceAddressAsParentToChild(child_id){
                 if(this.residence_address != null){
                     this.children[child_id].residence_address = this.residence_address;
+                    this.children[child_id].residence_flat    = this.residence_flat;
                     return;
                 }
 
@@ -1706,6 +1709,7 @@
                 this.children[child_id].residence_address = response.viewer.residence_address;
                 this.children[child_id].residence_flat = response.viewer.residence_flat;
                 this.residence_address = response.viewer.residence_address;
+                this.residence_address = response.viewer.residence_flat;
             },
 
             getChildAge(child)
@@ -1927,11 +1931,10 @@
                     if (hours >= 8 && hours <= 10) {
                         this.step4_warning = true;
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
+                        return;
                     }
 
                 }
-                if (this.step4_warning)
-                    return;
                 this.sendProps();
             },
 

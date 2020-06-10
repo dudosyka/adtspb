@@ -145,24 +145,33 @@ extend("kid_bdate",{
         let year = parseInt(__data[2]); //0
         let month = parseInt(__data[1]); //1
         let day = parseInt(__data[0]); //2
-
-        let validation1 = year >= 1000 && year <= 9999;
-        let validation2 = month >= 1 && month <= 12;
-        let validation3 = day >= 1 && day <= 31;
-
-        let year_validation = ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0);
-
-        let special = (month == 4 || month == 6 || month == 9 || month == 11) ? day <= 30 : true; // месяцы, где нет 31 дня
-        let special1 = (!year_validation && month == 2) ? day <= 28 : true; // февраль
-        let special2 = (year_validation && month == 2) ? day <= 29 : true; // високосный год
-
-        if((input && validation1 && validation2 && validation3 && special && special1 && special2) == false)
-            return false;
-
-
-        let getAge = function(date) {
-            return ((new Date().getTime() - new Date(date)) / (24 * 3600 * 365.25 * 1000)) | 0;
-        };
+        //
+        // let validation1 = year >= 1000 && year <= 9999;
+        // let validation2 = month >= 1 && month <= 12;
+        // let validation3 = day >= 1 && day <= 31;
+        //
+        // let year_validation = ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0);
+        //
+        // let special = (month == 4 || month == 6 || month == 9 || month == 11) ? day <= 30 : true; // месяцы, где нет 31 дня
+        // let special1 = (!year_validation && month == 2) ? day <= 28 : true; // февраль
+        // let special2 = (year_validation && month == 2) ? day <= 29 : true; // високосный год
+        //
+        // if((input && validation1 && validation2 && validation3 && special && special1 && special2) == false)
+        //     return false;
+        //
+        //
+        // let getAge = function(date) {
+        //     return ((new Date().getTime() - new Date(date)) / (24 * 3600 * 365.25 * 1000)) | 0;
+        // };
+        let getAge = date =>
+        {
+            let now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            now = now.toISOString().substr(0, 19).replace('T',' ');
+            let age = now.substr(0, 4) - date.substr(0, 4);
+            if(now.substr(5) < date.substr(5)) --age;
+            return age;
+        }
 
         let age = getAge(year+"-"+month+"-"+day);
         if(age >= 6 && age <= 18)
@@ -186,7 +195,7 @@ extend('password_match', {
 extend("valid_full_address",{
     message: "Адрес не найден или требует уточнения",
     validate: async function(value){
-
+        //TODO: Включить ymaps
         await loadYmap({
             apiKey: '46740486-10c9-4828-9ffb-783dbdf451c6', //TODO: убрать дубликаты токена Яндекс Карт!
             lang: 'ru_RU',
@@ -194,6 +203,13 @@ extend("valid_full_address",{
             version: '2.1',
             debug: true
         });
+
+        try
+        {
+            console.log(ymaps);
+        } catch (ReferenceError) {
+            return true;
+        }
 
         let res = await ymaps.geocode(value);
 
