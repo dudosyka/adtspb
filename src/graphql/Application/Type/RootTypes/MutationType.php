@@ -189,6 +189,12 @@ class MutationType extends ObjectType
                     'args' => []
                 ],
 
+                'adminUploadStaff' => [
+                    'type' => Types::string(),
+                    'description' => 'Загрузить список адм. сотрудников на сервер (файл должен быть загружен в поле file0 POST-запроса)',
+                    'args' => []
+                ],
+
             ],
             'resolveField' => function($val, $args, $context, ResolveInfo $info) {
                 return $this->{$info->fieldName}($val, $args, $context, $info);
@@ -828,6 +834,7 @@ HTML;
      * @throws \Exception
      */
     public function adminUploadTeachersList($rootValue, $args, AppContext $context){
+        //TODO: проверить
         $context->viewer->hasAccessOrError(2); //TODO: adminUploadTeachersList action_id в константу
         $file = $context->getFileOrError("file0"); //TODO: биндинг файла через graphql
 
@@ -882,6 +889,78 @@ HTML;
             DataSource::registerUser($instance, $context, User::TEACHER);
 
             $registered[] = "Педагог {$name} {$surname} {$midname} зарегистрирован. Пароль: {$password}";
+        });
+
+        return implode("\n", $registered);
+    }
+
+
+    /**
+     * Загрузка списка административных сотрудников в базу данных
+     *
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     * @throws \Exception
+     */
+    public function adminUploadStaff($rootValue, $args, AppContext $context){
+        //TODO: проверить
+        $context->viewer->hasAccessOrError(2); //TODO: отдельное право
+        $file = $context->getFileOrError("file0"); //TODO: биндинг файла через graphql
+
+        if(!$file->isUTF8())
+            throw new RequestError("Неверная кодировка файла: файл должен иметь кодировку UTF-8.");
+
+        $registered = [];
+
+        CSVFileHandler::scanFileByRow($file, function($line_index, $data) use(&$registered, &$context){
+
+            // Игнорируем пустые линии
+            if(count($data) <= 1 && trim($data[0]) == "") return; //TODO: игнорирование пустых строк в классе обработчика CSV?
+
+            if (
+                (count($data) != 3) or
+                (!isset($data[0]) || !isset($data[1]) || !isset($data[2])) // or
+                // TODO: проверка на значения (парсятся ли они)
+//                (!is_string($data[0]) || !is_string($data[1]) || !is_string($data[2]))
+            )
+                throw new RequestError("Файл имеет неверный формат");
+
+
+            $_ = explode(" ", $data[0]);
+
+            $surname = trim($_[0], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
+            $name = trim($_[1], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
+            $midname = trim($_[2], "\r\n!@#$%^&*()\"№;%:?',;{}/\\. ");
+
+            $password = Application::getRandomString();
+
+            // TODO: регистрация прав у адм. сотрудника
+
+            $instance = new User([
+                'name' => $name,
+                'surname' => $surname,
+                'midname' => $midname ?? "",
+                'email' => $data[2],
+                'password' => User::hashPassword($password),
+                'phone_number' => "", // TODO: регистрация номера телефона у адм. сотрудника
+                'sex' => "м",  // Временно! // TODO: регистрация пола у адм. сотрудника
+                'job_position' => "",
+                'job_place' => "", // TODO: регистрация места работы у адм. сотрудника
+                'registration_address' => "", // TODO: регистрация адреса регистрации у адм. сотрудника
+                'residence_address' => "", // TODO: регистрация адреса проживания у адм. сотрудника
+                'relationship' => "", // TODO: регистрация роли у адм. сотрудника
+                'study_place' => '',
+                'study_class' => '',
+                'date_registered' => DataSource::timeInMYSQLFormat(),
+                'status_email' => 'подтвержден'
+            ]);
+
+            DataSource::registerUser($instance, $context, User::TEACHER); //TODO: новая роль
+
+            $registered[] = "Сотрудник {$name} {$surname} {$midname} зарегистрирован. Пароль: {$password}";
         });
 
         return implode("\n", $registered);
