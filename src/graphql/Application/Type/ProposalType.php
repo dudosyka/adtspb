@@ -27,6 +27,9 @@ class ProposalType extends ObjectType
 	                'status_admin_id' => ['type' => Types::int()],
 	                'status_parent_id' => ['type' => Types::int()],
 	                'status_teacher_id' => ['type' => Types::int()],
+	                'status_admin' => ['type' => Types::string()],
+	                'status_parent' => ['type' => Types::string()],
+	                'status_teacher' => ['type' => Types::string()],
                     'getAssociation' => ['type' => Types::association()]
                 ];
             },

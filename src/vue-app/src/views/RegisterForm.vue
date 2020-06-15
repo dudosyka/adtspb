@@ -297,24 +297,74 @@
 
                                 <!-- TODO проверка валидации у адресов -->
                                 <!--  -->
+
+                                <b-badge pill variant="light" class="border border-dark">Адрес регистрации:</b-badge>
+
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    mode="lazy"
-                                    :rules="{ required: true, valid_full_address: true }"
-                                    name="Адрес регистрации"
+                                    :rules="{ required: true }"
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
-                                        <AddressInput
-                                            v-model="registration_address"
-                                            placeholder="Адрес регистрации"
-
+                                        <b-form-input
+                                            v-model="registration_city"
+                                            placeholder="Город"
                                             :state="getValidationState(validationContext)"
-                                            aria-describedby="registration_address-feedback"
-                                        />
+                                            :aria-describedby="'parent-registration-city-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'parent-registration-city-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
 
-                                        <b-form-invalid-feedback id="registration_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="registration_district"
+                                            placeholder="Район"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'parent-registration-district-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'parent-registration-district-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="registration_street"
+                                            placeholder="Улица\проспект"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'parent-registration-street-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'parent-registration-street-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="registration_house"
+                                            placeholder="Дом (с корпусом, если есть)"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'parent-registration-house-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'parent-registration-house-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -328,54 +378,91 @@
                                         <b-form-input
                                             class="icon"
                                             v-model="registration_flat"
-                                            placeholder="Номер квартиры по адресу регистрации"
-
+                                            placeholder="Номер квартиры по адресу проживания"
                                             :state="getValidationState(validationContext)"
-                                            aria-describedby="registration_flat-feedback"
+                                            :aria-describedby="'parent-registration_flat-feedback'"
                                         />
-
                                         <div>
-                                            <b-button @click="registration_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
+                                            <b-button @click="registration_flat = 'Без номера квартиры'" size="sm" class="mr-3">Без номера квартиры</b-button>
                                         </div>
 
-                                        <b-form-invalid-feedback id="registration_flat-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <b-form-invalid-feedback :id="'parent-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
+                                <template v-if="invalidRegistrationAddress === true">
+                                    <b-alert show variant="danger">Введите корректный адрес регистрации!</b-alert>
+                                </template>
 
+                                <b-badge pill variant="light" class="border border-dark">Адрес проживания:</b-badge>
 
-
-
-
-
-                                <!-- :rules="{ required: true }" -->
                                 <validation-provider
                                     style="width: 100%;"
 
-                                    name="Адрес проживания"
-                                    :rules="{ required: true, valid_full_address: true }"
-                                    mode="lazy"
+                                    :rules="{ required: true }"
                                     v-slot="validationContext"
                                 >
-
-
                                     <b-form-group>
-                                        <!-- @input="getValidationState(validationContext)" -->
-                                        <AddressInput
-                                            v-model="residence_address"
-                                            placeholder="Адрес проживания"
-
+                                        <b-form-input
+                                            v-model="residence_city"
+                                            placeholder="Город"
                                             :state="getValidationState(validationContext)"
-                                            aria-describedby="residence_address-live-feedback" />
-                                        <b-form-invalid-feedback id="residence_address-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                            :aria-describedby="'parent-residence-city-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'parent-residence-city-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
-
-                                    <div>
-                                        <b-button @click="residence_address = registration_address; residence_flat = registration_flat" size="sm" style="margin-right: 5px;">По адресу регистрации</b-button>
-                                    </div>
                                 </validation-provider>
 
+                                <validation-provider
+                                    style="width: 100%;"
 
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="residence_district"
+                                            placeholder="Район"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'parent-residence-district-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'parent-residence-district-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="residence_street"
+                                            placeholder="Улица\проспект"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'parent-residence-street-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'parent-residence-street-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="residence_house"
+                                            placeholder="Дом (с корпусом, если есть)"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'parent-residence-house-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'parent-residence-house-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -388,19 +475,21 @@
                                             class="icon"
                                             v-model="residence_flat"
                                             placeholder="Номер квартиры по адресу проживания"
-
                                             :state="getValidationState(validationContext)"
-                                            aria-describedby="registration_flat-feedback"
+                                            :aria-describedby="'parent-residence_flat-feedback'"
                                         />
-
                                         <div>
-                                            <b-button @click="residence_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
+                                            <b-button @click="residence_flat = 'Без номера квартиры'" size="sm" class="mr-3">Без номера квартиры</b-button>
+                                            <b-button @click="residence_city = registration_city;residence_district = registration_district;residence_street = registration_street;residence_house = registration_house; residence_flat = registration_flat" size="sm">По адресу регистрации</b-button>
                                         </div>
 
-                                        <b-form-invalid-feedback id="residence_flat-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <b-form-invalid-feedback :id="'parent-residence_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
+                                <template v-if="invalidResidenceAddress === true">
+                                    <b-alert show variant="danger">Введите корректный адрес проживания!</b-alert>
+                                </template>
 
                                 <!-- TODO: Разделить иконки стрелочки и иконки у инпута (через 2 фона) -->
 
@@ -424,9 +513,7 @@
                                     <!-- Можно и не отображать -->
                                     <!--                            <b-form-invalid-feedback id="agreement-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>-->
                                 </validation-provider>
-
 <!--                                <b-button type="submit" block :disabled="is_sending_request">Создать аккаунт</b-button>-->
-
                             </b-form-row>
 <!--                        </b-form>-->
                     </validation-observer>
@@ -839,6 +926,8 @@
                                     </b-form-group>
                                 </validation-provider>
 
+                                <template v-if="item.id != 0">
+
                                 <validation-provider
                                     style="width: 100%;"
 
@@ -865,6 +954,37 @@
                                 </validation-provider>
 
                                 <validation-provider
+                                        style="width: 100%;"
+
+                                        :rules="{ required: true }"
+                                        v-slot="validationContext"
+                                    >
+                                        <b-form-group>
+                                            <b-form-input
+                                                class="icon"
+                                                v-model="item.registration_flat"
+                                                placeholder="Номер квартиры по адресу регистрации ребенка"
+
+                                                :disabled="item.isDisabled"
+                                                :state="getValidationState(validationContext)"
+                                                :aria-describedby="'cld-'+index+'-registration_flat-feedback'"
+                                            />
+
+                                            <div>
+                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
+                                            </div>
+
+                                            <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        </b-form-group>
+                                    </validation-provider>
+
+                                </template>
+
+                                <template v-else>
+
+                                <b-badge pill variant="light" class="border border-dark">Адрес регистрации ребенка:</b-badge>
+
+                                <validation-provider
                                     style="width: 100%;"
 
                                     :rules="{ required: true }"
@@ -872,24 +992,107 @@
                                 >
                                     <b-form-group>
                                         <b-form-input
-                                            class="icon"
-                                            v-model="item.registration_flat"
-                                            placeholder="Номер квартиры по адресу регистрации ребенка"
+                                            v-model="item.registration_city"
+                                            placeholder="Город"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
-                                            :aria-describedby="'cld-'+index+'-registration_flat-feedback'"
-                                        />
-
-                                        <div>
-                                            <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
-                                        </div>
-
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                            :aria-describedby="'cld-'+index+'-registration-city-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration-city-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
-                                <!-- :rules="{ required: true }" -->
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="item.registration_district"
+                                            placeholder="Район"
+
+                                            :disabled="item.isDisabled"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-registration-district-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration-district-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="item.registration_street"
+                                            placeholder="Улица\проспект"
+
+                                            :disabled="item.isDisabled"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-registration-street-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration-street-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="item.registration_house"
+                                            placeholder="Дом (с корпусом, если есть)"
+
+                                            :disabled="item.isDisabled"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-registration-house-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration-house-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                        style="width: 100%;"
+
+                                        :rules="{ required: true }"
+                                        v-slot="validationContext"
+                                    >
+                                        <b-form-group>
+                                            <b-form-input
+                                                class="icon"
+                                                v-model="item.registration_flat"
+                                                placeholder="Номер квартиры по адресу регистрации ребенка"
+
+                                                :disabled="item.isDisabled"
+                                                :state="getValidationState(validationContext)"
+                                                :aria-describedby="'cld-'+index+'-registration_flat-feedback'"
+                                            />
+                                            <div>
+                                                <template v-if="isOldRegister !== true">
+                                                    <b-button @click="getRegistrationAddressAsParentToChild(index)" size="sm" class="mr-3">Как у родителя</b-button>
+                                                </template>
+                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm">Без номера квартиры</b-button>
+                                            </div>
+
+                                            <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        </b-form-group>
+                                    </validation-provider>
+
+                                <template v-if="invalidRegistrationAddress === true">
+                                        <b-alert show variant="danger">Введите корректный адрес регистрации!</b-alert>
+                                    </template>
+                                </template>
+
+                                <template v-if="item.id != 0">
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -899,20 +1102,69 @@
                                     v-slot="validationContext"
                                 >
                                     <b-form-group>
-                                        <!-- @input="getValidationState(validationContext)" -->
                                         <AddressInput
-                                            v-model="item.residence_address"
+                                            v-model="item.registration_address"
                                             placeholder="Адрес проживания ребенка"
+
                                             :disabled="item.isDisabled"
-                                            :aria-describedby="'cld-'+index+'-residence_address-feedback'"
                                             :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-registration_address-feedback'"
                                         />
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-registration_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                         <div>
-<!--                                            <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>-->
-                                            <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm" class="mr-3">Как у родителя</b-button>
-                                            <b-button @click="item.residence_address = item.registration_address; item.residence_flat = item.registration_flat" size="sm">По адресу регистрации</b-button>
+<!--                                            <b-link @click="getRegistrationAddressAsParentToChild(index)">Как у родителя</b-link>-->
+                                            <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm">Как у родителя</b-button>
                                         </div>
+
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                        style="width: 100%;"
+
+                                        :rules="{ required: true }"
+                                        v-slot="validationContext"
+                                    >
+                                        <b-form-group>
+                                            <b-form-input
+                                                class="icon"
+                                                v-model="item.registration_flat"
+                                                placeholder="Номер квартиры по адресу проживания ребенка"
+
+                                                :disabled="item.isDisabled"
+                                                :state="getValidationState(validationContext)"
+                                                :aria-describedby="'cld-'+index+'-registration_flat-feedback'"
+                                            />
+
+                                            <div>
+                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
+                                            </div>
+                                            <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        </b-form-group>
+                                    </validation-provider>
+
+                                </template>
+
+                                <template v-else>
+
+                                <b-badge pill variant="light" class="border border-dark">Адрес проживания ребенка:</b-badge>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="item.residence_city"
+                                            placeholder="Город"
+
+                                            :disabled="item.isDisabled"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-residence-city-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence-city-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
 
@@ -924,22 +1176,88 @@
                                 >
                                     <b-form-group>
                                         <b-form-input
-                                            class="icon"
-                                            v-model="item.residence_flat"
-                                            placeholder="Номер квартиры по адресу проживания ребенка"
+                                            v-model="item.residence_district"
+                                            placeholder="Район"
 
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
-                                            :aria-describedby="'cld-'+index+'-residence_flat-feedback'"
-                                        />
-
-                                        <div>
-                                            <b-button @click="item.residence_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
-                                        </div>
-
-                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                            :aria-describedby="'cld-'+index+'-residence-district-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence-district-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                     </b-form-group>
                                 </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="item.residence_street"
+                                            placeholder="Улица\проспект"
+
+                                            :disabled="item.isDisabled"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-residence-street-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence-street-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                    style="width: 100%;"
+
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                >
+                                    <b-form-group>
+                                        <b-form-input
+                                            v-model="item.residence_house"
+                                            placeholder="Дом (с корпусом, если есть)"
+
+                                            :disabled="item.isDisabled"
+                                            :state="getValidationState(validationContext)"
+                                            :aria-describedby="'cld-'+index+'-residence-house-feedback'"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback :id="'cld-'+index+'-residence-house-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                    </b-form-group>
+                                </validation-provider>
+
+                                <validation-provider
+                                        style="width: 100%;"
+
+                                        :rules="{ required: true }"
+                                        v-slot="validationContext"
+                                    >
+                                        <b-form-group>
+                                            <b-form-input
+                                                class="icon"
+                                                v-model="item.residence_flat"
+                                                placeholder="Номер квартиры по адресу проживания ребенка"
+
+                                                :disabled="item.isDisabled"
+                                                :state="getValidationState(validationContext)"
+                                                :aria-describedby="'cld-'+index+'-residence_flat-feedback'"
+                                            />
+                                            <div>
+                                                <template v-if="isOldRegister !== true">
+                                                    <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm" class="mr-3">Как у родителя</b-button>
+                                                </template>
+                                                <b-button @click="item.residence_flat = 'Без номера квартиры'" size="sm" class="mr-3">Без номера квартиры</b-button>
+                                                <b-button @click="item.residence_city = item.registration_city;item.residence_district = item.registration_district;item.residence_street = item.registration_street;item.residence_house = item.registration_house; item.residence_flat = item.registration_flat" size="sm">По адресу регистрации</b-button>
+                                            </div>
+
+                                            <b-form-invalid-feedback :id="'cld-'+index+'-residence_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                                        </b-form-group>
+                                    </validation-provider>
+                                    <template v-if="invalidResidenceAddress === true">
+                                        <b-alert show variant="danger">Введите корректный адрес проживания!</b-alert>
+                                    </template>
+                                </template>
+
+                                <!-- :rules="{ required: true }" -->
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -1158,7 +1476,7 @@
                             {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
                         </b-button>
 
-                        <b-collapse :id="'collapse-proposal-child-' + index" class="mt-2">
+                        <b-collapse :id="'collapse-proposal-child-' + index" class="mt-2" :visible="true">
                             <b-card>
 
                                 <b-table
@@ -1169,10 +1487,15 @@
                                     responsive="sm"
                                 >
                                     <template v-slot:cell(status)="row">
-                                        Подано
+                                        {{ row.item.status_parent }}
                                     </template>
                                     <template v-slot:cell(actions)="row">
-                                        <b-button class="custom-btn" @click="generateForm(item, row.item.id)" size="sm" style="width: 100%;">Скачать</b-button>
+                                        <template v-if="row.item.status_parent == 'Подано'">
+                                            <b-button class="custom-btn" @click="generateForm(item, row.item.id)" size="sm" style="width: 100%;">Скачать</b-button>
+                                        </template>
+                                        <template v-if="row.item.status_parent != 'Отозвано'">
+                                            <b-button class="custom-btn" @click="setRecalled(row.item.id, item)" size="sm" style="width: 100%;">Отозвать</b-button>
+                                        </template>
                                     </template>
                                 </b-table>
 
@@ -1208,6 +1531,7 @@
     import { GoodWizard } from 'vue-good-wizard';
     import jsPDF from 'jspdf';
     import html2canvas from "html2canvas";
+    import {loadYmap} from "vue-yandex-maps";
 
     export default {
         name: "RegisterForm",
@@ -1224,21 +1548,29 @@
             const child_prototype = {
                 id: 0,
 
-                relationship: null,
-                name: null,
-                surname: null,
-                midname: null,
+                relationship: "null",
+                name: "null",
+                surname: "null",
+                midname: "null",
                 sex_options_selected: null,
                 residence_address: null,
+                residence_city: "null",
+                residence_district: "null",
+                residence_street: "null",
+                residence_house: null,
                 residence_flat: null,
-                study_place: null,
-                study_class: null,
+                study_place: "null",
+                study_class: "null",
                 birthday: null,
 
                 registration_address: null,
-                registration_flat: null,
+                registration_city: "null",
+                registration_district: "null",
+                registration_street: "null",
+                registration_house: "null",
+                registration_flat: "null",
 
-                email: null,
+                email: "null@nu.ry",
                 phone_number: null,
 
                 password: null,
@@ -1285,6 +1617,7 @@
                 midname: null,
                 email: null,
                 password: null,
+                date_registered: null,
                 password_matching: null,
                 phone_number: null,
                 job_position: null,
@@ -1292,9 +1625,19 @@
                 birthday: null,
 
                 registration_address: null,
+                registration_city: null,
+                registration_district: null,
+                registration_street: null,
+                registration_house: null,
                 registration_flat: null,
+
                 residence_address: null,
+                residence_city: null,
+                residence_district: null,
+                residence_street: null,
+                residence_house: null,
                 residence_flat: null,
+
                 skipped_id: -1,
 
                 // Шаг 2
@@ -1307,6 +1650,9 @@
                 children: [
                     {... child_prototype}
                 ],
+                invalidRegistrationAddress: false,
+                invalidResidenceAddress: false,
+                isOldRegister: false,
 
                 //Шаг 4
                 associations: [],
@@ -1432,6 +1778,54 @@
                     this.children[id].skipped = true;
             },
 
+            async checkRegistrationDate()
+            {
+                if(this.date_registered == null)
+                {
+                    const request = `
+                        query {
+                            viewer {
+                               date_registered
+                            }
+                        }
+                    `;
+                    let response            = await this.$graphql_client.request(request, {});
+                    this.date_registered    = new Date(response.viewer.date_registered);
+                }
+                let oldRegisterDate = new Date("2020-06-15 22:59:59");
+                // console.log((this.date_registered.valueOf() > oldRegisterDate.valueOf()))
+                this.isOldRegister = (this.date_registered.valueOf() < oldRegisterDate.valueOf());
+            },
+
+            setRecalled(association_id, child)
+            {
+                const request = `
+                    mutation(
+                        $association_id: Int!,
+                        $child_id: Int!
+                    ) {
+                        setRecalled (
+                            association_id: $association_id
+                            child_id: $child_id
+                        )
+                    }
+                `;
+                const data = {
+                    association_id: association_id,
+                    child_id: parseInt(child.id)
+                };
+
+                this.$graphql_client.request(request, data).then(data=>{
+                    if (data.setRecalled)
+                        child.proposal.map(el=>{
+                            if (el.id == association_id)
+                                el.status_parent = "Отозвано";el.status_parent_id = 3;
+                            return el;
+                        })
+                }).catch(e=>{});
+
+            },
+
             enoughSpaceForTopButtons: function () {
                 return this.windowWidth >= 765;
             },
@@ -1445,27 +1839,12 @@
             },
 
             onRowAssociationsSelected(association, row, childId) {
-                // console.log(this.children[childId].associations_selected);
-                // console.log(this.children[childId].associations_selected[row.item.id]);
-                // setTimeout(
-                //     () => {
-                this.$nextTick(function () {
-                        //console.log(this.children[childId].associations_selected);
-                        //console.log(this.children[childId].associations_selected[row.item.id]);
-                        // }, 1);
-                });
             },
 
             onAssociationsFiltered() {
-                // setTimeout(() => {
                 this.$nextTick(function () {
                     this.childTick();
                 });
-                // }, 1);
-                /*
-                  Событие @filtered срабатывает перед тем как отрендерить строки в таблице.
-                  Поэтому нужна эта "задержка", чтобы чекбоксы проставлялись после отрисовки
-               */
             },
 
             rowStyler(item, type) {
@@ -1537,6 +1916,7 @@
 
 
                 if(currentPage >= 3)
+                    this.checkRegistrationDate();
                     this.stepChanged(currentPage);
                     return true; // Можем вернуться назад
 
@@ -1626,8 +2006,7 @@
 
                 // Если шаг >= 4, то грузим информацию о поданных заявлениях
                 if(page >= 3){
-                    let data = await this.$graphql_client.request("query{ viewer{ getChildren{ getInProposals { getAssociation { id, name } } } } }");
-
+                    let data = await this.$graphql_client.request("query{ viewer{ getChildren{ getInProposals { status_admin, status_teacher, status_parent, getAssociation { id, name } } } } }");
                     for(var i in data.viewer.getChildren)
                     {
                         let current = data.viewer.getChildren[i];
@@ -1638,14 +2017,18 @@
 
                         for(let y in current.getInProposals){
                             let y_current = current.getInProposals[y];
+                            console.log(y_current);
 
                             //TODO: прописать поле isAlreadyExists у selected_associations в прототипе (во избежания undefined, для того, чтобы было 100% не undefined)
                             selected_associationsIds.push(parseInt(y_current.getAssociation.id, 10))
                             proposal.push({
                                 id: parseInt(y_current.getAssociation.id, 10),
                                 name: y_current.getAssociation.name,
-                                isAlreadyExists: true
-                            })
+                                isAlreadyExists: true,
+                                status_teacher: y_current.status_teacher,
+                                status_parent: y_current.status_parent,
+                                status_admin: y_current.status_admin,
+                            });
                         }
                         // console.log(selected_associationsIds.indexOf());
                         this.associations.map(association => {
@@ -1661,7 +2044,7 @@
                                 selected_associations[association.id] = null;
                             }
                         });
-                        // console.log(selected_associations);
+                        console.log(proposal);
                         this.children[i] = {
                             ...this.children[i],
                             associations_selected: selected_associations,
@@ -1693,7 +2076,11 @@
 
             async getRegistrationAddressAsParentToChild(child_id){
                 if(this.registration_address != null){
-                    this.children[child_id].registration_address = this.registration_address;
+                    let address = this.registration_address.split(", ");
+                    this.children[child_id].registration_city = address[0];
+                    this.children[child_id].registration_district = address[1];
+                    this.children[child_id].registration_street = address[2];
+                    this.children[child_id].registration_house = address[3];
                     this.children[child_id].registration_flat    = this.registration_flat;
                     return;
                 }
@@ -1710,7 +2097,11 @@
                 `;
 
                 let response = await this.$graphql_client.request(request, {});
-                this.children[child_id].registration_address = response.viewer.registration_address;
+                let address = response.viewer.registration_address.split(", ");
+                this.children[child_id].registration_city = address[0];
+                this.children[child_id].registration_district = address[1];
+                this.children[child_id].registration_street = address[2];
+                this.children[child_id].registration_house = address[3];
                 this.children[child_id].registration_flat    = response.viewer.registration_flat;
                 this.registration_address = response.viewer.registration_address;
                 this.registration_flat    = response.viewer.registration_flat;
@@ -1718,7 +2109,11 @@
 
             async getResidenceAddressAsParentToChild(child_id){
                 if(this.residence_address != null){
-                    this.children[child_id].residence_address = this.residence_address;
+                    let address = this.residence_address.split(", ");
+                    this.children[child_id].residence_city = address[0];
+                    this.children[child_id].residence_district = address[1];
+                    this.children[child_id].residence_street = address[2];
+                    this.children[child_id].residence_house = address[3];
                     this.children[child_id].residence_flat    = this.residence_flat;
                     return;
                 }
@@ -1735,7 +2130,11 @@
                 `;
 
                 let response = await this.$graphql_client.request(request, {});
-                this.children[child_id].residence_address = response.viewer.residence_address;
+                let address = response.viewer.residence_address.split(", ");
+                this.children[child_id].residence_city = address[0];
+                this.children[child_id].residence_district = address[1];
+                this.children[child_id].residence_street = address[2];
+                this.children[child_id].residence_house = address[3];
                 this.children[child_id].residence_flat = response.viewer.residence_flat;
                 this.residence_address = response.viewer.residence_address;
                 this.residence_address = response.viewer.residence_flat;
@@ -1806,7 +2205,6 @@
 
             childTick()
             {
-                // console.log(this.$refs);
                 for (let i in this.children)
                 {
                     for (let j in this.childAssociations[i])
@@ -1817,7 +2215,6 @@
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = false;
                     }
                 }
-                // console.log(this.children);
                 for (let i in this.children)
                 {
                     let el = this.children[i];
@@ -2040,9 +2437,64 @@
                 });
             },
 
+            async validateAddress(value) {
+                // return true;
+                await loadYmap({
+                    apiKey: '46740486-10c9-4828-9ffb-783dbdf451c6', //TODO: убрать дубликаты токена Яндекс Карт!
+                    // apiKey: '8ae15378-2641-415e-8789-239a9a7df87a',
+                    lang: 'ru_RU',
+                    coordorder: 'latlong',
+                    version: '2.1',
+                    debug: true
+                });
+
+                try {
+                    ymaps;
+                } catch (ReferenceError) {
+                    return true;
+                }
+
+                let res = await ymaps.geocode(value);
+
+                let obj = res.geoObjects.get(0),
+                    error;
+
+                if (obj) {
+                    // Об оценке точности ответа геокодера можно прочитать тут: https://tech.yandex.ru/maps/doc/geocoder/desc/reference/precision-docpage/
+                    switch (obj.properties.get('metaDataProperty.GeocoderMetaData.precision')) {
+                        case 'exact':
+                            break;
+                        case 'number':
+                        case 'near':
+                        case 'range':
+                            // error = 'Неточный адрес, требуется уточнение';
+                            error = true;
+                            break;
+                        case 'street':
+                            // error = 'Неполный адрес, требуется уточнение';
+                            error = true;
+                            break;
+                        case 'other':
+                        default:
+                            // error = 'Неточный адрес, требуется уточнение';
+                            error = true;
+                    }
+                } else {
+                    // error = 'Адрес не найден';
+                    error = true;
+                }
+
+                // Если геокодер возвращает пустой массив или неточный результат, то показываем ошибку.
+                if (error) {
+                    return false;
+                }
+                return true;
+            },
+
             /* Шаг 3 */
             async addChildren(){
                 const isValid = await this.$refs.children_observer.validate();
+                console.log(isValid);
                 if(!isValid) return false;
 
 
@@ -2100,13 +2552,25 @@
                             `ovz: $ovz`+i+`,`+
                             `state: $state`+i+`,`+
                         `)`;
-
+                    let residence_address = current['residence_city'] + ", " + current['residence_district'] + ", " + current['residence_street'] + ", " + current['residence_house'];
+                    console.log(residence_address);
+                    console.log(await this.validateAddress(residence_address));
+                    if (!await this.validateAddress(residence_address))
+                    {
+                        console.log(2);
+                        this.invalidResidenceAddress = true;
+                        return;
+                    }
+                    else
+                    {
+                        this.invalidResidenceAddress = false;
+                    }
                     data["relationship"+i] = current["relationship"];
                     data["name"+i] = current["name"];
                     data["surname"+i] = current["surname"];
                     data["midname"+i] = current["midname"];
                     data["sex"+i] = current["sex_options_selected"];
-                    data["residence_address"+i] = current["residence_address"];
+                    data["residence_address"+i] = residence_address;
                     data["residence_flat"+i] = current["residence_flat"];
                     data["study_place"+i] = current["study_place"];
                     data["study_class"+i] = current["study_class"];
@@ -2116,8 +2580,18 @@
                     data["birthday"+i] = bday[2]+"-"+bday[1]+"-"+bday[0];
 
 
-
-                    data["registration_address"+i] = current["registration_address"];
+                    let registration_address = current['registration_city'] + ", " + current['registration_district'] + ", " + current['registration_street'] + ", " + current['registration_house'];
+                    if (!await this.validateAddress(registration_address))
+                    {
+                        console.log(1);
+                        this.invalidRegistrationAddress = true;
+                        return;
+                    }
+                    else
+                    {
+                        this.invalidRegistrationAddress = false;
+                    }
+                    data["registration_address"+i] = registration_address;
                     data["registration_flat"+i] = current["registration_flat"];
                     data["email"+i] = (current["email"] == "") ? null : current["email"];
                     data["phone_number"+i] = (current["phone_number"] == "") ? null : current["phone_number"];
@@ -2228,6 +2702,7 @@
             /* Шаг 1 */
             async submitAccountRegistration(){
                 const isValid = await this.$refs.registration_observer.validate();
+                console.log(isValid);
                 if(!isValid) return false;
 
                 const request = `
@@ -2263,6 +2738,29 @@
                 // job_position: $job_position,
                 //     job_place: $job_place,
                 // birthday: $birthday
+                this.registration_address = this.registration_city + ", " + this.registration_district + ", " + this.registration_street + ", " + this.registration_house;
+                if (!await this.validateAddress(this.registration_address))
+                {
+                    console.log(this.registration_address);
+                    this.invalidRegistrationAddress = true;
+                    return;
+                }
+                else
+                {
+                    this.invalidRegistrationAddress = false;
+                }
+
+                this.residence_address = this.residence_city + ", " + this.residence_district + ", " + this.residence_street + ", " + this.residence_house;
+                if (!await this.validateAddress(this.residence_address))
+                {
+                    console.log(this.residence_address);
+                    this.invalidResidenceAddress = true;
+                    return;
+                }
+                else
+                {
+                    this.invalidResidenceAddress = false;
+                }
 
                 const data = {
                     name:                   this.name,

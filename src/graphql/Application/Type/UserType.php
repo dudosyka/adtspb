@@ -51,6 +51,7 @@ class UserType extends ObjectType
                     'hasAnyChildrenAdded' => ['type' => Types::boolean()],
                     'hasAnyProposals' => ['type' => Types::boolean()],
                     'getChildren' => ['type' => Types::listOf(Types::user())],
+                    'getChildren' => ['type' => Types::listOf(Types::user())],
                     'getInProposals' => Types::listOf(Types::proposal()),
 
                     'state' => Types::string(),
@@ -168,10 +169,24 @@ class UserType extends ObjectType
         if($find == null)
             throw new RequestError("Доступ запрещен");
 
+        $q = DataSource::findAll("SettingsProposal", "id != -1");
+        $statuses = [];
+        foreach($q as $status)
+        {
+            $statuses[$status->id] = $status->name;
+        }
+        $result = [];
 
+        foreach (DataSource::findAll("Proposal", "child_id = :child_id", ["child_id" => $user->id]) as $proposal)
+        {
+            $proposal->status_admin = $statuses[$proposal->status_admin_id];
+            $proposal->status_parent = $statuses[$proposal->status_parent_id];
+            $proposal->status_teacher = $statuses[$proposal->status_teacher_id];
+            $result[] = $proposal;
+        }
 
+        return $result;
 
-        return DataSource::findAll("Proposal", "child_id = :child_id", ["child_id" => $user->id]);
     }
 
 

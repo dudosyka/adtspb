@@ -175,8 +175,6 @@ class MutationType extends ObjectType
                     "args" => []
                 ],
 
-
-
                 'adminUploadAssociations' => [
                     'type' => Types::string(),
                     'description' => 'Загрузить список объединений на сервер (файл должен быть загружен в поле file0 POST-запроса)',
@@ -193,6 +191,15 @@ class MutationType extends ObjectType
                     'type' => Types::string(),
                     'description' => 'Загрузить список адм. сотрудников на сервер (файл должен быть загружен в поле file0 POST-запроса)',
                     'args' => []
+                ],
+
+                'setRecalled' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Set proposal`s status_parent_id to "recalled"(id = 3)',
+                    'args' => [
+                        'child_id' => Types::int(),
+                        'association_id' => Types::int()
+                    ]
                 ],
 
             ],
@@ -966,30 +973,46 @@ HTML;
         return implode("\n", $registered);
     }
 
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function setRecalled($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(9);
 
+        $child = $args['child_id'];
+        $association_id = $args['association_id'];
 
+        $find = DataSource::findOne("UserChild", "parent_id = :parent_id AND child_id = :child_id",
+            [
+               "child_id" => $child,
+               "parent_id" => $context->viewer->id
+            ]
+        );
 
+        if($find == null)
+            throw new RequestError("Доступ запрещен");
 
+        $proposal = DataSource::findOne("Proposal", "association_id = :association_id AND child_id = :child_id",
+            [
+                'child_id' => $child,
+                'association_id' => $association_id
+            ]
+        );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+       if ($proposal == null)
+            return false;
+       else
+       {
+           $proposal->status_parent_id = 3;
+           DataSource::update($proposal);
+           return true;
+       }
+    }
 
 
     public function sendRegistrationEmail(string $email, string $code){
