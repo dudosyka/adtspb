@@ -70,7 +70,14 @@
 
             this.$refs.field.$refs.input.disabled = (typeof this.disabled == 'boolean') ? this.disabled : false;
             this.$refs.field.$refs.input.value = this.value;
-
+            //TODO: полность вырезать ymaps отсюда (оставить только в валидации адреса)
+            $(this.$refs.field.$refs.input).fias({
+                oneString: true,
+                select: e=>{
+                    this.$emit('input', $(this.$refs.field.$refs.input).val());
+                    this.$emit('state', this.state);
+                }
+            });
             const baseComponent = this;
 
             //TODO: сделать конфиги Яндекс Карт глобавльными
@@ -84,7 +91,7 @@
             }).then(function(){
                 // Только после then будет доступен ymaps
                 // console.log(test);
-                baseComponent.yandex_maps_inited = true;
+                // baseComponent.yandex_maps_inited = true;
             });
 
 

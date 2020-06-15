@@ -300,6 +300,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    mode="lazy"
                                     :rules="{ required: true, valid_full_address: true }"
                                     name="Адрес регистрации"
                                     v-slot="validationContext"
@@ -353,6 +354,7 @@
 
                                     name="Адрес проживания"
                                     :rules="{ required: true, valid_full_address: true }"
+                                    mode="lazy"
                                     v-slot="validationContext"
                                 >
 
@@ -392,7 +394,7 @@
                                         />
 
                                         <div>
-                                            <b-button @click="residence_flat = 'Без номер квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
+                                            <b-button @click="residence_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback id="residence_flat-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -840,6 +842,7 @@
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    mode="lazy"
                                     :rules="{ required: true, valid_full_address: true }"
                                     v-slot="validationContext"
                                 >
@@ -887,9 +890,11 @@
                                 </validation-provider>
 
                                 <!-- :rules="{ required: true }" -->
+
                                 <validation-provider
                                     style="width: 100%;"
 
+                                    mode="lazy"
                                     :rules="{ required: true, valid_full_address: true }"
                                     v-slot="validationContext"
                                 >
@@ -898,10 +903,10 @@
                                         <AddressInput
                                             v-model="item.residence_address"
                                             placeholder="Адрес проживания ребенка"
-
                                             :disabled="item.isDisabled"
+                                            :aria-describedby="'cld-'+index+'-residence_address-feedback'"
                                             :state="getValidationState(validationContext)"
-                                            :aria-describedby="'cld-'+index+'-residence_address-feedback'" />
+                                        />
                                         <b-form-invalid-feedback :id="'cld-'+index+'-residence_address-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                         <div>
 <!--                                            <b-link @click="getResidenceAddressAsParentToChild(index)">Как у родителя</b-link>-->
@@ -1102,7 +1107,7 @@
                                 <b-button
                                     style="margin-right: 10px;"
                                     class="float-right btn-light"
-                                    @click="sendProps(); step4_warning=false"
+                                    @click="preSendProps();setSkipped(skipped_id); step4_warning=false"
                                 >
                                     Все равно продолжить
                                 </b-button>
@@ -1148,7 +1153,7 @@
                         <b-button
                             v-b-toggle="'collapse-proposal-child-' + index"
                             class="custom-btn"
-                            style="width: 100%; border-radius: 2px !important; custom-btn"
+                            style="width: 100%; border-radius: 2px !important;"
                         >
                             {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
                         </b-button>
@@ -1194,8 +1199,8 @@
 
 
 <!-- TODO: подгрузка детей из graphql при переходе на страницу регистрации по ссылке -->
-
 <script>
+
     import CenteredCaption from "../components/CenteredCaption";
     import FacebookButton from "../components/social/FacebookButton";
     import GoogleButton from "../components/social/GoogleButton";
@@ -1247,6 +1252,7 @@
                 associations_selected: [],
                 associations_selectedIds: [],
                 proposal: [],
+                skipped: false,
 
                 isDisabled: false
             };
@@ -1289,6 +1295,7 @@
                 registration_flat: null,
                 residence_address: null,
                 residence_flat: null,
+                skipped_id: -1,
 
                 // Шаг 2
                 key_code: null,
@@ -1394,17 +1401,35 @@
 
             const email = (this.$route.query.email == "") ? 0 : this.$route.query.email;
             this.email = email;
+
+
+            // TODO: оптимизация
+            document.getElementsByClassName("wizard__step__label").forEach(function(item, i){
+                const _i = i;
+
+                item.style.cssText = "cursor: pointer;";
+                item.onclick = async function(){
+
+                    let current_step = _this.$refs.wizard.currentStep;
+
+                    if(_i > current_step){
+                        if(await _this.backClicked()) _this.setStep(i);
+                    }
+                    if(_i < current_step){
+                        if(await _this.nextClicked()) _this.setStep(i);
+                    }
+
+
+                };
+            });
+
         },
 
         methods: {
 
-
-            collapseOpened(collapseId){
-                this.collapseArrows[collapseId] = true;
-            },
-
-            collapseClosed(collapseId){
-                this.collapseArrows[collapseId] = undefined;
+            setSkipped(id) {
+                if (id!=-1)
+                    this.children[id].skipped = true;
             },
 
             enoughSpaceForTopButtons: function () {
@@ -1424,15 +1449,19 @@
                 // console.log(this.children[childId].associations_selected[row.item.id]);
                 // setTimeout(
                 //     () => {
-                        // console.log(this.children[childId].associations_selected);
-                        // console.log(this.children[childId].associations_selected[row.item.id]);
+                this.$nextTick(function () {
+                        //console.log(this.children[childId].associations_selected);
+                        //console.log(this.children[childId].associations_selected[row.item.id]);
                         // }, 1);
+                });
             },
 
             onAssociationsFiltered() {
-                setTimeout(() => {
-                    this.childTick()
-                }, 1);
+                // setTimeout(() => {
+                this.$nextTick(function () {
+                    this.childTick();
+                });
+                // }, 1);
                 /*
                   Событие @filtered срабатывает перед тем как отрендерить строки в таблице.
                   Поэтому нужна эта "задержка", чтобы чекбоксы проставлялись после отрисовки
@@ -1900,7 +1929,10 @@
             preSendProps(){
                 for(let i in this.children) {
                     let child = this.children[i];
+                    if (child.skipped)
+                        continue;
                     let hours = 0;
+                    let existsHours = 0;
 
 
 
@@ -1917,9 +1949,19 @@
                         let selected = child.associations_selected[i2];
                         if (selected == null || selected == false)
                             continue;
-                        hours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
+                        if (selected.isAlreadyExists)
+                            existsHours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
+                        else
+                            hours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
                     }
                     // console.log(hours);
+                    if ((existsHours + hours) > 10)
+                    {
+                        this.step4_fatal = true;
+                        this.step4_warning = false;
+                        this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
+                        return;
+                    }
 
                     if (hours > 10) {
                         this.step4_fatal = true;
@@ -1931,6 +1973,14 @@
                     if (hours >= 8 && hours <= 10) {
                         this.step4_warning = true;
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
+                        this.skipped_id = i;
+                        return;
+                    }
+                    if ((hours + existsHours) >= 8 && (hours + existsHours) <= 10 && existsHours < 10)
+                    {
+                        this.step4_warning = true;
+                        this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
+                        this.skipped_id = i;
                         return;
                     }
 
@@ -1996,7 +2046,7 @@
                 if(!isValid) return false;
 
 
-                // TODO: оптимизировать отправку нескольких детей
+                // TODO: оптимизировать отправку нескольких детей (возможно, можно посылать сразу весь объект вместо полей?)
 
                 let variables = ``;
                 let requests = ``;

@@ -344,7 +344,7 @@ class ProposalGenerateModule implements Module {
                     <li><b>Дата рождения:</b> 															<u>{$child_birthday}</u></li>
                     <li><b>Гражданство</b> <i>(государство)</i><b>:</b> 								<u>{$child_state}</u></li>
                     <li><b>Регистрация</b> <i>(постоянная/временная)</i><b>:</b> 						<u>{$child_registration_type}</u></li>
-                    <li><b>Адрес фактического проживания:</b> 											<u>{$child_residence_address}, кв. {$child_registration_flat}</u></li>
+                    <li><b>Адрес фактического проживания:</b> 											<u>{$child_residence_address}, кв. {$child_residence_flat}</u></li>
                     <li><b>Адрес регистрации по месту жительства:</b> 									<u>{$child_registration_address}, кв. {$child_registration_flat}</u></li>
                     <li><b>Контактный телефон ребенка:</b> 												<u>{$child_phone_number}</u></li>
                     <li><b>Контактный телефон родителя (законного представителя):</b> 					<u>{$parent_phone_number}</u></li>

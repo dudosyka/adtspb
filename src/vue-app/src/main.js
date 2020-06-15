@@ -145,6 +145,8 @@ extend("kid_bdate",{
         let year = parseInt(__data[2]); //0
         let month = parseInt(__data[1]); //1
         let day = parseInt(__data[0]); //2
+        day = (day < 10) ? "0"+String(day) : day;
+        month = (month < 10) ? "0"+String(month) : month;
         //
         // let validation1 = year >= 1000 && year <= 9999;
         // let validation2 = month >= 1 && month <= 12;
@@ -172,8 +174,7 @@ extend("kid_bdate",{
             if(now.substr(5) < date.substr(5)) --age;
             return age;
         }
-
-        let age = getAge(year+"-"+month+"-"+day);
+        let age = getAge(year+"-"+month+"-"+day+" 00:00:00");
         if(age >= 6 && age <= 18)
             return true;
 
@@ -195,9 +196,10 @@ extend('password_match', {
 extend("valid_full_address",{
     message: "Адрес не найден или требует уточнения",
     validate: async function(value){
-        //TODO: Включить ymaps
+        // return true;
         await loadYmap({
             apiKey: '46740486-10c9-4828-9ffb-783dbdf451c6', //TODO: убрать дубликаты токена Яндекс Карт!
+            // apiKey: '8ae15378-2641-415e-8789-239a9a7df87a',
             lang: 'ru_RU',
             coordorder: 'latlong',
             version: '2.1',
@@ -206,8 +208,9 @@ extend("valid_full_address",{
 
         try
         {
-            console.log(ymaps);
-        } catch (ReferenceError) {
+            ymaps;
+        } catch (ReferenceError)
+        {
             return true;
         }
 

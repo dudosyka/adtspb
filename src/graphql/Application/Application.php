@@ -15,6 +15,8 @@ use \GraphQL\Type\Schema;
 use \GraphQL\GraphQL;
 use \GraphQL\Error\FormattedError;
 use \GraphQL\Error\Debug;
+use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\DisableIntrospection;
 
 class Application
 {
@@ -115,6 +117,8 @@ class Application
                 throw new ErrorException($message, 0, $severity, $file, $line);
             });
             $this->debug = Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE;
+        } else {
+            DocumentValidator::addRule(new DisableIntrospection());
         }
     }
 
