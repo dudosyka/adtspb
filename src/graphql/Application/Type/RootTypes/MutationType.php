@@ -439,8 +439,9 @@ HTML;
             "child_id" => $args["child_id"],
             "association_id" => $args["association_id"]
         ]);
-        if($findProposal != null){
-
+        if($findProposal != null)
+        {
+            
             /** @var User $child */
             /*
             $child = DataSource::find("User", $args["child_id"]);
@@ -473,6 +474,8 @@ HTML;
             foreach($findAllProps as $prop){
                 /** @var Proposal $prop */
                 /** @var Association $info */
+                if ($prop->status_parent_id == 3)
+                    continue;
                 $info = DataSource::find("Association", $prop->association_id);
                 $hours += $info->study_hours_week;
                 if($hours >= 10) break;

@@ -2020,7 +2020,8 @@
                             console.log(y_current);
 
                             //TODO: прописать поле isAlreadyExists у selected_associations в прототипе (во избежания undefined, для того, чтобы было 100% не undefined)
-                            selected_associationsIds.push(parseInt(y_current.getAssociation.id, 10))
+                            if (y_current.status_parent == "Подано")
+                                selected_associationsIds.push(parseInt(y_current.getAssociation.id, 10))
                             proposal.push({
                                 id: parseInt(y_current.getAssociation.id, 10),
                                 name: y_current.getAssociation.name,
@@ -2044,12 +2045,12 @@
                                 selected_associations[association.id] = null;
                             }
                         });
-                        console.log(proposal);
                         this.children[i] = {
                             ...this.children[i],
                             associations_selected: selected_associations,
                             proposal: proposal
                         };
+                        console.log(this.children[0].associations_selected);
                     }
                     this.$forceUpdate();
                     this.childTick();
@@ -2218,9 +2219,11 @@
                 for (let i in this.children)
                 {
                     let el = this.children[i];
-                    for (let j in el.proposal)
+                    for (let j in el.associations_selected)
                     {
-                        let _id = el.proposal[j].id;
+                        if (el.associations_selected[j] == null || el.associations_selected[j] == false)
+                            continue;
+                            let _id = el.associations_selected[j].id;
                         // console.log('checkbox_'+i+"_"+_id);
                         if (this.$refs['checkbox_'+i+"_"+_id] != undefined)
                             this.$refs['checkbox_'+i+"_"+_id][0].$el.children[0].checked = true;
@@ -2331,8 +2334,6 @@
                     let hours = 0;
                     let existsHours = 0;
 
-
-
                     if(child.associations_selected.length <= 0){
                         this.step3_error_notification = true;
                         const _this = this;
@@ -2351,7 +2352,7 @@
                         else
                             hours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
                     }
-                    // console.log(hours);
+
                     if ((existsHours + hours) > 10)
                     {
                         this.step4_fatal = true;
@@ -2360,19 +2361,22 @@
                         return;
                     }
 
-                    if (hours > 10) {
+                    if (hours > 10)
+                    {
                         this.step4_fatal = true;
                         this.step4_warning = false;
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
                         return;
                     }
 
-                    if (hours >= 8 && hours <= 10) {
+                    if (hours >= 8 && hours <= 10)
+                    {
                         this.step4_warning = true;
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
                         this.skipped_id = i;
                         return;
                     }
+
                     if ((hours + existsHours) >= 8 && (hours + existsHours) <= 10 && existsHours < 10)
                     {
                         this.step4_warning = true;
@@ -2393,7 +2397,8 @@
                 for(let i in this.children){
                     let current = this.children[i];
 
-                    for(let i2 in current.associations_selected){
+                    for(let i2 in current.associations_selected)
+                    {
                         let current2 = current.associations_selected[i2];
 
                         if (current2 == null || current2 == false)
@@ -2428,6 +2433,7 @@
                     // _component.$router.pushState({path: "/register/form?page=4"});
                     // history.replaceState(null, null, '/register/form?page=4');
                 }).catch(function(e){
+                    console.log(1);
                     _component.is_sending_request = false;
                     _component.graphql_errors = e.response.errors;
                     _component.$nextTick(function(){
