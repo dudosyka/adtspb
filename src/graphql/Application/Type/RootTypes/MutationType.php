@@ -441,7 +441,15 @@ HTML;
         ]);
         if($findProposal != null)
         {
-            
+            DataSource::insert(new Proposal([
+                "timestamp" => DataSource::timeInMYSQLFormat(),
+                'child_id' => $findProposal->child_id,
+                'parent_id' => $context->viewer->id,
+                'association_id' => $findProposal->association_id,
+                'status_admin_id' => 1, //TODO: константы статусов ожидания запроса?
+                'status_parent_id' => 4, //TODO: константы статусов ожидания запроса?
+                'status_teacher_id' => 1 //TODO: константы статусов ожидания запроса?
+            ]));
             /** @var User $child */
             /*
             $child = DataSource::find("User", $args["child_id"]);
@@ -457,6 +465,7 @@ HTML;
 
             throw new RequestError("Заявление в объединение {$title} на {$full_name} уже подано");
             */
+
             // Ничего не говорим, всё ок.
             return true;
         }

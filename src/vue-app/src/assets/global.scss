@@ -364,3 +364,18 @@ fieldset.form-group{
 [type="search"]{
     margin: 5px 0 !important;
 }
+
+// Смерть кнопки "завершить"
+.wizard__next.pull-right.final-step {
+    display: none;
+}
+
+// Поворот стрелки на спойлерах
+.btn.custom-btn.btn-secondary.not-collapsed.collapse-arrow-icon svg
+{
+    transition-duration: 0.3s;
+}
+.btn.custom-btn.btn-secondary.not-collapsed:active.collapse-arrow-icon svg
+{
+    transform: rotateX(180deg);
+}

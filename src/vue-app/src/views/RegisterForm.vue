@@ -982,7 +982,7 @@
 
                                 <template v-else>
 
-                                <b-badge pill variant="light" class="border border-dark">Адрес регистрации ребенка:</b-badge>
+                                <b-badge pill variant="light" class="border border-dark col-auto" style="width:100%!important;">Адрес регистрации ребенка:</b-badge>
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -1147,7 +1147,7 @@
 
                                 <template v-else>
 
-                                <b-badge pill variant="light" class="border border-dark">Адрес проживания ребенка:</b-badge>
+                                <b-badge pill variant="light" class="border border-dark col-auto" style="width:100%!important;">Адрес проживания ребенка:</b-badge>
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -1407,8 +1407,9 @@
                                 <div v-html="row.item.description"></div>
                             </template>
                         </b-table>
-                        <b-badge pill variant="success" class="m-2">Соответствует возрасту</b-badge>
-                        <b-badge pill variant="light" class="border border-dark">Доступно к записи</b-badge>
+                        <b-badge pill variant="success" class="m-1">Соответствует возрасту</b-badge>
+                        <b-badge pill variant="light" class="border border-dark m-3">Доступно к записи</b-badge>
+                        <b-badge pill variant="danger">Запись приостановлена</b-badge>
                     </div>
 
                     <b-modal id="step4-warning" title="Предупреждение" v-model="step4_warning" :centered="true">
@@ -1474,7 +1475,7 @@
                             class="custom-btn"
                             style="width: 100%; border-radius: 2px !important;"
                         >
-                            {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <i class="fas fa-hand-point-up"></i>
+                            {{item.surname}} {{item.name}} {{(typeof item.midname != 'string') ? '' : item.midname}} <span class="collapse-arrow-icon"><i class="fas fa-hand-point-up"></i></span>
                         </b-button>
 
                         <b-collapse :id="'collapse-proposal-child-' + index" class="mt-2" :visible="true">
@@ -1495,7 +1496,7 @@
                                             <b-button class="custom-btn" @click="generateForm(item, row.item.id)" size="sm" style="width: 100%;">Скачать</b-button>
                                         </template>
                                         <template v-if="row.item.status_parent != 'Отозвано'">
-                                            <b-button class="custom-btn" @click="setRecalled(row.item.id, item)" size="sm" style="width: 100%;">Отозвать</b-button>
+                                            <b-button class="custom-btn" @click="recalledProposal={show:true,item: item,id: row.item.id,name:row.item.name}" size="sm" style="width: 100%;">Отозвать</b-button>
                                         </template>
                                     </template>
                                 </b-table>
@@ -1509,6 +1510,29 @@
 
                     <b-button  class="btn-light" @click="setStep(2); children.push({...child_prototype})" style="width: 100%; margin-top: 35px;">Добавить ещё одного ребенка</b-button>
 
+                    <b-modal id="step4-fatal" title="Отзыв заявления" v-model="recalledProposal.show" :centered="true">
+                        <p>При отзыве заявления место в очереди записи в объединение "{{ recalledProposal.name }}" будет потеряно.</p>
+                        <p>Вы уверены?</p>
+                        <template v-slot:modal-footer>
+                            <div class="w-100">
+                                <b-button
+                                    class="float-right btn-light btn-outline-success"
+                                    @click="recalledProposal.show=false;"
+                                >
+                                    Отмена
+                                </b-button>
+
+                                <b-button
+                                    style="margin-right: 10px;"
+                                    class="float-right btn-light"
+                                    @click="setRecalled(recalledProposal.id, recalledProposal.item)"
+                                >
+                                    Отозвать заявление
+                                </b-button>
+
+                            </div>
+                        </template>
+                    </b-modal>
                 </div>
             </vue-good-wizard>
 
@@ -1549,29 +1573,29 @@
             const child_prototype = {
                 id: 0,
 
-                relationship: "null",
-                name: "null",
-                surname: "null",
-                midname: "null",
+                relationship: "",
+                name: "",
+                surname: "",
+                midname: "",
                 sex_options_selected: null,
                 residence_address: null,
-                residence_city: "null",
-                residence_district: "null",
-                residence_street: "null",
+                residence_city: "",
+                residence_district: "",
+                residence_street: "",
                 residence_house: null,
                 residence_flat: null,
-                study_place: "null",
-                study_class: "null",
+                study_place: "",
+                study_class: "",
                 birthday: null,
 
                 registration_address: null,
-                registration_city: "null",
-                registration_district: "null",
-                registration_street: "null",
-                registration_house: "null",
-                registration_flat: "null",
+                registration_city: "",
+                registration_district: "",
+                registration_street: "",
+                registration_house: "",
+                registration_flat: "",
 
-                email: "null@nu.ry",
+                email: "",
                 phone_number: null,
 
                 password: null,
@@ -1686,6 +1710,7 @@
                     {key: 'status', label: 'Статус', sortable: false},
                     {key: 'actions', label: 'Действия', sortable: false},
                 ],
+                recalledProposal: {show: false},
 
                 // Остальное
                 is_sending_request: false,
@@ -1850,6 +1875,7 @@
 
             rowStyler(item, type) {
                 if (!item || type !== 'row') return;
+                if (item.isAvailable != null) return 'table-danger';
                 if (item.isGoodAssociation) return 'table-success';
             },
 
