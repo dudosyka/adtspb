@@ -1384,6 +1384,7 @@
                             <!-- Example scoped slot for select state illustrative purposes -->
                             <template v-slot:cell(selected)="row">
                                 <b-form-checkbox
+                                    v-if="row.item.isAvailable == null"
                                     :ref="'checkbox_'+index+'_'+row.item.id"
                                     :id="'checkbox_'+index+'_'+row.item.id"
                                     v-model="children[index].associations_selected[row.item.id]"
@@ -2159,13 +2160,14 @@
 
                 let request = `
                     query {
-                        associations {
+                        associationsExceptSpecials {
                             id,
                             name,
                             min_age,
                             max_age,
                             study_hours_week,
-                            description
+                            description,
+                            isAvailable
                         }
                     }
                 `;
@@ -2175,8 +2177,9 @@
                 this.is_sending_request = true;
 
                 await this.$graphql_client.request(request, {}).then(function(data){
+                    console.log(data);
                     _this.is_sending_request = false;
-                    _this.associations = data.associations;
+                    _this.associations = data.associationsExceptSpecials;
                     _this.childAssociations = _this.children.map(child => {
                         child.associations_selected = [false, false];
                         _this.associations_filter.push("");
@@ -2200,6 +2203,7 @@
                     });
                     _this.childTick();
                 }).catch(function(e){
+                    console.log(e);
                     _this.is_sending_request = false;
                 });
             },

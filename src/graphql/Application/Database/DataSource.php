@@ -386,7 +386,29 @@ class DataSource
         return $id;
     }
 
+    public static function _query($str, $bindings = [])
+    {
+        $q = self::getPDO()->prepare($str);
+        foreach($bindings as $key => $value)
+        {
+            $q->bindValue($key, $value);
+        }
+        $q->execute();
+        $res = $q->fetchAll();
+        $result = [];
+        foreach($res as $object_key => $object_value)
+        {
+            $__ = new \GraphQL\Application\Entity\Base();
 
+            foreach($object_value as $key => $value)
+            {
+                $__->$key = $value;
+            }
 
+            $result[] = $__;
+
+        }
+        return $result;
+    }
 
 }

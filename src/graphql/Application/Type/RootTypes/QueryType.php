@@ -56,6 +56,12 @@ class QueryType extends ObjectType
                         'min_age' => Types::int()
                     ]
                 ],
+
+                'associationsExceptSpecials' => [
+                    'type' => Types::listOf(Types::association()),
+                    'description' => 'Вывод всех доступных для записи объединений',
+                ],
+
                 'associationsForChild' => [
                     'type' => Types::listOf(Types::association()),
                     'description' => 'Вывод всех доступных объединений для конкретного ребенка',
@@ -132,9 +138,19 @@ class QueryType extends ObjectType
      * @return array
      * @throws RequestError
      */
+    public function associationsExceptSpecials($rootValue, $args, AppContext $context){
+        // TODO: ограничение по списку ассоциаций?
+        $context->viewer->hasAccessOrError(5);
+
+        return DataSource::_query("SELECT `association_specials`.`association_id` AS `isAvailable`,`association`.`*` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1");
+    }
+
     public function associations($rootValue, $args, AppContext $context){
         // TODO: ограничение по списку ассоциаций?
         $context->viewer->hasAccessOrError(5);
+
+        if (isset($args["exceptSpecials"]))
+            return DataSource::_query("SELECT `association_specials`.`association_id`AS `isAvailable`,`association`.`*` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1");
 
         if(!isset($args["min_age"]) and !isset($args["max_age"]))
             return DataSource::findAll('Association', '1');
