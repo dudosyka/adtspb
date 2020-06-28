@@ -479,6 +479,10 @@ HTML;
             "child_id" => $args["child_id"]
         ]);
         if($findAllProps != null){
+            $child = DataSource::find("User", $args["child_id"]);
+            $maxHours = 10;
+            if ($child->getAge() >= 14)
+                $maxHours = 12;
             $hours = 0;
             foreach($findAllProps as $prop){
                 /** @var Proposal $prop */
@@ -487,9 +491,9 @@ HTML;
                     continue;
                 $info = DataSource::find("Association", $prop->association_id);
                 $hours += $info->study_hours_week;
-                if($hours >= 10) break;
+                if($hours >= $maxHours) break;
             }
-            if($hours >= 10)
+            if($hours >= $maxHours)
                 throw new RequestError("Загруженность ребенка превышает 10 часов");
         }
 

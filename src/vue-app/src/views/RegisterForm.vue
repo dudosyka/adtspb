@@ -298,7 +298,7 @@
                                 <!-- TODO проверка валидации у адресов -->
                                 <!--  -->
 
-                                <b-badge pill variant="light" class="border border-dark">Адрес регистрации:</b-badge>
+                                <b-badge pill variant="light" class="border border-dark font m-1" style="font-size: 100%;!important;width:100%!important;">Адрес регистрации:</b-badge>
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -394,7 +394,7 @@
                                     <b-alert show variant="danger">Введите корректный адрес регистрации!</b-alert>
                                 </template>
 
-                                <b-badge pill variant="light" class="border border-dark">Адрес проживания:</b-badge>
+                                <b-badge pill variant="light" class="border border-dark m-1 mt-2" style="font-size: 100%;!important;width:100%!important;">Адрес проживания:</b-badge>
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -479,7 +479,7 @@
                                             :aria-describedby="'parent-residence_flat-feedback'"
                                         />
                                         <div>
-                                            <b-button @click="residence_flat = 'Без номера квартиры'" size="sm" class="mr-3">Без номера квартиры</b-button>
+                                            <b-button @click="residence_flat = 'Без номера квартиры'" size="sm" class="mr-3 mt-1">Без номера квартиры</b-button>
                                             <b-button @click="residence_city = registration_city;residence_district = registration_district;residence_street = registration_street;residence_house = registration_house; residence_flat = registration_flat" size="sm">По адресу регистрации</b-button>
                                         </div>
 
@@ -637,8 +637,8 @@
                                         ></b-form-input>
 
                                         <div>
-                                            <b-button @click="item.relationship = 'Родитель'" size="sm" style="margin-right: 5px;">Родитель</b-button>
-                                            <b-button @click="item.relationship = 'Законный представитель'" size="sm">Законный представитель</b-button>
+                                            <b-button @click="item.relationship = 'Родитель'" size="sm" class="mr-3 mb-2 mt-2">Родитель</b-button>
+                                            <b-button @click="item.relationship = 'Законный представитель'" size="sm" class="mb-2 mt-2">Законный представитель</b-button>
 <!--                                            <b-link @click="item.relationship = 'Родитель'">Родитель</b-link>,-->
 <!--                                            <b-link @click="item.relationship = 'Законный представитель'">законный представитель</b-link>-->
                                         </div>
@@ -859,7 +859,7 @@
 
                                         <div>
 <!--                                            <b-link @click="item.state = 'РФ'">РФ</b-link>-->
-                                            <b-button @click="item.state = 'РФ'" size="sm">РФ</b-button>
+                                            <b-button @click="item.state = 'РФ'" size="sm mt-2 mb-2">РФ</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback :id="'cld-'+index+'-state-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -982,7 +982,7 @@
 
                                 <template v-else>
 
-                                <b-badge pill variant="light" class="border border-dark col-auto" style="width:100%!important;">Адрес регистрации ребенка:</b-badge>
+                                <b-badge pill variant="light" class="border border-dark col-auto m-1" style="font-size: 100%;!important;width:100%!important;">Адрес регистрации ребенка:</b-badge>
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -1080,7 +1080,7 @@
                                                 <template v-if="isOldRegister !== true">
                                                     <b-button @click="getRegistrationAddressAsParentToChild(index)" size="sm" class="mr-3">Как у родителя</b-button>
                                                 </template>
-                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm">Без номера квартиры</b-button>
+                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" class="mt-1">Без номера квартиры</b-button>
                                             </div>
 
                                             <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -1137,7 +1137,7 @@
                                             />
 
                                             <div>
-                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" style="margin-right: 5px;">Без номера квартиры</b-button>
+                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" class="mt-1">Без номера квартиры</b-button>
                                             </div>
                                             <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                                         </b-form-group>
@@ -1147,7 +1147,7 @@
 
                                 <template v-else>
 
-                                <b-badge pill variant="light" class="border border-dark col-auto" style="width:100%!important;">Адрес проживания ребенка:</b-badge>
+                                <b-badge pill variant="light" class="border border-dark col-auto m-1 mt-2" style="font-size: 100%;!important;width:100%!important;">Адрес проживания ребенка:</b-badge>
 
                                 <validation-provider
                                     style="width: 100%;"
@@ -1243,9 +1243,9 @@
                                             />
                                             <div>
                                                 <template v-if="isOldRegister !== true">
-                                                    <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm" class="mr-3">Как у родителя</b-button>
+                                                    <b-button @click="getResidenceAddressAsParentToChild(index)" size="sm" class="mr-3 mb-2">Как у родителя</b-button>
                                                 </template>
-                                                <b-button @click="item.residence_flat = 'Без номера квартиры'" size="sm" class="mr-3">Без номера квартиры</b-button>
+                                                <b-button @click="item.residence_flat = 'Без номера квартиры'" size="sm" class="mr-3 mb-2 mt-2">Без номера квартиры</b-button>
                                                 <b-button @click="item.residence_city = item.registration_city;item.residence_district = item.registration_district;item.residence_street = item.registration_street;item.residence_house = item.registration_house; item.residence_flat = item.registration_flat" size="sm">По адресу регистрации</b-button>
                                             </div>
 
@@ -1336,7 +1336,7 @@
                         <h3 class="form-title">Выбор объединений</h3>
                     </div>
 
-                    <b-alert show>Действуют ограничения на подачу заявлений: нагрузка на одного ребенка не более 10 часов в неделю.</b-alert>
+                    <b-alert show>Действуют ограничения на подачу заявлений: нагрузка на одного ребенка младше 14 не более 10 часов в неделю, старше - 12 часов.</b-alert>
 
                     <b-alert :show="step3_error_notification" variant="warning" id="associations_selecting_error">
                         Пожалуйста, проверьте заполненность всех полей выбора объединений.
@@ -1407,8 +1407,8 @@
                                 <div v-html="row.item.description"></div>
                             </template>
                         </b-table>
-                        <b-badge pill variant="success" class="m-1">Соответствует возрасту</b-badge>
-                        <b-badge pill variant="light" class="border border-dark m-3">Доступно к записи</b-badge>
+                        <b-badge pill variant="success" class="mr-2">Соответствует возрасту</b-badge>
+                        <b-badge pill variant="light" class="border border-dark mr-2">Доступно к записи</b-badge>
                         <b-badge pill variant="danger">Запись приостановлена</b-badge>
                     </div>
 
@@ -1437,7 +1437,7 @@
                     </b-modal>
 
                     <b-modal id="step4-fatal" title="Ограничение на подачу заявлений" v-model="step4_fatal" :centered="true">
-                        <p class="my-4">{{ step4_error_author }} имеет количество часов в неделю, превышающее допустимое. Согласно СанПиН максимально допустимый объем нагрузки внеучебной деятельности составляет 10 часов. <br>Пожалуйста, проверьте нагрузку детей и остановите выбор на объединениях, соответствующих этому требованию.</p>
+                        <p class="my-4">{{ step4_error_author }} имеет количество часов в неделю, превышающее допустимое. Согласно СанПиН максимально допустимый объем нагрузки внеучебной деятельности для детей от 6 до 13 лет составляет 10 часов, для детей от 14 и выше 12 часов. <br>Пожалуйста, проверьте нагрузку детей и остановите выбор на объединениях, соответствующих этому требованию.</p>
 
                         <template v-slot:modal-footer>
                             <div class="w-100">
@@ -2172,10 +2172,11 @@
             {
                 let date = child.birthday.split("-").reverse().join("-") + " 00:00:00";
                 let now = new Date();
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                now = now.toISOString().substr(0, 19).replace('T',' ');
-                let age = now.substr(0, 4) - date.substr(0, 4);
-                if(now.substr(5) < date.substr(5)) --age;
+                let newStudyYear = new Date(now.getFullYear() + "-09-01" + "T20:31:59.090Z");
+                newStudyYear.setMinutes(newStudyYear.getMinutes() - newStudyYear.getTimezoneOffset());
+                newStudyYear = newStudyYear.toISOString().substr(0, 19).replace('T',' ');
+                let age = newStudyYear.substr(0, 4) - date.substr(0, 4);
+                if(newStudyYear.substr(5) < date.substr(5)) --age;
                 return age;
             },
 
@@ -2361,6 +2362,10 @@
                     let child = this.children[i];
                     if (child.skipped)
                         continue;
+                    let maxHours = 10;
+                    let minHours = 8;
+                    if (this.getChildAge(child) >= 14)
+                        maxHours = 12;
                     let hours = 0;
                     let existsHours = 0;
 
@@ -2383,7 +2388,7 @@
                             hours += parseInt(this.associations[this.associationsIds.indexOf(String(selected.id))].study_hours_week, 10);
                     }
 
-                    if ((existsHours + hours) > 10)
+                    if ((existsHours + hours) > maxHours)
                     {
                         this.step4_fatal = true;
                         this.step4_warning = false;
@@ -2391,7 +2396,7 @@
                         return;
                     }
 
-                    if (hours > 10)
+                    if (hours > maxHours)
                     {
                         this.step4_fatal = true;
                         this.step4_warning = false;
@@ -2399,7 +2404,7 @@
                         return;
                     }
 
-                    if (hours >= 8 && hours <= 10)
+                    if (hours >= minHours && hours <= maxHours)
                     {
                         this.step4_warning = true;
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
@@ -2407,7 +2412,7 @@
                         return;
                     }
 
-                    if ((hours + existsHours) >= 8 && (hours + existsHours) <= 10 && existsHours < 10)
+                    if ((hours + existsHours) >= minHours && (hours + existsHours) <= maxHours && existsHours < maxHours)
                     {
                         this.step4_warning = true;
                         this.step4_error_author = child.surname + " " + child.name + " " + child.midname;
