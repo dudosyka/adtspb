@@ -1533,6 +1533,16 @@
                             </div>
                         </template>
                     </b-modal>
+                    <b-modal title="Завершение" v-model="showFinallyMsg" :centered="true">
+                        <p>
+                            Регистрация успешно пройдена.<br> Ваше заявление принято к рассмотрению.<br> Очный (обязательный) прием заявлений пройдет с 24 по 31 августа {{new Date().getFullYear()}} года в ГБНОУ Академии цифровых технологий по адресу: Санкт-Петербург, Большой проспект П.С., д.29/2 (ориентир черные ворота).
+                        </p>
+                        <template v-slot:modal-footer>
+                            <b-button class="float-right btn-light" @click="showFinallyMsg = false;">
+
+                            </b-button>
+                        </template>
+                    </b-modal>
                 </div>
             </vue-good-wizard>
 
@@ -1750,7 +1760,7 @@
 
                 incorrect_code: false,
                 collapseArrows: {},
-
+                showFinallyMsg: false,
 
 
 
@@ -1908,7 +1918,7 @@
                 }
 
                 if(currentPage == 4){
-                    this.$router.push({path: "/"});
+                    this.showFinallyMsg = true;
                     return false;
                 }
 
