@@ -18,6 +18,7 @@ use GraphQL\Type\Definition\CustomScalarType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\NullableType;
 
 /**
  * Class Types
@@ -250,5 +251,13 @@ class Types
     public static function nonNull($type)
     {
         return new NonNull($type);
+    }
+
+    /**
+     * @return NullableType
+     */
+    public static function Nullable()
+    {
+        return new NullableType();
     }
 }

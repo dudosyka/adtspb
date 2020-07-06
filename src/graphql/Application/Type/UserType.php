@@ -52,6 +52,7 @@ class UserType extends ObjectType
                     'hasAnyProposals' => ['type' => Types::boolean()],
                     'getChildren' => ['type' => Types::listOf(Types::user())],
                     'getChildren' => ['type' => Types::listOf(Types::user())],
+                    'getChild' => ['type' => Types::user(), 'args' => ['child_id' => Types::int()]],
                     'getInProposals' => Types::listOf(Types::proposal()),
 
                     'state' => Types::string(),
@@ -127,6 +128,28 @@ class UserType extends ObjectType
         }
 
         return $return;
+    }
+
+    /**
+     * @param User $user
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return User
+     * @throws RequestError
+     */
+    public function resolveGetChild(User $user, array $args, AppContext $context, ResolveInfo $info){
+
+        // Если не родитель
+        $context->viewer->hasAccessOrError(9);
+
+        // Если не локальный пользователь
+        if($context->viewer->id != $user->id)
+            throw new RequestError("Доступ запрещен");
+
+        return DataSource::findOne("User", "id = :child_id", [
+            "child_id" => $args['child_id']
+        ]);
     }
 
     /**

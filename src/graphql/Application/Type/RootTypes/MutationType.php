@@ -108,7 +108,8 @@ class MutationType extends ObjectType
                     'description' => 'Выбрать ассоциацию ребенка',
                     'args' => [
                         'association_id' => Types::nonNull(Types::int()),
-                        'child_id' => Types::nonNull(Types::int())
+                        'child_id' => Types::nonNull(Types::int()),
+                        'token' => Types::int()
                     ]
                 ],
 
@@ -199,6 +200,22 @@ class MutationType extends ObjectType
                     'args' => [
                         'child_id' => Types::int(),
                         'association_id' => Types::int()
+                    ]
+                ],
+
+                'switchAssociationRecordingType' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Switch type of recording in association',
+                    'args' => [
+                        'association_id' => Types::int()
+                    ]
+                ],
+
+                'checkAssociationSpecialToken' => [
+                    'type' => Types::int(),
+                    'description' => 'Check if token exists else return RequestError',
+                    'args' => [
+                        'token' => Types::int()
                     ]
                 ],
 
@@ -434,43 +451,31 @@ HTML;
             throw new RequestError("Неверно задан id ребенка");
 
         // Было ли уже подано заявление
-        $findProposal = DataSource::findOne("Proposal", "parent_id = :parent_id AND child_id = :child_id AND association_id = :association_id", [
+        $findProposal = DataSource::findOne("Proposal", "parent_id = :parent_id AND child_id = :child_id AND association_id = :association_id ORDER BY `id` DESC", [
             "parent_id" => $context->viewer->id,
             "child_id" => $args["child_id"],
             "association_id" => $args["association_id"]
         ]);
+
         if($findProposal != null)
         {
-            DataSource::insert(new Proposal([
-                "timestamp" => DataSource::timeInMYSQLFormat(),
-                'child_id' => $findProposal->child_id,
-                'parent_id' => $context->viewer->id,
-                'association_id' => $findProposal->association_id,
-                'status_admin_id' => 1, //TODO: константы статусов ожидания запроса?
-                'status_parent_id' => 4, //TODO: константы статусов ожидания запроса?
-                'status_teacher_id' => 1 //TODO: константы статусов ожидания запроса?
-            ]));
-            /** @var User $child */
-            /*
-            $child = DataSource::find("User", $args["child_id"]);
 
-            $name = $child->name;
-            $surname = $child->surname;
-            $midname = $child->midname;
+            if ($findProposal->status_parent_id == 4)
+            {
+                $child = DataSource::find("User", $args["child_id"]);
 
-            $full_name = "{$name} {$surname}";
-            if($midname != "") $full_name .= " {$midname}";
+                $name = $child->name;
+                $surname = $child->surname;
+                $midname = $child->midname;
 
-            $title = $findAssoc->name;
+                $full_name = "{$name} {$surname}";
+                if($midname != "") $full_name .= " {$midname}";
 
-            throw new RequestError("Заявление в объединение {$title} на {$full_name} уже подано");
-            */
+                $title = $findAssoc->name;
 
-            // Ничего не говорим, всё ок.
-            return true;
+                throw new RequestError("Заявление в объединение {$title} на {$full_name} уже подано");
+            }
         }
-
-
 
         // Проверка на количество часов
         // TODO: оптимизировать механизм проверки количества часов
@@ -496,11 +501,6 @@ HTML;
             if($hours >= $maxHours)
                 throw new RequestError("Загруженность ребенка превышает 10 часов");
         }
-
-
-
-
-
 
         DataSource::insert(new Proposal([
             "timestamp" => DataSource::timeInMYSQLFormat(),
@@ -1013,7 +1013,7 @@ HTML;
         if($find == null)
             throw new RequestError("Доступ запрещен");
 
-        $proposal = DataSource::findOne("Proposal", "association_id = :association_id AND child_id = :child_id",
+        $proposal = DataSource::findOne("Proposal", "association_id = :association_id AND child_id = :child_id ORDER BY `proposal`.`id` DESC",
             [
                 'child_id' => $child,
                 'association_id' => $association_id
@@ -1021,7 +1021,7 @@ HTML;
         );
 
        if ($proposal == null)
-            return false;
+           throw new RequestError("Заявление не найдено.");
        else
        {
            $proposal->status_parent_id = 3;
@@ -1030,6 +1030,44 @@ HTML;
        }
     }
 
+    public function switchAssociationRecordingType($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(11);
+
+        if ($args['special'] == true)
+        {
+            $model = DataSource::findOne("AssociationSpecials", "association_id = :id", ['id' => $args['association_id']]);
+            if ($model != null)
+                return true;
+
+            $model = new AssociationSpecials([
+                'association_id' => $args['association_id'],
+                'token' => time()
+            ]);
+
+            DataSource::insert($model);
+
+            return true;
+        }
+
+        DataSource::deleteOne("AssociationSpecials", "association_id = :id", ["id"=>$args['association_id']]);
+
+        return true;
+    }
+
+    public function checkAssociationSpecialToken($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(7);
+
+        $token = (int)$args['token'];
+
+        $res = DataSource::findOne("AssociationSpecials", "token = :token", ['token'=>$token]);
+
+        if ($res == null)
+            throw new RequestError("Объединение не найдено");
+
+        return $res->association_id;
+    }
 
     public function sendRegistrationEmail(string $email, string $code){
         $html = <<<HTML

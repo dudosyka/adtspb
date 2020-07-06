@@ -1271,7 +1271,6 @@
                                             placeholder="Относится ли ребёнок к категории лиц из числа ОВЗ?"
                                             v-model="item.ovz"
                                             :options="ovz_type"
-
                                             :disabled="item.isDisabled"
                                             :state="getValidationState(validationContext)"
                                             :aria-describedby="'cld-'+index+'-ovz-feedback'"
@@ -1508,7 +1507,10 @@
 
                     </div>
 
-                    <b-button  class="btn-light" @click="setStep(2); children.push({...child_prototype})" style="width: 100%; margin-top: 35px;">Добавить ещё одного ребенка</b-button>
+<!--                    <b-button class="btn" @click="specialAssociationSelectingStart()">Запись по токену</b-button>-->
+
+                    <b-button  class="btn-light" @click="setStep(2); children.push({...child_prototype})" style="width: 50%; margin-top: 35px;">Добавить ещё одного ребенка</b-button>
+                    <b-button  class="btn-light" @click="specialAssociationSelectingStart()" style="width: 50%; margin-top: 35px;">Запись по токену</b-button>
 
                     <b-modal id="step4-fatal" title="Отзыв заявления" v-model="recalledProposal.show" :centered="true">
                         <p>При отзыве заявления место в очереди записи в объединение "{{ recalledProposal.name }}" будет потеряно.</p>
@@ -1517,7 +1519,7 @@
                             <div class="w-100">
                                 <b-button
                                     class="float-right btn-light btn-outline-success"
-                                    @click="recalledProposal.show=false;"
+                                    @click="recalledProposal.show=null;"
                                 >
                                     Отмена
                                 </b-button>
@@ -1525,7 +1527,7 @@
                                 <b-button
                                     style="margin-right: 10px;"
                                     class="float-right btn-light"
-                                    @click="setRecalled(recalledProposal.id, recalledProposal.item)"
+                                    @click="setRecalled(recalledProposal.id, recalledProposal.item);recalledProposal.show=null;"
                                 >
                                     Отозвать заявление
                                 </b-button>
@@ -1542,6 +1544,28 @@
 
                             </b-button>
                         </template>
+                    </b-modal>
+                    <b-modal @hide="clearSpecialAssociationSelecting()" hide-footer title="Запись по токену" v-model="specialAssociationSelecting.step" :centered="true">
+                        <b-alert :show="specialAssociationSelecting.errors.length > 0" v-if="specialAssociationSelecting.errors.length > 0" variant="danger" id="associations_special_selecting_graphql_errors">
+                            {{specialAssociationSelecting.errors[0].message}}
+                        </b-alert>
+                        <div v-if="specialAssociationSelecting.step == 1">
+                            <b-input
+                            v-model="specialAssociationSelecting.token"
+                            placeholder="Токен"
+                            >
+                            </b-input>
+                            <b-button @click="checkToken()">Отправить</b-button>
+                        </div>
+                        <div v-if="specialAssociationSelecting.step == 2">
+                            <b-form-select
+                                :options="specialAssociationSelecting.existing_children"
+                                v-model="specialAssociationSelecting.selected_child"
+                            >
+                            </b-form-select>
+                            <b-button @click="selectAssociation()">Подать заявление</b-button>
+                        </div>
+
                     </b-modal>
                 </div>
             </vue-good-wizard>
@@ -1722,6 +1746,15 @@
                 ],
                 recalledProposal: {show: false},
 
+                specialAssociationSelecting: {
+                    association_id: null, // id ассоциации для записи
+                    step: null, // шаг (0 - модалка закрыта, 1 - начало (открытие модалки), 2 - проверка токена, 3 - регистрация в ассоциации)
+                    existing_children: [],
+                    errors: false, // ошибки от graphql
+                    selected_child: null, //выбранный ребенок
+                    token: "" // токен для записи
+                },
+
                 // Остальное
                 is_sending_request: false,
                 graphql_errors: [],
@@ -1814,6 +1847,75 @@
                     this.children[id].skipped = true;
             },
 
+            specialAssociationSelectingStart()
+            {
+                this.specialAssociationSelecting.step=1;
+                this.specialAssociationSelecting.existing_children = [{ value: null, text: 'Выберете ребенка', disabled: true }].concat(
+                    this.children.map(el=>
+                        {
+                            return {
+                                value: el.id,
+                                text: String(el.surname + " " + el.name + " " + el.midname).trim()
+                            }
+                        }
+                    )
+                );
+            },
+
+            clearSpecialAssociationSelecting()
+            {
+                this.specialAssociationSelecting = {
+                    association_id: null, // id ассоциации для записи
+                    step: null, // шаг (0 - модалка закрыта, 1 - начало (открытие модалки), 2 - проверка токена, 3 - регистрация в ассоциации)
+                    existing_children: [],
+                    errors: false, // ошибки от graphql
+                    selected_child: null, //выбранный ребенок
+                    token: "" // токен для записи
+                };
+            },
+
+            checkToken()
+            {
+                let request = `
+                    mutation (
+                        $token: Int!
+                    ) {
+                        checkAssociationSpecialToken ( token: $token )
+                    }
+                `;
+
+                let token = String(this.specialAssociationSelecting.token).trim();
+
+                if (token.match(/\D/))
+                {
+                    this.specialAssociationSelecting.errors = [{message: "Неверный формат токена."}];
+                    return;
+                }
+
+                this.$graphql_client.request(request, {token: token}).then(data=>{
+                    // console.log(data);
+                    this.specialAssociationSelecting.association_id = data.checkAssociationSpecialToken;
+                    this.specialAssociationSelecting.step = 2;
+                    this.specialAssociationSelecting.errors = false;
+                }).catch(err=>{
+                    this.specialAssociationSelecting.errors = err.response.errors;
+                });
+            },
+
+            selectAssociation()
+            {
+                let request = `
+                    mutation {
+                        selectChildAssociations (
+                            child_id: `+ this.specialAssociationSelecting.selected_child +`
+                            association_id: `+this.specialAssociationSelecting.association_id+`
+                            token: `+this.specialAssociationSelecting.token+`
+                        )
+                    }
+                `;
+                this.$graphql_client.request(request, {}).then(data=>{this.updateChildSelectedAssociations(this.specialAssociationSelecting.selected_child); this.specialAssociationSelecting.step = null;}).catch(err=>{this.specialAssociationSelecting.errors = err.response.errors;});
+            },
+
             async checkRegistrationDate()
             {
                 if(this.date_registered == null)
@@ -1840,7 +1942,7 @@
                         $association_id: Int!,
                         $child_id: Int!
                     ) {
-                        setRecalled (
+                        (
                             association_id: $association_id
                             child_id: $child_id
                         )
@@ -1855,11 +1957,11 @@
                     if (data.setRecalled)
                         child.proposal.map(el=>{
                             if (el.id == association_id)
-                                el.status_parent = "Отозвано";el.status_parent_id = 3;
+                                el.status_parent = "Отозвано";
+                                el.status_parent_id = 3;
                             return el;
-                        })
+                        });
                 }).catch(e=>{});
-
             },
 
             enoughSpaceForTopButtons: function () {
@@ -1971,6 +2073,67 @@
                 await this.$graphql_client.request(request, {}).catch(e=>{
                     // console.log(e);
                 });
+            },
+
+            getChildId(id)
+            {
+                for (let i = 0; i < this.children.length; i++)
+                {
+                    if (this.children[i].id == id)
+                    {
+                        return i;
+                    }
+                }
+            },
+
+            async updateChildSelectedAssociations(id)
+            {
+                let data = await this.$graphql_client.request("query{ viewer{ getChild(child_id: " + id + "){ getInProposals { status_admin, status_teacher, status_parent, getAssociation { id, name } } } } }");
+
+                data = data.viewer.getChild;
+
+                let selected_associations = [];
+                let selected_associationsIds = [];
+                let proposal = [];
+
+                for(let y in data.getInProposals){
+                    let y_data = data.getInProposals[y];
+
+                    //TODO: прописать поле isAlreadyExists у selected_associations в прототипе (во избежания undefined, для того, чтобы было 100% не undefined)
+                    if (y_data.status_parent == "Подано")
+                        selected_associationsIds.push(parseInt(y_data.getAssociation.id, 10))
+                    proposal.push({
+                        id: parseInt(y_data.getAssociation.id, 10),
+                        name: y_data.getAssociation.name,
+                        isAlreadyExists: true,
+                        status_teacher: y_data.status_teacher,
+                        status_parent: y_data.status_parent,
+                        status_admin: y_data.status_admin,
+                    });
+                }
+                // console.log(selected_associationsIds.indexOf());
+                this.associations.map(association => {
+                    if (selected_associationsIds.indexOf(parseInt(association.id)) != -1)
+                    {
+                        selected_associations[association.id] = {
+                            ...association,
+                            isAlreadyExists: true
+                        };
+                    }
+                    else
+                    {
+                        selected_associations[association.id] = null;
+                    }
+                });
+                let i = this.getChildId(id);
+                this.children[i] = {
+                    ...this.children[i],
+                    associations_selected: selected_associations,
+                    proposal: proposal
+                };
+
+                this.$forceUpdate();
+                this.childTick();
             },
 
             stepChanged: async function(page){
