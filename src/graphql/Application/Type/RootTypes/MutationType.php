@@ -1,6 +1,7 @@
 <?php
 namespace GraphQL\Application\Type;
 
+use Com\Tecnick\Pdf\Encrypt\Data;
 use GraphQL\Application\Application;
 use GraphQL\Application\Bearer;
 use GraphQL\Application\AppContext;
@@ -987,6 +988,17 @@ HTML;
         });
 
         return implode("\n", $registered);
+    }
+
+    public function adminLoadStatistic($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(12);
+
+        $result = [
+            'proposal_statistic' => DataSource::_query("SELECT association.name AS \"Название объединения\", association.group_count AS \"Количество групп\", association.group_count*20 AS \"Плановые цифры\", COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\" FROM proposal INNER JOIN association ON association.id = proposal.association_id GROUP BY proposal.association_id"),
+            'parent_statistic' => DataSource::_query("SELECT COUNT(DISTINCT(`parent_id`)) FROM `user_child` WHERE 1"),
+            'child_statistic' => DataSource::_query("SELECT COUNT(DISTINCT(`child_id`)) FROM `user_child` WHERE 1"),
+        ];
     }
 
     /**

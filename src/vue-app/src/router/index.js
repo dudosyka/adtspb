@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import adminRouter from "./admin"
 import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
@@ -36,15 +37,27 @@ const routes = [
         name: 'Register form',
         component: () => import('../views/RegisterForm.vue')
     },
-    {
-        path: '/dashboard',
-        name: 'Dashboard',
-        component: () => import('../views/Dashboard.vue')
-    },
+    // {
+    //     path: '/dashboard',
+    //     name: 'Dashboard',
+    //     component: () => import('../views/Dashboard.vue')
+    // },
     {
         path: '/login/restore-password',
         name: 'Restore password',
         component: () => import('../views/RestorePassword.vue')
+    },
+
+    {
+        path: '/dashboard',
+        name: 'Admin',
+        children: [
+            {
+                path: "/",
+                component: adminRouter
+            }
+        ],
+        // component: adminRouter
     },
 
 ]

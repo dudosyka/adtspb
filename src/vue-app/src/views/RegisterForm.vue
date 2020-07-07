@@ -586,8 +586,6 @@
                         Дополнительных действий по изменению регистрационных данных или кода подтверждения не требуется.
                     </b-alert>
 
-
-
                     <validation-observer ref="children_observer" >
                         <!--                        <b-form @submit.stop.prevent="passes(submitAccountRegistration)">-->
                         <b-form-row>
@@ -859,7 +857,7 @@
 
                                         <div>
 <!--                                            <b-link @click="item.state = 'РФ'">РФ</b-link>-->
-                                            <b-button @click="item.state = 'РФ'" size="sm mt-2 mb-2">РФ</b-button>
+                                            <b-button @click="item.state = 'РФ'" size="sm mt-2">РФ</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback :id="'cld-'+index+'-state-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -1080,7 +1078,7 @@
                                                 <template v-if="isOldRegister !== true">
                                                     <b-button @click="getRegistrationAddressAsParentToChild(index)" size="sm" class="mr-3">Как у родителя</b-button>
                                                 </template>
-                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" class="mt-1">Без номера квартиры</b-button>
+                                                <b-button @click="item.registration_flat = 'Без номера квартиры'" size="sm" :class='(isOldRegister === true) ? "mt-1" : ""'>Без номера квартиры</b-button>
                                             </div>
 
                                             <b-form-invalid-feedback :id="'cld-'+index+'-registration_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -1345,6 +1343,8 @@
                         {{graphql_errors[0].message}}
                     </b-alert>
 
+                    <b-button  class="btn-light" @click="specialAssociationSelectingStart()" style="width: 30%;">Запись по токену</b-button>
+
                     <div v-for="(item, index) in children" style="width: 100%;">
 
                         <hr style="width: 100%;">
@@ -1510,7 +1510,7 @@
 <!--                    <b-button class="btn" @click="specialAssociationSelectingStart()">Запись по токену</b-button>-->
 
                     <b-button  class="btn-light" @click="setStep(2); children.push({...child_prototype})" style="width: 50%; margin-top: 35px;">Добавить ещё одного ребенка</b-button>
-                    <b-button  class="btn-light" @click="specialAssociationSelectingStart()" style="width: 50%; margin-top: 35px;">Запись по токену</b-button>
+                    <b-button  class="btn-light" @click="setStep(3)" style="width: 50%; margin-top: 35px;">Добавить заявление</b-button>
 
                     <b-modal id="step4-fatal" title="Отзыв заявления" v-model="recalledProposal.show" :centered="true">
                         <p>При отзыве заявления место в очереди записи в объединение "{{ recalledProposal.name }}" будет потеряно.</p>
@@ -1850,7 +1850,7 @@
             specialAssociationSelectingStart()
             {
                 this.specialAssociationSelecting.step=1;
-                this.specialAssociationSelecting.existing_children = [{ value: null, text: 'Выберете ребенка', disabled: true }].concat(
+                this.specialAssociationSelecting.existing_children = [{ value: null, text: 'Выберите ребенка', disabled: true }].concat(
                     this.children.map(el=>
                         {
                             return {
