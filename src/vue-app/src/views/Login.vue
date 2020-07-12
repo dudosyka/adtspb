@@ -138,6 +138,7 @@
 
             if(this.$token != undefined){
                 this.checkUps();
+
             }
 
         },
@@ -156,9 +157,14 @@
                 this.$router.push({path: "/register/form"});
             },
 
-            async checkUps(){
-
+            async checkUps() {
                 let data = await this.$graphql_client.request(`query{viewer{email, status_email, hasAnyChildrenAdded, hasAnyProposals}}`, {});
+
+                if (await this.hasAccess(13))
+                {
+                    this.$router.push({path: "/dashboard/"});
+                    return;
+                }
 
                 // На шаг подтверждения e-mail
                 if(data.viewer.status_email == "ожидание"){

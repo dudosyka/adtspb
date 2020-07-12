@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import adminRouter from "./admin"
 import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
@@ -12,7 +11,8 @@ const routes = [
 
         // name: 'Home',
         // component: Home
-        component: () => import('../views/Login.vue')
+        component: () => import('../views/Login.vue'),
+        right: 1,
     },
     {
         path: '/about',
@@ -47,17 +47,20 @@ const routes = [
         name: 'Restore password',
         component: () => import('../views/RestorePassword.vue')
     },
-
     {
         path: '/dashboard',
-        name: 'Admin',
+        name: 'Dashboard',
+        component: () => import('../views/Dashboard/Dashboard.vue'),
         children: [
             {
-                path: "/",
-                component: adminRouter
+                path: "/dashboard",
+                component: () => import('../views/Dashboard/DashboardHome')
+            },
+            {
+                path: "/dashboard/statistic",
+                component: () => import('../views/Dashboard/DashboardStatistic')
             }
         ],
-        // component: adminRouter
     },
 
 ]
@@ -66,6 +69,7 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+
 })
 
 export default router

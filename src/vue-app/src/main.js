@@ -305,7 +305,8 @@ Vue.prototype.$request = request;
 const $globals = Vue.observable({
     $token: {},
     $graphql_client: {},
-    $file_upload: {}
+    $file_upload: {},
+    $action_list: null
 });
 
 Object.defineProperty(Vue.prototype, '$token', {
@@ -338,12 +339,44 @@ Object.defineProperty(Vue.prototype, '$file_upload', {
     }
 });
 
+Object.defineProperty(Vue.prototype, '$action_list', {
+    get () {
+        return $globals.$action_list
+    },
+
+    set (value) {
+        $globals.$action_list = value
+    }
+});
+
+
+async function hasAccess(action_id, action_list_id = 1)
+{
+    let request = `
+                mutation {
+                    getViewerRights(action_list_id: ` + action_list_id + `)
+                }
+            `;
+    let result = false;
+    try {
+        await $globals.$graphql_client.request(request, {}).then(data => {
+            $globals.$action_list = JSON.parse(data.getViewerRights).map(el => {
+                return parseInt(el)
+            });
+            result = ($globals.$action_list.indexOf(action_id) > -1);
+        }).catch(err => {
+            console.log(err)
+        });
+    } catch (e) {}
+    return result;
+}
 
 Vue.mixin({
     mounted(){
         this.$token = localStorage.$token;
     },
     methods: {
+        hasAccess: hasAccess,
         $recreateClient(){
             if(this.$token){
                 this.$graphql_client = new GraphQLClient(this.$request_endpoint, {
@@ -385,7 +418,31 @@ Vue.mixin({
     },
 });
 
+let config = [
+    {regExp: /\/dashboard\/.*/,actionId: 13}
+];
+
+let requested;
+
+let redirect;
+
+router.beforeEach(async function(to, from, next) {
+    requested = to;
+    redirect = () => {
+        router.push(from.path);
+    };
+    next();
+})
+
 new Vue({
     router,
-    render: h => h(App)
+    render: h => h(App),
+    created: async function () {
+        this.$token = localStorage.$token
+        this.$recreateClient();
+        let found = config.filter(el=>{return (requested.path.match(el.regExp))});
+        if (found.length > 0)
+            if (!await this.hasAccess(found[0].actionId))
+                redirect();
+    }
 }).$mount('#app');

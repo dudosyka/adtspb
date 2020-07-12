@@ -1,5 +1,5 @@
 <template>
-    <div class="dashboard">
+    <div class="dashboard-home">
 
         <vue-headful title="Панель управления | Личный кабинет"/>
 
@@ -7,6 +7,8 @@
         <b-button @click="logout">
             Выйти
         </b-button>
+        <router-link class="text-dark bg-light rounded p-2 text-decoration-none ml-2" to="/dashboard/statistic">Выгрузка статистики</router-link>
+
 
         <p>
             Форма для добавления ребенка:
@@ -48,10 +50,10 @@
 </template>
 
 <script>
-    import AddressInput from "../components/AddressInput";
+    import AddressInput from "../../components/AddressInput";
 
     export default {
-        name: "Dashboard",
+        name: "DashboardHome",
 
         data: function(){
             return {

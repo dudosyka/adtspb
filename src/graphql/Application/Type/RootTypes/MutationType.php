@@ -195,11 +195,11 @@ class MutationType extends ObjectType
                     'args' => []
                 ],
 
-//                'adminLoadStatistic' => [
-//                    'type' => Types::array(),
-//                    'description' => 'Загрузить список адм. сотрудников на сервер (файл должен быть загружен в поле file0 POST-запроса)',
-//                    'args' => []
-//                ],
+                'adminLoadStatistic' => [
+                    'type' => Types::string(),
+                    'description' => 'Return JSON contains proposal and user statistic',
+                    'args' => []
+                ],
 
                 'setRecalled' => [
                     'type' => Types::boolean(),
@@ -223,6 +223,14 @@ class MutationType extends ObjectType
                     'description' => 'Check if token exists else return RequestError',
                     'args' => [
                         'token' => Types::int()
+                    ]
+                ],
+
+                'getViewerRights' => [
+                    'type' => Types::string(),
+                    'description' => 'Return json string which contains current viewer rights',
+                    'args' => [
+                        'action_list_id' => Types::int()
                     ]
                 ],
 
@@ -996,18 +1004,24 @@ HTML;
         return implode("\n", $registered);
     }
 
-//    public function adminLoadStatistic($rootValue, $args, AppContext $context)
-//    {
-//        $context->viewer->hasAccessOrError(12);
-//
-//        $result = [
-//            'proposal_statistic' => DataSource::_query("SELECT association.name AS \"Название объединения\", association.group_count AS \"Количество групп\", association.group_count*20 AS \"Плановые цифры\", COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\" FROM proposal INNER JOIN association ON association.id = proposal.association_id GROUP BY proposal.association_id"),
-//            'parent_statistic' => DataSource::_query("SELECT COUNT(DISTINCT(`parent_id`)) FROM `user_child` WHERE 1"),
-//            'child_statistic' => DataSource::_query("SELECT COUNT(DISTINCT(`child_id`)) FROM `user_child` WHERE 1"),
-//        ];
-//
-//        return $result;
-//    }
+    public function adminLoadStatistic($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(12);
+
+        $query = DataSource::_query("SELECT COUNT(DISTINCT(`parent_id`)) AS parents FROM `user_child` WHERE 1");
+        $parent_statistic = $query[0]->parents;
+
+        $query = DataSource::_query("SELECT COUNT(DISTINCT(`child_id`)) AS children FROM `user_child` WHERE 1");
+        $children_statistic = $query[0]->children;
+
+        $result = [
+            'proposal_statistic' => DataSource::_query("SELECT association.name AS \"Название объединения\", association.group_count AS \"Количество групп\", association.group_count*0.5 AS \"Плановые цифры\", COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*0.5)) AS \"% наполненности\" FROM proposal INNER JOIN association ON association.id = proposal.association_id GROUP BY proposal.association_id"),
+            'parent_statistic' => $parent_statistic,
+            'child_statistic' => $children_statistic,
+        ];
+
+        return json_encode($result, JSON_UNESCAPED_UNICODE);
+    }
 
     /**
      * @param $rootValue
@@ -1087,6 +1101,28 @@ HTML;
             throw new RequestError("Объединение не найдено");
 
         return $res->association_id;
+    }
+
+    public function getViewerRights($rootValue, $args, AppContext $context)
+    {
+        $actions = [];
+        $user_role = DataSource::findAll("UserRole", "user_id = :uid", ["uid" => $context->viewer->id]);
+        foreach ($user_role as $i){
+            /** @var UserRole $i */
+
+            /** @var ActionList $action_data */
+            $action_data = DataSource::findAll("ActionList", "role_id = :rid AND list_id = :lid", [
+                "rid" => $i->role_id,
+                "lid" => $args['action_list_id']
+            ]);
+            if($action_data != null)
+                foreach ($action_data as $action)
+                {
+                    if($action->sign == "+")
+                        $actions[] = $action->action_id;
+                }
+        }
+        return json_encode($actions, JSON_UNESCAPED_UNICODE);
     }
 
     public function sendRegistrationEmail(string $email, string $code){
