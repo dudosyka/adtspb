@@ -480,7 +480,7 @@
                                         />
                                         <div>
                                             <b-button @click="residence_flat = 'Без номера квартиры'" size="sm" class="mr-3 mt-1">Без номера квартиры</b-button>
-                                            <b-button @click="residence_city = registration_city;residence_district = registration_district;residence_street = registration_street;residence_house = registration_house; residence_flat = registration_flat" size="sm">По адресу регистрации</b-button>
+                                            <b-button @click="residence_city = registration_city;residence_district = registration_district;residence_street = registration_street;residence_house = registration_house; residence_flat = registration_flat" size="sm" class="mt-1">По адресу регистрации</b-button>
                                         </div>
 
                                         <b-form-invalid-feedback :id="'parent-residence_flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
@@ -1451,6 +1451,28 @@
                     </b-modal>
 
 
+                    <b-modal @hide="clearSpecialAssociationSelecting()" hide-footer title="Запись по токену" v-model="specialAssociationSelecting.step" :centered="true">
+                        <b-alert :show="specialAssociationSelecting.errors.length > 0" v-if="specialAssociationSelecting.errors.length > 0" variant="danger" id="associations_special_selecting_graphql_errors">
+                            {{specialAssociationSelecting.errors[0].message}}
+                        </b-alert>
+                        <div v-if="specialAssociationSelecting.step == 1">
+                            <b-input
+                                v-model="specialAssociationSelecting.token"
+                                placeholder="Токен"
+                            >
+                            </b-input>
+                            <b-button @click="checkToken()">Отправить</b-button>
+                        </div>
+                        <div v-if="specialAssociationSelecting.step == 2">
+                            <b-form-select
+                                :options="specialAssociationSelecting.existing_children"
+                                v-model="specialAssociationSelecting.selected_child"
+                            >
+                            </b-form-select>
+                            <b-button @click="selectAssociation()">Подать заявление</b-button>
+                        </div>
+
+                    </b-modal>
 
                 </div>
 
@@ -1544,28 +1566,6 @@
 
                             </b-button>
                         </template>
-                    </b-modal>
-                    <b-modal @hide="clearSpecialAssociationSelecting()" hide-footer title="Запись по токену" v-model="specialAssociationSelecting.step" :centered="true">
-                        <b-alert :show="specialAssociationSelecting.errors.length > 0" v-if="specialAssociationSelecting.errors.length > 0" variant="danger" id="associations_special_selecting_graphql_errors">
-                            {{specialAssociationSelecting.errors[0].message}}
-                        </b-alert>
-                        <div v-if="specialAssociationSelecting.step == 1">
-                            <b-input
-                            v-model="specialAssociationSelecting.token"
-                            placeholder="Токен"
-                            >
-                            </b-input>
-                            <b-button @click="checkToken()">Отправить</b-button>
-                        </div>
-                        <div v-if="specialAssociationSelecting.step == 2">
-                            <b-form-select
-                                :options="specialAssociationSelecting.existing_children"
-                                v-model="specialAssociationSelecting.selected_child"
-                            >
-                            </b-form-select>
-                            <b-button @click="selectAssociation()">Подать заявление</b-button>
-                        </div>
-
                     </b-modal>
                 </div>
             </vue-good-wizard>
@@ -1942,7 +1942,7 @@
                         $association_id: Int!,
                         $child_id: Int!
                     ) {
-                        (
+                        setRecalled (
                             association_id: $association_id
                             child_id: $child_id
                         )

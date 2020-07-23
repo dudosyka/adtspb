@@ -1015,7 +1015,7 @@ HTML;
         $children_statistic = $query[0]->children;
 
         $result = [
-            'proposal_statistic' => DataSource::_query("SELECT association.name AS \"Название объединения\", association.group_count AS \"Количество групп\", association.group_count*20 AS \"Плановые цифры\", COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\" FROM proposal INNER JOIN association ON association.id = proposal.association_id GROUP BY proposal.association_id"),
+            'proposal_statistic' => DataSource::_query("SELECT association.name AS \"Название объединения\", COUNT(*) AS `allProposalCount`, association.group_count AS \"Количество групп\", association.group_count*20 AS \"Плановые цифры\", COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\", association_specials.association_id AS \"special\" FROM proposal LEFT JOIN association_specials ON proposal.association_id = association_specials.association_id INNER JOIN association ON association.id = proposal.association_id GROUP BY proposal.association_id"),
             'parent_statistic' => $parent_statistic,
             'child_statistic' => $children_statistic,
         ];

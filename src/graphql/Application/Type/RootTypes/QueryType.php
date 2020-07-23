@@ -142,7 +142,7 @@ class QueryType extends ObjectType
         // TODO: ограничение по списку ассоциаций?
         $context->viewer->hasAccessOrError(5);
 
-        return DataSource::_query("SELECT `association_specials`.`association_id` AS `isAvailable`,`association`.`*` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1 ORDER BY `isAvailable` DESC");
+        return DataSource::_query("SELECT `association_specials`.`association_id` AS `isAvailable`,`association`.`*` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1 ORDER BY `isAvailable` ASC");
     }
 
     public function associations($rootValue, $args, AppContext $context){
@@ -150,7 +150,7 @@ class QueryType extends ObjectType
         $context->viewer->hasAccessOrError(5);
 
         if (isset($args["exceptSpecials"]))
-            return DataSource::_query("SELECT `association_specials`.`association_id`AS `isAvailable`,`association`.`*` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1 ORDER BY `isAvailable` DESC");
+            return DataSource::_query("SELECT `association_specials`.`association_id`AS `isAvailable`,`association`.`*` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1 ORDER BY `isAvailable` ASC");
 
         if(!isset($args["min_age"]) and !isset($args["max_age"]))
             return DataSource::findAll('Association', '1');
