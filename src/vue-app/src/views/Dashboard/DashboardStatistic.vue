@@ -43,27 +43,27 @@
 </template>
 
 <script>
-    export default {
-        name: "DashboardStatistic",
+export default {
+    name: "DashboardStatistic",
 
-        data(){
-            return {
-                association_statistic_table_fields: [{key: 'Название объединения', sortable: true}, {key: 'Количество групп', sortable: true}, {key: 'Плановые цифры', sortable: true}, {key: 'Фактические цифры', sortable: true}, {key: '% наполненности', sortable: true}],
-                allProposalCount: 0,
-                user_statistic_table_fields: ['Всего зарегистрировано детей', 'Всего зарегистрировано родителей'],
-                association_statistic: [],
-                user_statistic: [],
-                associations_filter: null
-            }
-        },
-        mounted() {
-            let request = `
+    data(){
+        return {
+            association_statistic_table_fields: [{key: 'Название объединения', sortable: true}, {key: 'Количество групп', sortable: true}, {key: 'Плановые цифры', sortable: true}, {key: 'Фактические цифры', sortable: true}, {key: '% наполненности', sortable: true}],
+            allProposalCount: 0,
+            user_statistic_table_fields: ['Всего зарегистрировано детей', 'Всего зарегистрировано родителей'],
+            association_statistic: [],
+            user_statistic: [],
+            associations_filter: null
+        }
+    },
+    mounted() {
+        let request = `
                 mutation {
                     adminLoadStatistic
                 }
             `;
 
-            this.$graphql_client.request(request, {})
+        this.$graphql_client.request(request, {})
             .then(data=>{
                 let statistic = JSON.parse(data.adminLoadStatistic);
                 this.user_statistic.push({
@@ -86,18 +86,18 @@
             .catch(err=>{
                 console.log(err);
             });
-        },
-        methods: {
-            rowStyler(item, type) {
-                if (!item || type !== 'row') return
-                if (item['special'] != null) return 'table-secondary'
-                if (item['% наполненности'] <= 20) return 'table-primary'
-                if (item['% наполненности'] > 300) return 'table-danger'
-                if (item['% наполненности'] > 200) return 'table-warning'
-            }
+    },
+    methods: {
+        rowStyler(item, type) {
+            if (!item || type !== 'row') return
+            if (item['special'] != null) return 'table-secondary'
+            if (item['% наполненности'] <= 20) return 'table-primary'
+            if (item['% наполненности'] > 300) return 'table-danger'
+            if (item['% наполненности'] > 200) return 'table-warning'
         }
-
     }
+
+}
 </script>
 
 <style scoped>

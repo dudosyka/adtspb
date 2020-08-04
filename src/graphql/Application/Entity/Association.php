@@ -14,6 +14,8 @@ class Association extends EntityBase
     public $study_hours;
     public $study_hours_week;
     public $description;
+    public $isClosed;
+    public $isHidden;
 
     public function __construct(array $data = null)
     {

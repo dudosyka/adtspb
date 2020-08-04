@@ -26,7 +26,8 @@ class AssociationType extends ObjectType
 	                'study_hours' => ['type' => Types::int()],
 	                'study_hours_week' => ['type' => Types::int()],
 	                'description' => ['type' => Types::string()],
-	                'isAvailable' => Types::int()
+	                'isClosed' => Types::int(),
+                    'isHidden' => Types::int()
                 ];
             },
             'interfaces' => [

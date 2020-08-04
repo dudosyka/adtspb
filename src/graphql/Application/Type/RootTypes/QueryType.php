@@ -59,6 +59,7 @@ class QueryType extends ObjectType
 
                 'associationsExceptSpecials' => [
                     'type' => Types::listOf(Types::association()),
+//                    'type' => Types::string(),
                     'description' => 'Вывод всех доступных для записи объединений',
                 ],
 
@@ -139,10 +140,10 @@ class QueryType extends ObjectType
      * @throws RequestError
      */
     public function associationsExceptSpecials($rootValue, $args, AppContext $context){
-        // TODO: ограничение по списку ассоциаций?
         $context->viewer->hasAccessOrError(5);
 
-        return DataSource::_query("SELECT `association_specials`.`association_id` AS `isAvailable`,`association`.`*` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1 ORDER BY `isAvailable` ASC");
+        return DataSource::findAll("Association", '1');
+//        return json_encode(DataSource::_query("SELECT `association_specials`.`association_id` AS `isAvailable`,`association`.`id`, `association`.`name`, `association`.`min_age`, `association`.`max_age`, `association`.`study_hours_week`, `association`.`description` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1 ORDER BY `isAvailable` ASC"), JSON_UNESCAPED_UNICODE);
     }
 
     public function associations($rootValue, $args, AppContext $context){
