@@ -201,19 +201,38 @@ class MutationType extends ObjectType
                     'args' => []
                 ],
 
+                'adminSwitchAssociationHidden' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Switch association state before hidden / not hidden by id',
+                    'args' => [
+                        'id' => Types::nonNull(Types::int()),
+                        'token' => Types::string()
+                    ]
+                ],
+
+                'adminSwitchAssociationClosed' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Switch association state before closed / not closed for join by id',
+                    'args' => [
+                        'id' => Types::nonNull(Types::int())
+                    ]
+                ],
+
+                'adminSetNewTokenForHiddenAssociation' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Changed auto-generated token for hidden association by id',
+                    'args' => [
+                        'id' => Types::nonNull(Types::int()),
+                        'token' => Types::nonNull(Types::string())
+                    ]
+                ],
+
+
                 'setRecalled' => [
                     'type' => Types::boolean(),
                     'description' => 'Set proposal`s status_parent_id to "recalled"(id = 3)',
                     'args' => [
                         'child_id' => Types::int(),
-                        'association_id' => Types::int()
-                    ]
-                ],
-
-                'switchAssociationRecordingType' => [
-                    'type' => Types::boolean(),
-                    'description' => 'Switch type of recording in association',
-                    'args' => [
                         'association_id' => Types::int()
                     ]
                 ],
@@ -1004,6 +1023,13 @@ HTML;
         return implode("\n", $registered);
     }
 
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return string
+     * @throws RequestError
+     */
     public function adminLoadStatistic($rootValue, $args, AppContext $context)
     {
         $context->viewer->hasAccessOrError(12);
@@ -1019,8 +1045,70 @@ HTML;
             'parent_statistic' => $parent_statistic,
             'child_statistic' => $children_statistic,
         ];
+        $res = json_encode($result, JSON_UNESCAPED_UNICODE);
+        return $res ? $res : "";
+    }
 
-        return json_encode($result, JSON_UNESCAPED_UNICODE);
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function adminSwitchAssociationClosed($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(11);
+
+        $association = DataSource::findOne("Associaion", "id = :id", [":id" => $args['id']]);
+        if ($association == null)
+            return false;
+
+        $association->isClosed = $association->isClosed == 1 ? 0 : 1;
+
+        return DataSource::update($association);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function adminSwitchAssociationHidden($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(11);
+
+        $association = DataSource::findOne("Associaion", "id = :id", [":id" => $args['id']]);
+        if ($association == null)
+            return false;
+
+        $association->isHidden = $association->isHidden == 0 ? $args['token'] == null ? time() : $args['token'] : 1;
+
+        return DataSource::update($association);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function adminSetNewTokenForHiddenAssociation($rootValue, $args, AppContext $context)
+    {
+        $association = DataSource::findOne("Association", "id = :id", [':id' => $args['id']]);
+
+        if ($association == null)
+            return false;
+
+        if ($association->isHidden == 0)
+            return false;
+
+        $association->isHidden = $args['token'];
+
+        return DataSource::update($association);
     }
 
     /**
@@ -1062,31 +1150,6 @@ HTML;
            DataSource::update($proposal);
            return true;
        }
-    }
-
-    public function switchAssociationRecordingType($rootValue, $args, AppContext $context)
-    {
-        $context->viewer->hasAccessOrError(11);
-
-        if ($args['special'] == true)
-        {
-            $model = DataSource::findOne("AssociationSpecials", "association_id = :id", ['id' => $args['association_id']]);
-            if ($model != null)
-                return true;
-
-            $model = new AssociationSpecials([
-                'association_id' => $args['association_id'],
-                'token' => time()
-            ]);
-
-            DataSource::insert($model);
-
-            return true;
-        }
-
-        DataSource::deleteOne("AssociationSpecials", "association_id = :id", ["id"=>$args['association_id']]);
-
-        return true;
     }
 
     public function checkAssociationSpecialToken($rootValue, $args, AppContext $context)

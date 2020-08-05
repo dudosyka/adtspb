@@ -1,6 +1,7 @@
 <?php
 namespace GraphQL\Application\Type;
 
+use Com\Tecnick\Barcode\Type\Square\PdfFourOneSeven\Data;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\Association;
@@ -53,7 +54,9 @@ class QueryType extends ObjectType
                     'type' => Types::listOf(Types::association()),
                     'description' => 'Вывод всех доступных объединений',
                     'args' => [
-                        'min_age' => Types::int()
+                        'min_age' => Types::int(),
+                        'hidden' => Types::int(),
+                        'closed' => Types::int(),
                     ]
                 ],
 
@@ -150,14 +153,27 @@ class QueryType extends ObjectType
         // TODO: ограничение по списку ассоциаций?
         $context->viewer->hasAccessOrError(5);
 
-        if (isset($args["exceptSpecials"]))
-            return DataSource::_query("SELECT `association_specials`.`association_id`AS `isAvailable`,`association`.`*` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1 ORDER BY `isAvailable` ASC");
-
         if(!isset($args["min_age"]) and !isset($args["max_age"]))
             return DataSource::findAll('Association', '1');
 
         if(!isset($args["min_age"]))
             throw new RequestError("Параметр min_age должен быть задан.");
+
+        if (isset($args["closed"]))
+        {
+            if ($args["closed"] == 1)
+                return DataSource::findAll('Association', '`isClosed` == 1');
+            else
+                return DataSource::findAll('Association', '`isClosed` == 0');
+        }
+
+        if (isset($args["hidden"]))
+        {
+            if ($args['hidden'] == 1)
+                return DataSource::findAll('Association', '`isHidden` == 1');
+            else
+                return DataSource::findAll('Association', '`isHidden` == 0');
+        }
 
 //        if(!isset($args["max_age"]))
 //            throw new RequestError("Параметр max_age должен быть задан.");
