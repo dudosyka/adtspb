@@ -253,6 +253,14 @@ class MutationType extends ObjectType
                     ]
                 ],
 
+                'getAssociationDetails' => [
+                    'type' => Types::string(),
+                    'description' => 'Return json string which contains detail statistic for association by id',
+                    'args' => [
+                        'id' => Types::int()
+                    ]
+                ]
+
             ],
             'resolveField' => function($val, $args, $context, ResolveInfo $info) {
                 return $this->{$info->fieldName}($val, $args, $context, $info);
@@ -1041,7 +1049,7 @@ HTML;
         $children_statistic = $query[0]->children;
 
         $result = [
-            'proposal_statistic' => DataSource::_query("SELECT association.name AS \"Название объединения\", COUNT(*) AS `allProposalCount`, association.group_count AS \"Количество групп\", association.group_count*20 AS \"Плановые цифры\", COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\", association_specials.association_id AS \"special\" FROM proposal LEFT JOIN association_specials ON proposal.association_id = association_specials.association_id INNER JOIN association ON association.id = proposal.association_id GROUP BY proposal.association_id"),
+            'proposal_statistic' => DataSource::_query("SELECT association.id as id, association.name AS \"Название объединения\", COUNT(*) AS `allProposalCount`, association.group_count AS \"Количество групп\", association.group_count*20 AS \"Плановые цифры\", COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\", association_specials.association_id AS \"special\" FROM proposal LEFT JOIN association_specials ON proposal.association_id = association_specials.association_id INNER JOIN association ON association.id = proposal.association_id GROUP BY proposal.association_id"),
             'parent_statistic' => $parent_statistic,
             'child_statistic' => $children_statistic,
         ];
@@ -1152,13 +1160,20 @@ HTML;
        }
     }
 
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return mixed
+     * @throws RequestError
+     */
     public function checkAssociationSpecialToken($rootValue, $args, AppContext $context)
     {
         $context->viewer->hasAccessOrError(7);
 
         $token = (int)$args['token'];
 
-        $res = DataSource::findOne("AssociationSpecials", "token = :token", ['token'=>$token]);
+        $res = DataSource::findOne("Association", "isHidden = :token", ['token'=>$token]);
 
         if ($res == null)
             throw new RequestError("Объединение не найдено");
@@ -1186,6 +1201,26 @@ HTML;
                 }
         }
         return json_encode($actions, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return string
+     * @throws RequestError
+     */
+    public function getAssociationDetails($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(12);
+
+        $association = DataSource::findOne("Association", 'id = :id', [':id' => $args['id']]);
+        if ($association == null)
+            throw new RequestError("Association with id ".$args['id']."not found");
+
+        $res = json_encode(DataSource::_query("SELECT child.name AS child_name, child.midname AS child_midname, child.surname AS child_surname, child.email as child_email, child.phone_number as child_phone, parent.name AS parent_name, parent.midname AS parent_midname, parent.surname AS parent_surname, parent.email as parent_email, parent.phone_number as parent_phone, association.id AS association_id, association.name AS association_name, proposal.timestamp, parent_s.name AS status_parent, admin_s.name AS status_admin, teacher_s.name AS status_teacher FROM proposal INNER JOIN association ON association.id = proposal.association_id INNER JOIN user AS child ON proposal.child_id = child.id INNER JOIN user AS parent ON proposal.parent_id = parent.id INNER JOIN settings_proposal AS parent_s ON proposal.status_parent_id = parent_s.id INNER JOIN settings_proposal AS admin_s ON proposal.status_admin_id = admin_s.id INNER JOIN settings_proposal AS teacher_s ON proposal.status_teacher_id = teacher_s.id WHERE proposal.association_id = :id", [':id' => $args['id']]), JSON_UNESCAPED_UNICODE);
+
+        return $res ? $res : "";
     }
 
     public function sendRegistrationEmail(string $email, string $code){
