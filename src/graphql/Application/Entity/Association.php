@@ -13,6 +13,7 @@ class Association extends EntityBase
     public $study_years;
     public $study_hours;
     public $study_hours_week;
+    public $group_count;
     public $description;
     public $isClosed;
     public $isHidden;

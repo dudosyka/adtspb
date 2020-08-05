@@ -50,15 +50,29 @@ const routes = [
     {
         path: '/dashboard',
         name: 'Dashboard',
-        component: () => import('../views/Dashboard/Dashboard.vue'),
+        component: () => import('../views/Dashboard.vue'),
         children: [
             {
                 path: "/dashboard",
-                component: () => import('../views/Dashboard/DashboardHome')
+                component: () => import('../views/Dashboard/Home')
             },
             {
                 path: "/dashboard/statistic",
-                component: () => import('../views/Dashboard/DashboardStatistic')
+                component: () => import('../views/Dashboard/Statistic')
+            },
+            {
+                path: "/dashboard/associations",
+                component: () => import('../views/Dashboard/Associations/Home'),
+                children: [
+                    {
+                        path: "/dashboard/associations/hidden",
+                        component: () => import('../views/Dashboard/Associations/HiddenAssociations'),
+                    },
+                    {
+                        path: "/dashboard/associations/closed",
+                        component: () => import('../views/Dashboard/Associations/ClosedAssociations'),
+                    }
+                ]
             }
         ],
     },

@@ -50,6 +50,7 @@ class QueryType extends ObjectType
                         'id' => Types::nonNull(Types::id())
                     ]
                 ],
+
                 'associations' => [
                     'type' => Types::listOf(Types::association()),
                     'description' => 'Вывод всех доступных объединений',
@@ -60,12 +61,6 @@ class QueryType extends ObjectType
                     ]
                 ],
 
-                'associationsExceptSpecials' => [
-                    'type' => Types::listOf(Types::association()),
-//                    'type' => Types::string(),
-                    'description' => 'Вывод всех доступных для записи объединений',
-                ],
-
                 'associationsForChild' => [
                     'type' => Types::listOf(Types::association()),
                     'description' => 'Вывод всех доступных объединений для конкретного ребенка',
@@ -73,8 +68,6 @@ class QueryType extends ObjectType
                         'child_id' => Types::int()
                     ]
                 ],
-
-//                'hello' => Type::string()
 
 
             ],
@@ -135,45 +128,39 @@ class QueryType extends ObjectType
         return DataSource::find('Association', $args['id']);
     }
 
-    /**
-     * @param $rootValue
-     * @param $args
-     * @param AppContext $context
-     * @return array
-     * @throws RequestError
-     */
-    public function associationsExceptSpecials($rootValue, $args, AppContext $context){
-        $context->viewer->hasAccessOrError(5);
-
-        return DataSource::findAll("Association", '1');
-//        return json_encode(DataSource::_query("SELECT `association_specials`.`association_id` AS `isAvailable`,`association`.`id`, `association`.`name`, `association`.`min_age`, `association`.`max_age`, `association`.`study_hours_week`, `association`.`description` FROM `association_specials` RIGHT JOIN `association` ON `association_specials`.`association_id` = `association`.`id` WHERE 1 ORDER BY `isAvailable` ASC"), JSON_UNESCAPED_UNICODE);
-    }
-
     public function associations($rootValue, $args, AppContext $context){
         // TODO: ограничение по списку ассоциаций?
         $context->viewer->hasAccessOrError(5);
+
+        if (isset($args["closed"]) && isset($args["hidden"]))
+        {
+            if ($args['closed'] == 1 && $args['hidden'] == 1)
+                return DataSource::findAll('Association', '`isClosed` = 1 AND `isHidden` != 0');
+            if ($args['closed'] == 0 && $args['hidden'] == 0)
+                return DataSource::findAll('Association', '`isClosed` = 0 AND `isHidden` = 0');
+        }
+
+        if (isset($args["closed"]))
+        {
+            if ($args["closed"] == 1)
+                return DataSource::findAll('Association', '`isClosed` = 1');
+            else
+                return DataSource::findAll('Association', '`isClosed` = 0');
+        }
+
+        if (isset($args["hidden"]))
+        {
+            if ($args['hidden'] == 1)
+                return DataSource::findAll('Association', '`isHidden` != 0');
+            else
+                return DataSource::findAll('Association', '`isHidden` = 0');
+        }
 
         if(!isset($args["min_age"]) and !isset($args["max_age"]))
             return DataSource::findAll('Association', '1');
 
         if(!isset($args["min_age"]))
             throw new RequestError("Параметр min_age должен быть задан.");
-
-        if (isset($args["closed"]))
-        {
-            if ($args["closed"] == 1)
-                return DataSource::findAll('Association', '`isClosed` == 1');
-            else
-                return DataSource::findAll('Association', '`isClosed` == 0');
-        }
-
-        if (isset($args["hidden"]))
-        {
-            if ($args['hidden'] == 1)
-                return DataSource::findAll('Association', '`isHidden` == 1');
-            else
-                return DataSource::findAll('Association', '`isHidden` == 0');
-        }
 
 //        if(!isset($args["max_age"]))
 //            throw new RequestError("Параметр max_age должен быть задан.");

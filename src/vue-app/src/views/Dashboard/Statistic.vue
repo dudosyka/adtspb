@@ -3,42 +3,37 @@
 
         <vue-headful title="Панель управления | Выгрузка статистики"/>
 
-        <router-link class="text-dark bg-light rounded position-relative p-2 text-decoration-none" style="top: 1em; left: 1em;" to="/dashboard">Назад</router-link>
+        <h3 class="text-center">Выгрузка статистики: </h3>
+        <b-container class="mb-5">
+            <h5>По пользователям: </h5>
+            <b-table
+                :fields="user_statistic_table_fields"
+                :items="user_statistic"
+            >
 
-        <b-container class="w-75 min-vw-75 bg-light mt-2 rounded p-2 pt-4">
-            <h3 class="text-center">Выгрузка статистики: </h3>
-            <b-container class="mb-5">
-                <h5>По пользователям: </h5>
-                <b-table
-                    :fields="user_statistic_table_fields"
-                    :items="user_statistic"
-                >
-
-                </b-table>
-            </b-container>
-            <hr>
-            <b-container class="mt-5">
-                <h5>По объединениям: </h5>
-                <h6>Общее количество заявлений: {{ allProposalCount }}</h6>
-                <b-input :type="'search'" v-model="associations_filter" placeholder="Поиск объединения"></b-input>
-                <div class="mt-1 mb-2">
-                    <b-badge class="mr-1 p-1" variant="secondary">Запись приостановлена</b-badge>
-                    <b-badge class="mr-1 p-1" variant="primary">% наполненности <= 20</b-badge>
-                    <b-badge class="mr-1 p-1" variant="warning">% наполненности > 200 </b-badge>
-                    <b-badge class="mr-1 p-1" variant="danger">% наполненности > 300</b-badge>
-                </div>
-                <b-table
-                    :fields="association_statistic_table_fields"
-                    :filter="associations_filter"
-                    :filter-included-fields="['Название объединения']"
-                    :items="association_statistic"
-                    :tbody-tr-class="rowStyler"
-                >
-
-                </b-table>
-            </b-container>
+            </b-table>
         </b-container>
+        <hr>
+        <b-container class="mt-5">
+            <h5>По объединениям: </h5>
+            <h6>Общее количество заявлений: {{ allProposalCount }}</h6>
+            <b-input :type="'search'" v-model="associations_filter" placeholder="Поиск объединения"></b-input>
+            <div class="mt-1 mb-2">
+                <b-badge class="mr-1 p-1" variant="secondary">Запись приостановлена</b-badge>
+                <b-badge class="mr-1 p-1" variant="primary">% наполненности <= 20</b-badge>
+                <b-badge class="mr-1 p-1" variant="warning">% наполненности > 200 </b-badge>
+                <b-badge class="mr-1 p-1" variant="danger">% наполненности > 300</b-badge>
+            </div>
+            <b-table
+                :fields="association_statistic_table_fields"
+                :filter="associations_filter"
+                :filter-included-fields="['Название объединения']"
+                :items="association_statistic"
+                :tbody-tr-class="rowStyler"
+            >
 
+            </b-table>
+        </b-container>
     </div>
 </template>
 

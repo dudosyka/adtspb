@@ -3,47 +3,8 @@
 
         <vue-headful title="Панель управления | Личный кабинет"/>
 
-        Вы авторизованы
-        <b-button @click="logout">
-            Выйти
-        </b-button>
         <router-link class="text-dark bg-light rounded p-2 text-decoration-none ml-2" to="/dashboard/statistic">Выгрузка статистики</router-link>
-
-<!--        <p>-->
-<!--            Форма для добавления ребенка:-->
-<!--        </p>-->
-
-<!--        <AddressInput placeholder="Фамилия"/>-->
-<!--        <AddressInput placeholder="Имя"/>-->
-<!--        <AddressInput placeholder="Отчество"/>-->
-<!--        <AddressInput placeholder="Дата рождения"/>-->
-<!--        <AddressInput placeholder="Школа"/>-->
-<!--        <AddressInput placeholder="Класс"/>-->
-
-<!--        <b-btn>Добавить</b-btn>-->
-
-<!--        <p>-->
-<!--            Загрузка списка педагогов:-->
-<!--        </p>-->
-
-<!--        <input type="file" @change="uploadTeachersList">-->
-
-<!--        <p>{{last_upload_status_uploadTeachersList}}</p>-->
-
-<!--        <p>-->
-<!--            Загрузка списка объедений:-->
-<!--        </p>-->
-
-<!--        <input type="file" @change="adminUploadAssociations">-->
-
-<!--        <p>{{last_upload_status_adminUploadAssociations}}</p>-->
-
-<!--        <p>-->
-<!--            Загрузка списка административных сотрудников:-->
-<!--        </p>-->
-
-<!--        <input type="file">-->
-
+        <router-link class="text-dark bg-light rounded p-2 text-decoration-none ml-2" to="/dashboard/associations">Управление объединениями</router-link>
 
     </div>
 </template>
@@ -62,17 +23,6 @@
         },
 
         methods: {
-            logout(){
-
-                this.$graphql_client.request(`mutation{ logout }`)
-                    .then(this.clearToken)
-                    .catch(this.clearToken);
-
-            },
-            clearToken(){
-                this.$token = "";
-                this.$router.push({ path: '/login' });
-            },
             uploadTeachersList({ target }){
 
                 this.last_upload_status_uploadTeachersList = "";

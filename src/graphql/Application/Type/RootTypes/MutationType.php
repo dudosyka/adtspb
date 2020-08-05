@@ -1060,7 +1060,7 @@ HTML;
     {
         $context->viewer->hasAccessOrError(11);
 
-        $association = DataSource::findOne("Associaion", "id = :id", [":id" => $args['id']]);
+        $association = DataSource::findOne("Association", "id = :id", [":id" => $args['id']]);
         if ($association == null)
             return false;
 
@@ -1080,11 +1080,11 @@ HTML;
     {
         $context->viewer->hasAccessOrError(11);
 
-        $association = DataSource::findOne("Associaion", "id = :id", [":id" => $args['id']]);
+        $association = DataSource::findOne("Association", "id = :id", [":id" => $args['id']]);
         if ($association == null)
             return false;
 
-        $association->isHidden = $association->isHidden == 0 ? $args['token'] == null ? time() : $args['token'] : 1;
+        $association->isHidden = $association->isHidden == 0 ? !isset($args['token']) ? time() : $args['token'] : 0;
 
         return DataSource::update($association);
     }
