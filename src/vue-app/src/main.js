@@ -252,6 +252,12 @@ extend("valid_full_address",{
     }
 });
 
+extend("integer", {
+    message: "Поле должно содержать только цифры",
+    validate: value => {
+        return (value.match(/^\D+$/u) == null);
+    }
+})
 
 import vee_validate_ru from "vee-validate/dist/locale/ru.json";
 import {loadYmap} from "vue-yandex-maps";

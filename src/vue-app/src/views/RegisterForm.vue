@@ -63,7 +63,6 @@
 
                             <validation-provider
                                 style="width: 100%;"
-
                                 name="Фамилия"
                                 :rules="{ required: true }"
                                 v-slot="validationContext"
@@ -2141,7 +2140,7 @@ export default {
             history.replaceState(null, null, '/register/form?page='+page); //почему-то не работает?
 
             // Если шаг >= 3, то грузим информацию о детях
-            if(page >= 2){
+            if(page >= 2) {
                 let data = await this.$graphql_client.request("query{ viewer{ getChildren{ id, " +
                     "name, " +
                     "surname, " +
@@ -2205,7 +2204,7 @@ export default {
             }
 
             // Если шаг >= 4, то грузим информацию о поданных заявлениях
-            if(page >= 3){
+            if(page >= 3) {
                 let data = await this.$graphql_client.request("query{ viewer{ getChildren{ getInProposals { status_admin, status_teacher, status_parent, getAssociation { id, name } } } } }");
                 for(var i in data.viewer.getChildren)
                 {
@@ -2256,8 +2255,7 @@ export default {
                 this.childTick();
             }
 
-            if (page == 4)
-            {
+            if (page == 4) {
                 await this.sendProposalNotify();
             }
         },
@@ -2922,7 +2920,7 @@ export default {
         /* Шаг 1 */
         async submitAccountRegistration(){
             const isValid = await this.$refs.registration_observer.validate();
-            console.log(isValid);
+
             if(!isValid) return false;
 
             const request = `

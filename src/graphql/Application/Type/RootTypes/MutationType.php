@@ -227,6 +227,23 @@ class MutationType extends ObjectType
                     ]
                 ],
 
+                'adminCreateAssociation' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Create new association',
+                    'args' => [
+                        'name' => Types::string(),
+                        'min_age' => Types::nonNull(Types::int()),
+                        'max_age' => Types::nonNull(Types::int()),
+                        'study_hours' => Types::nonNull(Types::int()),
+                        'study_years' => Types::nonNull(Types::int()),
+                        'study_hours_week' => Types::nonNull(Types::int()),
+                        'group_count' => Types::nonNull(Types::int()),
+                        'description' => Types::string(),
+                        'isClosed' => Types::nonNull(Types::int()),
+                        'isHidden' => Types::nonNull(Types::int())
+                    ]
+                ],
+
 
                 'setRecalled' => [
                     'type' => Types::boolean(),
@@ -1117,6 +1134,23 @@ HTML;
         $association->isHidden = $args['token'];
 
         return DataSource::update($association);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return string
+     * @throws RequestError
+     */
+    public function adminCreateAssociation($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(14);
+
+        if ($args['isHidden'] == 1)
+            $args['isHidden'] = time();
+
+        return DataSource::insert(new Association($args));
     }
 
     /**

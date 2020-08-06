@@ -71,6 +71,10 @@ const routes = [
                     {
                         path: "/dashboard/associations/closed",
                         component: () => import('../views/Dashboard/Associations/ClosedAssociations'),
+                    },
+                    {
+                        path: "/dashboard/associations/add",
+                        component: () => import('../views/Dashboard/Associations/AddAssociation'),
                     }
                 ]
             }
