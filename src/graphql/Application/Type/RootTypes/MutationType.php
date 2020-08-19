@@ -244,6 +244,35 @@ class MutationType extends ObjectType
                     ]
                 ],
 
+                'adminChangeProposalStatus' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Change proposal`s status_admin_id by id',
+                    'args' => [
+                        'id' => Types::nonNull(Types::int()),
+                        'status_admin_id' => Types::nonNull(Types::int())
+                    ]
+                ],
+
+                'adminEditUserData' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Edit user`s data by id',
+                    'args' => [
+                        'id' => Types::nonNull(Types::int()),
+                        'name' => Types::nonNull(Types::string()),
+                        'surname' => Types::nonNull(Types::string()),
+                        'midname' => Types::string(),
+                        'email' => Types::nonNull(Types::email()),
+                        'password' => Types::nonNull(Types::password()),
+                        'phone_number' => Types::nonNull(Types::phoneNumber()),
+                        'sex' => Types::nonNull(Types::sex()),
+                        'registration_address' => Types::nonNull(Types::string()),
+                        'registration_flat' => Types::nonNull(Types::string()),
+                        'residence_address' => Types::nonNull(Types::string()),
+                        'residence_flat' => Types::nonNull(Types::string()),
+                        'birthday' => Types::nonNull(Types::date()),
+                    ]
+                ],
+
 
                 'setRecalled' => [
                     'type' => Types::boolean(),
@@ -1151,6 +1180,55 @@ HTML;
             $args['isHidden'] = time();
 
         return DataSource::insert(new Association($args));
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function adminChangeProposalStatus($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(16);
+
+        //checking if proposal exists
+        $proposal = DataSource::findOne("Proposal", "id = :id", [':id' => $args['id']]);
+
+        if ($proposal == null)
+            throw new RequestError("Proposal not found");
+
+        //checking if status valid
+        $status = DataSource::findOne("SettingsProposal", "id = :id", ['id' => $args['status_admin_id']]);
+
+        if ($status == null)
+            throw new RequestError("Invalid status");
+
+        $proposal->status_admin_id = $status->id;
+
+        return DataSource::update($proposal);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function adminEditUserData($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(16);
+
+        $user = DataSource::findOne("User", "id = :id", [':id' => $args['id']]);
+
+        if ($user == null)
+            throw new RequestError("User not found");
+
+        unset($args['id']);
+
+        return DataSource::update(new User(array_merge($user->asArray(), $args)));
     }
 
     /**

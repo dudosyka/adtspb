@@ -241,4 +241,23 @@ class User extends EntityBase
         return $age;
     }
 
+    public function asArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'surname' => $this->surname,
+            'midname' => $this->midname,
+            'email' => $this->email,
+            'password' => $this->password,
+            'phone_number' => $this->phone_number,
+            'sex' => $this->sex,
+            'registration_address' => $this->registration_address,
+            'registration_flat' => $this->registration_flat,
+            'residence_address' => $this->residence_address,
+            'residence_flat' => $this->residence_flat,
+            'birthday' => $this->birthday,
+        ];
+    }
+
 }
