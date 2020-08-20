@@ -519,6 +519,7 @@ HTML;
      * @param AppContext $context
      * @return bool
      * @throws RequestError
+     * @noinspection PhpUndefinedMethodInspection
      */
     public function selectChildAssociations($rootValue, $args, AppContext $context){
         // Есть ли доступ
@@ -566,43 +567,73 @@ HTML;
         }
 
         // Проверка на количество часов
-        // TODO: оптимизировать механизм проверки количества часов
-        $findAllProps = DataSource::findAll("Proposal", "parent_id = :parent_id AND child_id = :child_id", [
-            "parent_id" => $context->viewer->id,
-            "child_id" => $args["child_id"]
-        ]);
-        if($findAllProps != null){
-            $child = DataSource::find("User", $args["child_id"]);
-            $maxHours = 10;
-            if ($child->getAge() >= 14)
-                $maxHours = 12;
-            $hours = 0;
-            foreach($findAllProps as $prop){
-                /** @var Proposal $prop */
-                /** @var Association $info */
-                if ($prop->status_parent_id == 3)
-                    continue;
-                $info = DataSource::find("Association", $prop->association_id);
-                $hours += $info->study_hours_week;
-                if($hours >= $maxHours) break;
-            }
-            if($hours >= $maxHours)
-                throw new RequestError("Загруженность ребенка превышает 10 часов");
-        }
+        $parent_id = $context->viewer->id;
+        $child_id = $args['child_id'];
+        $association_id = $args['association_id'];
+        if (!$this->checkChildLoad($parent_id, $child_id))
+            throw new RequestError("Загруженность ребенка превышает 10 часов");
 
-        DataSource::insert(new Proposal([
-            "timestamp" => DataSource::timeInMYSQLFormat(),
-            'child_id' => $args["child_id"],
-            'parent_id' => $context->viewer->id,
-            'association_id' => $args["association_id"],
-            'status_admin_id' => 1, //TODO: константы статусов ожидания запроса?
-            'status_parent_id' => 4, //TODO: константы статусов ожидания запроса?
-            'status_teacher_id' => 1 //TODO: константы статусов ожидания запроса?
-        ]));
+        $this->createProposal($child_id, $parent_id, $association_id);
 
         return true;
     }
 
+    public function adminSelectChildAssociations($rootValue, $args, AppContext $context){
+        // Есть ли доступ
+        $context->viewer->hasAccessOrError(7);
+
+        // Есть ли такая ассоциация
+        /** @var Association $findAssoc */
+        $findAssoc = DataSource::find("Association", $args["association_id"]);
+        if($findAssoc == null)
+            throw new RequestError("Объединение не найдено!");
+
+        // Есть ли такой ребенок у такого родителя
+        $findChild = DataSource::findOne("UserChild", "parent_id = :parent_id AND child_id = :child_id", [
+            "parent_id" => $args['parent_id'],
+            "child_id" => $args["child_id"]
+        ]);
+        if($findChild == null)
+            throw new RequestError("Неверно задан id ребенка");
+
+        // Было ли уже подано заявление
+        $findProposal = DataSource::findOne("Proposal", "parent_id = :parent_id AND child_id = :child_id AND association_id = :association_id ORDER BY `id` DESC", [
+            "parent_id" => $args['parent_id'],
+            "child_id" => $args["child_id"],
+            "association_id" => $args["association_id"]
+        ]);
+
+        if($findProposal != null)
+        {
+
+            if ($findProposal->status_parent_id == 4)
+            {
+                $child = DataSource::find("User", $args["child_id"]);
+
+                $name = $child->name;
+                $surname = $child->surname;
+                $midname = $child->midname;
+
+                $full_name = "{$name} {$surname}";
+                if($midname != "") $full_name .= " {$midname}";
+
+                $title = $findAssoc->name;
+
+                throw new RequestError("Заявление в объединение {$title} на {$full_name} уже подано");
+            }
+        }
+
+        // Проверка на количество часов
+        $parent_id = $args['parent_id'];
+        $child_id = $args['child_id'];
+        $association_id = $args['association_id'];
+        if (!$this->checkChildLoad($parent_id, $child_id))
+            throw new RequestError("Загруженность ребенка превышает 10 часов");
+
+        $this->createProposal($child_id, $parent_id, $association_id);
+
+        return true;
+    }
 
     /**
      * Проверка кода на подтверждение аккаунта после регистрации
@@ -1348,6 +1379,44 @@ HTML;
         Application::sendMail($email, "Подтверждение аккаунта", $html);
     }
 
+    public function checkChildLoad(int $parent_id, int $child_id)
+    {
+        $findAllProps = DataSource::findAll("Proposal", "parent_id = :parent_id AND child_id = :child_id", [
+            "parent_id" => $parent_id,
+            "child_id" => $child_id
+        ]);
+        if($findAllProps != null){
+            $child = DataSource::find("User", $child_id);
+            $maxHours = 10;
+            if ($child->getAge() >= 14)
+                $maxHours = 12;
+            $hours = 0;
+            foreach($findAllProps as $prop){
+                /** @var Proposal $prop */
+                /** @var Association $info */
+                if ($prop->status_parent_id == 3)
+                    continue;
+                $info = DataSource::find("Association", $prop->association_id);
+                $hours += $info->study_hours_week;
+                if($hours >= $maxHours) break;
+            }
+            if($hours >= $maxHours)
+                return false;
+        }
+        return true;
+    }
 
+    public function createProposal(int $child_id, int $parent_id, int $association_id)
+    {
+        DataSource::insert(new Proposal([
+            "timestamp" => DataSource::timeInMYSQLFormat(),
+            'child_id' => $child_id,
+            'parent_id' => $parent_id,
+            'association_id' => $association_id,
+            'status_admin_id' => 1, //TODO: константы статусов ожидания запроса?
+            'status_parent_id' => 4, //TODO: константы статусов ожидания запроса?
+            'status_teacher_id' => 1 //TODO: константы статусов ожидания запроса?
+        ]));
+    }
 
 }
