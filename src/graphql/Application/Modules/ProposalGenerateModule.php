@@ -33,27 +33,33 @@ class ProposalGenerateModule implements Module {
 
         $child_id = $_GET["child_id"];
         $association_id = $_GET["association_id"];
+        if (isset($_GET['parent_id']))
+            $parent_id = $_GET['parent_id'];
+        else
+            $parent_id = $context->viewer->id;
 
         // Было ли такое заявление
         $find = DataSource::findOne("Proposal", "association_id = :association_id AND child_id = :child_id AND parent_id = :parent_id", [
             "association_id" => $association_id,
             "child_id" => $child_id,
-            "parent_id" => $context->viewer->id
+            "parent_id" => $parent_id
         ]);
         if($find == null)
             throw new RequestError("Заявления не найдено.");
         /** @var User $child */
         $child = DataSource::find("User", $child_id);
+        /** @var User $parent */
+        $parent = DataSource::find("User", $parent_id);
         /** @var Association $association */
         $association = DataSource::find("Association", $association_id);
 
         $mpdf = new Mpdf();
 
-        $parent_surname = $context->viewer->surname;
-        $parent_name = $context->viewer->name;
-        $parent_midname = $context->viewer->midname ?? "";
-        $parent_phone_number = $context->viewer->phone_number;
-        $parent_email = $context->viewer->email;
+        $parent_surname = $parent->surname;
+        $parent_name = $parent->name;
+        $parent_midname = $parent->midname ?? "";
+        $parent_phone_number = $parent->phone_number;
+        $parent_email = $parent->email;
 
         $child_surname = $child->surname;
         $child_name = $child->name;

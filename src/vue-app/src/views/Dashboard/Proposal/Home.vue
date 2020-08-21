@@ -28,9 +28,9 @@
             </template>
 
             <template v-slot:cell(controls)="row">
-                <b-button v-if="row.item.status_admin_id == 1" @click="setBrought(row.item.id)">Принесено</b-button>
-                <b-button v-if="row.item.status_admin_id == 1" @click="setReject(row.item.id)">Отклонить</b-button>
-                <b-button @click="generateForm(row.item.getChild)">Печать</b-button>
+                <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="setBrought(row.item.id)">Принесено</b-button>
+                <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="setReject(row.item.id)">Отклонить</b-button>
+                <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="generateForm(row.item.getChild, row.item.getAssociation.id, row.item.getParent)">Печать</b-button>
             </template>
         </b-table>
 
@@ -472,12 +472,12 @@ export default {
         async setReject(id) {
             console.log(await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + id + ", status_admin_id: 7) }"));
         },
-        generateForm(child, association_id){
+        generateForm(child, association_id, parent){
             const _this = this;
 
             //TODO: фетчинг не graphql файла через что-то цивильное?
 
-            fetch(this.$request_endpoint+"?__module=ProposalGenerate&child_id="+child.id+"&association_id="+association_id, {
+            fetch(this.$request_endpoint+"?__module=ProposalGenerate&child_id="+child.id+"&association_id="+association_id+"&parent_id="+parent.id, {
                 method: 'GET',
                 headers: new Headers({
                     "Authorization": "Bearer " + this.$token
