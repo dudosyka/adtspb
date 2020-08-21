@@ -77,6 +77,16 @@ const routes = [
                         component: () => import('../views/Dashboard/Associations/AddAssociation'),
                     }
                 ]
+            },
+            {
+                path: "/dashboard/proposals",
+                component: () => import('../views/Dashboard/Proposal/Home'),
+                children: [
+                    {
+                        path: '/dashboard/proposals/add',
+                        component: () => import("../views/Dashboard/Proposal/AddProposal")
+                    }
+                ]
             }
         ],
     },

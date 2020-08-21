@@ -159,7 +159,7 @@ export default {
     methods: {
         rowStyler(item, type) {
             if (!item || type !== 'row') return
-            if (item['special'] != null) return 'table-secondary'
+            if (item['isHidden'] != null) return 'table-secondary'
             if (item['% наполненности'] <= 20) return 'table-primary'
             if (item['% наполненности'] > 300) return 'table-danger'
             if (item['% наполненности'] > 200) return 'table-warning'

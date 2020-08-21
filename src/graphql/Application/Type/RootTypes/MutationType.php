@@ -262,17 +262,25 @@ class MutationType extends ObjectType
                         'surname' => Types::nonNull(Types::string()),
                         'midname' => Types::string(),
                         'email' => Types::nonNull(Types::email()),
-                        'password' => Types::nonNull(Types::password()),
                         'phone_number' => Types::nonNull(Types::phoneNumber()),
                         'sex' => Types::nonNull(Types::sex()),
                         'registration_address' => Types::nonNull(Types::string()),
                         'registration_flat' => Types::nonNull(Types::string()),
                         'residence_address' => Types::nonNull(Types::string()),
                         'residence_flat' => Types::nonNull(Types::string()),
-                        'birthday' => Types::nonNull(Types::date()),
                     ]
                 ],
 
+                'adminSelectChildAssociations' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Выбрать ассоциацию ребенка',
+                    'args' => [
+                        'association_id' => Types::nonNull(Types::int()),
+                        'child_id' => Types::nonNull(Types::int()),
+                        'parent_id' => Types::nonNull(Types::int()),
+                        'token' => Types::int()
+                    ]
+                ],
 
                 'setRecalled' => [
                     'type' => Types::boolean(),
@@ -578,6 +586,13 @@ HTML;
         return true;
     }
 
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
     public function adminSelectChildAssociations($rootValue, $args, AppContext $context){
         // Есть ли доступ
         $context->viewer->hasAccessOrError(7);
@@ -1379,6 +1394,11 @@ HTML;
         Application::sendMail($email, "Подтверждение аккаунта", $html);
     }
 
+    /**
+     * @param int $parent_id
+     * @param int $child_id
+     * @return bool
+     */
     public function checkChildLoad(int $parent_id, int $child_id)
     {
         $findAllProps = DataSource::findAll("Proposal", "parent_id = :parent_id AND child_id = :child_id", [
@@ -1406,6 +1426,12 @@ HTML;
         return true;
     }
 
+    /**
+     * @param int $child_id
+     * @param int $parent_id
+     * @param int $association_id
+     * @throws RequestError
+     */
     public function createProposal(int $child_id, int $parent_id, int $association_id)
     {
         DataSource::insert(new Proposal([

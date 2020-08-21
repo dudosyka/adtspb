@@ -1,6 +1,7 @@
 <?php
 namespace GraphQL\Application\Type;
 
+use Com\Tecnick\Pdf\Encrypt\Data;
 use GraphQL\Application\AppContext;
 use GraphQL\Application\Database\DataSource;
 use GraphQL\Application\Entity\Proposal;
@@ -30,7 +31,11 @@ class ProposalType extends ObjectType
 	                'status_admin' => ['type' => Types::string()],
 	                'status_parent' => ['type' => Types::string()],
 	                'status_teacher' => ['type' => Types::string()],
-                    'getAssociation' => ['type' => Types::association()]
+                    'getAssociation' => ['type' => Types::association()],
+                    'getChild' => ['type' => Types::user()],
+                    'getParent' => ['type' => Types::user()],
+                    'parentStatus' => ['type' => Types::string()],
+                    'adminStatus' => ['type' => Types::string()],
                 ];
             },
             'interfaces' => [
@@ -60,4 +65,51 @@ class ProposalType extends ObjectType
         return DataSource::findOne("Association", "id = :association_id", ["association_id" => $proposal->association_id]);
     }
 
+    /**
+     * @param Proposal $proposal
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return mixed|null
+     */
+    public function resolveGetChild(Proposal $proposal, array $args, AppContext $context, ResolveInfo $info)
+    {
+        return DataSource::findOne("User", "id = :id", [':id' => $proposal->child_id]);
+    }
+
+    /**
+     * @param Proposal $proposal
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return mixed|null
+     */
+    public function resolveGetParent(Proposal $proposal, array $args, AppContext $context, ResolveInfo $info)
+    {
+        return DataSource::findOne("User", "id = :id", [':id' => $proposal->parent_id]);
+    }
+
+    /**
+     * @param Proposal $proposal
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return mixed
+     */
+    public function resolveParentStatus(Proposal $proposal, array $args, AppContext $context, ResolveInfo $info)
+    {
+        return DataSource::findOne("SettingsProposal", 'id = :id', [':id' => $proposal->status_parent_id])->name;
+    }
+
+    /**
+     * @param Proposal $proposal
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return mixed
+     */
+    public function resolveAdminStatus(Proposal $proposal, array $args, AppContext $context, ResolveInfo $info)
+    {
+        return DataSource::findOne("SettingsProposal", 'id = :id', [':id' => $proposal->status_admin_id])->name;
+    }
 }

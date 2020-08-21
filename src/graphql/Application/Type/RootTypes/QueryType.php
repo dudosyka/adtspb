@@ -69,6 +69,12 @@ class QueryType extends ObjectType
                     ]
                 ],
 
+                'proposals' => [
+                    'type' => Types::listOf(Types::proposal()),
+                    'description' => 'Получение всех заявлений',
+                    'args' => []
+                ]
+
 
             ],
             'resolveField' => function($val, $args, $context, ResolveInfo $info) {
@@ -206,6 +212,20 @@ class QueryType extends ObjectType
         $pass["min_age"] = $user->getAge();
 
         return $this->associations($rootValue, $pass, $context);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return array
+     * @throws RequestError
+     */
+    public function proposals($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(17);
+
+        return DataSource::findAll("Proposal", "1");
     }
 
 

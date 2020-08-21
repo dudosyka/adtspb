@@ -257,6 +257,18 @@ class User extends EntityBase
             'residence_address' => $this->residence_address,
             'residence_flat' => $this->residence_flat,
             'birthday' => $this->birthday,
+            'login' => $this->login,
+            'job_place' => $this->job_place,
+            'job_position' => $this->job_position,
+            'relationship' => $this->relationship,
+            'study_place' => $this->study_place,
+            'study_class' => $this->study_class,
+            'date_registered' => $this->date_registered,
+            'status_email' => $this->status_email,
+            'verification_key_email' => $this->verification_key_email,
+            'state' => $this->state,
+            'registration_type' => $this->registration_type,
+            'ovz' => $this->ovz
         ];
     }
 

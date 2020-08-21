@@ -57,7 +57,8 @@ class UserType extends ObjectType
 
                     'state' => Types::string(),
                     'ovz' => Types::yesNo(),
-                    'registration_type' => Types::yesNo()
+                    'registration_type' => Types::yesNo(),
+                    'getFullname' => Types::string()
 
                 ];
             },
@@ -212,5 +213,9 @@ class UserType extends ObjectType
 
     }
 
+    public function resolveGetFullname(User $user, array $args, AppContext $context, ResolveInfo $info)
+    {
+        return $user->surname . " " . $user->name . ($user->midname != null ? " " . $user->midname : "");
+    }
 
 }
