@@ -282,6 +282,16 @@ class MutationType extends ObjectType
                     ]
                 ],
 
+                'adminCheckChildLoad' => [
+                    'type' => Types::int(),
+                    'description' => '',
+                    'args' => [
+                        'child_id' => Types::nonNull(Types::int()),
+                        'parent_id' => Types::nonNull(Types::int()),
+                        'association_id' => Types::int(),
+                    ]
+                ],
+
                 'setRecalled' => [
                     'type' => Types::boolean(),
                     'description' => 'Set proposal`s status_parent_id to "recalled"(id = 3)',
@@ -578,7 +588,7 @@ HTML;
         $parent_id = $context->viewer->id;
         $child_id = $args['child_id'];
         $association_id = $args['association_id'];
-        if (!$this->checkChildLoad($parent_id, $child_id))
+        if ($this->checkChildLoad($parent_id, $child_id) == -1)
             throw new RequestError("Загруженность ребенка превышает 10 часов");
 
         $this->createProposal($child_id, $parent_id, $association_id);
@@ -642,12 +652,41 @@ HTML;
         $parent_id = $args['parent_id'];
         $child_id = $args['child_id'];
         $association_id = $args['association_id'];
-        if (!$this->checkChildLoad($parent_id, $child_id))
-            throw new RequestError("Загруженность ребенка превышает 10 часов");
+//        if (!$this->checkChildLoad($parent_id, $child_id))
+//            throw new RequestError("Загруженность ребенка превышает 10 часов");
 
         $this->createProposal($child_id, $parent_id, $association_id);
 
         return true;
+    }
+
+    public function adminCheckChildLoad($rootValue, $args, AppContext $context)
+    {
+        $hours = 0;
+        $findAllProps = DataSource::findAll("Proposal", "parent_id = :parent_id AND child_id = :child_id", [
+            "parent_id" => $args['parent_id'],
+            "child_id" => $args['child_id']
+        ]);
+        if($findAllProps != null){
+            $child = DataSource::find("User", $args['child_id']);
+            $maxHours = 10;
+            if ($child->getAge() >= 14)
+                $maxHours = 12;
+            foreach($findAllProps as $prop){
+                /** @var Proposal $prop */
+                /** @var Association $info */
+                if ($prop->status_parent_id == 3)
+                    continue;
+                $info = DataSource::find("Association", $prop->association_id);
+                $hours += $info->study_hours_week;
+                if($hours >= $maxHours) break;
+            }
+        }
+        if (isset($args['association_id']))
+        {
+            $hours += DataSource::findOne("Association", "id = :id", [':id' => $args['association_id']])->study_hours_week;
+        }
+        return $hours;
     }
 
     /**
@@ -1421,9 +1460,13 @@ HTML;
                 if($hours >= $maxHours) break;
             }
             if($hours >= $maxHours)
-                return false;
+                return -1;
         }
-        return true;
+        else
+        {
+            return 0;
+        }
+        return $hours;
     }
 
     /**

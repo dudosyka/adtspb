@@ -73,6 +73,18 @@ class QueryType extends ObjectType
                     'type' => Types::listOf(Types::proposal()),
                     'description' => 'Получение всех заявлений',
                     'args' => []
+                ],
+
+                'getAllChildren' => [
+                    'type' => Types::listOf(Types::user()),
+                    'description' => 'Получение всех детей',
+                    'args' => []
+                ],
+
+                'getAllParents' => [
+                    'type' => Types::listOf(Types::user()),
+                    'description' => 'Получение всех родителей',
+                    'args' => []
                 ]
 
 
@@ -228,6 +240,27 @@ class QueryType extends ObjectType
         return DataSource::findAll("Proposal", "1");
     }
 
+    /**
+     * @param $rotValue
+     * @param $args
+     * @param AppContext $context
+     * @return array
+     */
+    public function getAllChildren($rotValue, $args, AppContext  $context)
+    {
+        return DataSource::findAll("User", "password = ''");
+    }
+
+    /**
+     * @param $rotValue
+     * @param $args
+     * @param AppContext $context
+     * @return array
+     */
+    public function getAllParents($rotValue, $args, AppContext  $context)
+    {
+        return DataSource::findAll("User", "password != '' AND password != '1'");
+    }
 
 	/**
 	 * "Ping" о том, что сервер работает корректно

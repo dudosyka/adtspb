@@ -80,11 +80,15 @@ const routes = [
             },
             {
                 path: "/dashboard/proposals",
-                component: () => import('../views/Dashboard/Proposal/Home'),
+                component: () => import('../views/Dashboard/Proposal/index'),
                 children: [
                     {
                         path: '/dashboard/proposals/add',
                         component: () => import("../views/Dashboard/Proposal/AddProposal")
+                    },
+                    {
+                        path: '/dashboard/proposals/view',
+                        component: () => import("../views/Dashboard/Proposal/Home")
                     }
                 ]
             }
