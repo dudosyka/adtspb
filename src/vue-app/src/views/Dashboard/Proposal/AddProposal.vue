@@ -9,7 +9,7 @@
                     v-slot="validationContext"
                     >
                     <b-form-group>
-                        ID ребенка:
+                        ФИО ребенка:
                         <b-form-input
                             v-model="child_id"
                             placeholder="Начните вводить ФИО ребенка"
@@ -27,7 +27,7 @@
                     v-slot="validationContext"
                     >
                     <b-form-group>
-                        ID родителя:
+                        ФИО родителя:
                         <b-form-input
                             v-model="parent_id"
                             placeholder="Начните вводить ФИО родителя"
@@ -45,7 +45,7 @@
                     v-slot="validationContext"
                     >
                     <b-form-group>
-                        ID объединения:
+                        ФИО объединения:
                         <b-form-input
                             v-model="association_id"
                             placeholder="Начните вводить название объединения"
