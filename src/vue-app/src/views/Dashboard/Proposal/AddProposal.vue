@@ -1,8 +1,9 @@
 <template>
-    <div class="DashboardAddProposal mt-4">
+    <div class="DashboardAddProposal">
         <b-alert variant="success" v-model="showNotice">Заявление успешно создано</b-alert>
+        <b-alert :show="showGraphQlErrors.length > 0" v-if="showGraphQlErrors.length > 0">{{ showGraphQlErrors[0].message }}</b-alert>
         <validation-observer ref="create_proposal">
-            <b-form-row>
+            <b-form-row class="mt-4">
                 <validation-provider
                     style="width: 100%"
                     :rules="{ required: true }"
@@ -86,7 +87,8 @@ export default {
 
             showNotice: false,
             ignored: false,
-            showWarn: false
+            showWarn: false,
+            showGraphQlErrors: [],
         }
     },
     methods: {
@@ -116,7 +118,7 @@ export default {
                     this.ignored = false;
                 })
                 .catch(err => {
-
+                    this.showGraphQlErrors = err.response.errors;
                     console.log(err);
                 });
         },

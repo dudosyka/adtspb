@@ -17,9 +17,11 @@
         <b-container class="mt-5">
             <h5>По объединениям: </h5>
             <h6>Общее количество заявлений: {{ allProposalCount }}</h6>
+            <h6>Количество принесенных заявлений: {{ broughtProposalCount }}</h6>
             <b-input :type="'search'" v-model="associations_filter" placeholder="Поиск объединения"></b-input>
             <div class="mt-1 mb-2">
                 <b-badge class="mr-1 p-1" variant="secondary">Запись приостановлена</b-badge>
+                <b-badge class="mr-1 p-1" variant="success">Целевое объединение</b-badge>
                 <b-badge class="mr-1 p-1" variant="primary">% наполненности <= 20</b-badge>
                 <b-badge class="mr-1 p-1" variant="warning">% наполненности > 200 </b-badge>
                 <b-badge class="mr-1 p-1" variant="danger">% наполненности > 300</b-badge>
@@ -64,7 +66,7 @@ export default {
 
     data(){
         return {
-            association_statistic_table_fields: [{key: 'id', thClass: 'd-none', tdClass: 'd-none'}, {key: 'Название объединения', sortable: true}, {key: 'Количество групп', sortable: true}, {key: 'Плановые цифры', sortable: true}, {key: 'Фактические цифры', sortable: true}, {key: '% наполненности', sortable: true}, {key: 'controls', 'label': 'Подробнее'}],
+            association_statistic_table_fields: [{key: 'id', thClass: 'd-none', tdClass: 'd-none'}, {key: 'Название объединения', sortable: true}, {key: 'Количество групп', sortable: true}, {key: 'Плановые цифры', sortable: true}, {key: 'Фактические цифры', sortable: true}, {key: '% наполненности', sortable: true}, {key: 'brought', label: 'Заявлений принесено', sortable:  true}, {key: 'controls', 'label': 'Подробнее'}],
             allProposalCount: 0,
             user_statistic_table_fields: ['Всего зарегистрировано детей', 'Всего зарегистрировано родителей'],
             association_statistic: [],
@@ -73,6 +75,7 @@ export default {
             association_detail_stat: null,
             association_details: [],
             association_detail_stat_visible: false,
+            broughtProposalCount: 0,
             association_detail_stat_fields: [
                 // {
                 //     key: 'association_name',
@@ -138,6 +141,7 @@ export default {
                 });
                 statistic.proposal_statistic.map(el=>{
                     this.allProposalCount += parseInt(el['allProposalCount']);
+                    this.broughtProposalCount += parseInt(el['brought']);
                     this.association_statistic.push({
                         'id': el['id'],
                         'Название объединения': el['Название объединения'],
@@ -145,7 +149,9 @@ export default {
                         'Плановые цифры': el['Плановые цифры'],
                         'Фактические цифры': el['Фактические цифры'],
                         '% наполненности': el['% наполненности'],
-                        'special': el['special'],
+                        'isHidden': el['special'],
+                        'isClosed': el['isClosed'],
+                        'brought': el['brought'],
                         'controls': null
 
                     });
@@ -159,7 +165,8 @@ export default {
     methods: {
         rowStyler(item, type) {
             if (!item || type !== 'row') return
-            if (item['isHidden'] != null) return 'table-secondary'
+            if (item['isHidden'] != 0) return 'table-success'
+            if (item['isClosed'] != 0) return 'table-secondary'
             if (item['% наполненности'] <= 20) return 'table-primary'
             if (item['% наполненности'] > 300) return 'table-danger'
             if (item['% наполненности'] > 200) return 'table-warning'

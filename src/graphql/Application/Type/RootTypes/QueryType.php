@@ -87,6 +87,12 @@ class QueryType extends ObjectType
                     'type' => Types::listOf(Types::user()),
                     'description' => 'Получение всех родителей',
                     'args' => []
+                ],
+
+                'adminLoadAssociationProposalInfo' => [
+                    'type' => Types::listOf(Types::association()),
+                    'description' => 'Return list of associations with proposal statistic',
+                    'args' => []
                 ]
 
 
@@ -313,6 +319,20 @@ class QueryType extends ObjectType
     public function getAllParents($rotValue, $args, AppContext  $context)
     {
         return DataSource::findAll("User", "password != '' AND password != '1'");
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return array
+     * @throws RequestError
+     */
+    public function adminLoadAssociationProposalInfo($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(17);
+
+        return DataSource::findAll('Association', '1');
     }
 
 	/**

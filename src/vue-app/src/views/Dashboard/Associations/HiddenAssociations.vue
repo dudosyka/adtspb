@@ -3,7 +3,7 @@
 
         <vue-headful title="Панель управления | Личный кабинет"/>
 
-        <h5>Управление секретными объединениями</h5>
+        <h5>Управление целевыми объединениями</h5>
         <admin-association-table v-on:updatedata="updateData = !updateData" :key="updateData" type="hidden"></admin-association-table>
         <admin-association-table v-on:updatedata="updateData = !updateData" :key="updateData" type="common-hidden"></admin-association-table>
     </div>

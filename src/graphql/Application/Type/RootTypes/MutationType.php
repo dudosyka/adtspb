@@ -249,7 +249,8 @@ class MutationType extends ObjectType
                     'description' => 'Change proposal`s status_admin_id by id',
                     'args' => [
                         'id' => Types::nonNull(Types::int()),
-                        'status_admin_id' => Types::nonNull(Types::int())
+                        'status_admin_id' => Types::nonNull(Types::int()),
+                        'comment' => Types::string()
                     ]
                 ],
 
@@ -1180,7 +1181,18 @@ HTML;
         $children_statistic = $query[0]->children;
 
         $result = [
-            'proposal_statistic' => DataSource::_query("SELECT association.id as id, association.name AS \"Название объединения\", COUNT(*) AS `allProposalCount`, association.group_count AS \"Количество групп\", association.group_count*20 AS \"Плановые цифры\", COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\", association.isHidden AS \"special\" FROM proposal RIGHT JOIN association ON association.id = proposal.association_id GROUP BY association.id"),
+            'proposal_statistic' => DataSource::_query("
+                   SELECT association.id                         as id,
+                   association.name                              AS \"Название объединения\",
+                   COUNT(*)                                      AS `allProposalCount`, 
+                   SUM(proposal.status_admin_id = 6)             AS `brought`,
+                   association.group_count                       AS \"Количество групп\", 
+                   association.group_count*20                    AS \"Плановые цифры\", 
+                   COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", 
+                   (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\", 
+                   association.isHidden                          AS \"special\",
+                   association.isCLosed                          AS 'isClosed'
+                   FROM proposal RIGHT JOIN association ON association.id = proposal.association_id GROUP BY association.id"),
             'parent_statistic' => $parent_statistic,
             'child_statistic' => $children_statistic,
         ];
@@ -1289,6 +1301,12 @@ HTML;
 
         if ($status == null)
             throw new RequestError("Invalid status");
+
+        //checking if status = 7 (reject) we must set a reject reason
+        if ($status->id == 7 && (!isset($args['comment']) || $args['comment'] == ""))
+            throw new RequestError("When rejecting the proposal must set reject reason4");
+        if ($status->id == 7)
+            $proposal->reject_reason = $args['comment'];
 
         $proposal->status_admin_id = $status->id;
 

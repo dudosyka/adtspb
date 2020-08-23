@@ -175,7 +175,7 @@
                         v-model="isHidden"
                         :state="getValidationState(validationContext)"
                         aria-describedby="is-hidden-feedback"
-                    >Секретное объединение</b-form-checkbox>
+                    >Целевое объединение</b-form-checkbox>
                     <b-form-invalid-feedback id="is-hidden-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                 </b-form-group>
             </validation-provider>

@@ -39,8 +39,8 @@
             </template>
 
             <template v-slot:cell(controls)="row">
-                <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="setBrought(row.item.id)">Принесено</b-button>
-                <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="setReject(row.item.id)">Отклонить</b-button>
+                <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="preSetBrought(row.item.id)">Принесено</b-button>
+                <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="rejectProposal = true; rejectProposalId = row.item.id">Отклонить</b-button>
                 <b-button v-if="(row.item.status_admin_id == 1 || row.item.status_admin_id == 6) && row.item.status_parent_id != 3" @click="generateForm(row.item)">Заявление</b-button>
             </template>
         </b-table>
@@ -54,6 +54,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Фамилия ребенка
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="child_data.surname"
@@ -71,6 +72,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Имя ребенка
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="child_data.name"
@@ -88,6 +90,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Отчестве ребенка
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="child_data.midname"
@@ -105,6 +108,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            E-mail ребенка
                             <b-form-input
                                 class="icon envelope"
                                 v-model="child_data.email"
@@ -122,6 +126,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Мобильный телефон ребенка
                             <b-form-input
                                 class="icon phone"
                                 v-model="child_data.phone_number"
@@ -141,6 +146,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Пол ребенка
                             <b-form-select
                                 placeholder="Пол ребенка"
                                 v-model="child_data.sex"
@@ -158,6 +164,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Адрес регистрации ребенка
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="child_data.registration_address"
@@ -175,6 +182,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Квартира по адресу регистрации ребенка
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="child_data.registration_flat"
@@ -192,6 +200,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Адрес проживания ребенка
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="child_data.residence_address"
@@ -209,6 +218,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Квартира по адресу проживания ребенка
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="child_data.residence_flat"
@@ -227,7 +237,7 @@
         </b-modal>
 
         <b-modal v-model="editParentModal">
-            <validation-observer ref="child_edit">
+            <validation-observer ref="parent_edit">
                 <b-form-row>
                     <validation-provider
                         style="width: 100%;"
@@ -235,6 +245,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Фамилия родителя
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="parent_data.surname"
@@ -252,6 +263,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Имя родителя
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="parent_data.name"
@@ -269,6 +281,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Отчество родителя
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="parent_data.midname"
@@ -286,6 +299,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            E-mail родителя
                             <b-form-input
                                 class="icon envelope"
                                 v-model="parent_data.email"
@@ -303,6 +317,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Мобильный телефон родителя
                             <b-form-input
                                 class="icon phone"
                                 v-model="parent_data.phone_number"
@@ -322,6 +337,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Пол родителя
                             <b-form-select
                                 placeholder="Пол родителя"
                                 v-model="parent_data.sex"
@@ -339,6 +355,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Адрес регистрации родителя
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="parent_data.registration_address"
@@ -356,6 +373,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Квартира по адресу регистрации родителя
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="parent_data.registration_flat"
@@ -373,6 +391,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Адрес проживания родителя
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="parent_data.residence_address"
@@ -390,6 +409,7 @@
                         v-slot="validationContext"
                     >
                         <b-form-group>
+                            Квартира по адресу проживания родителя
                             <b-form-input
                                 class="icon person-lines-fill"
                                 v-model="parent_data.residence_flat"
@@ -415,6 +435,14 @@
             </template>
         </b-modal>
 
+        <b-modal v-model="rejectProposal">
+            Введите причину отклонения:
+            <b-input v-model="rejectReason"></b-input>
+            <template v-slot:modal-footer>
+                <b-button @click="preSetReject()">Продолжить</b-button>
+                <b-button @click="rejectProposal = false; rejectProposalId = null; rejectReason = '';">Отмена</b-button>
+            </template>
+        </b-modal>
     </div>
 </template>
 
@@ -461,6 +489,7 @@ export default {
                     sortable: false
                 }
             ],
+            proposal_id: null,
 
             child_data: Array,
             editChildModal: false,
@@ -468,7 +497,7 @@ export default {
             parent_data: Array,
             editParentModal: false,
 
-            editConfirmation: {visible:false, type: false},
+            editConfirmation: {visible:false, function: false},
             sex_options: [
                 { value: null, text: 'Пол', disabled: true },
                 { value: "м", text: 'Мужской' },
@@ -478,6 +507,10 @@ export default {
             proposalsLoaded: true,
             currentPage: 1,
             perPage: 10,
+
+            rejectProposal: false,
+            rejectProposalId: null,
+            rejectReason: ""
         }
     },
     mounted() {
@@ -490,15 +523,34 @@ export default {
         }
     },
     methods: {
-        async setBrought(id)
+        async setBrought()
         {
-            await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + id + ", status_admin_id: 6) }");
+            await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + this.proposal_id + ", status_admin_id: 6) }");
             await this.loadProposals();
+            this.editConfirmation = {visible:false, function: false};
         },
-        async setReject(id)
+        preSetBrought(id)
         {
-            await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + id + ", status_admin_id: 7) }");
+            this.proposal_id = id;
+            this.editConfirmation.visible = true;
+            this.editConfirmation.function = this.setBrought;
+        },
+        async setReject()
+        {
+            await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + this.proposal_id + ", status_admin_id: 7, comment: \"" + this.rejectReason + "\") }");
             await this.loadProposals();
+            this.editConfirmation = {visible:false, function: false};
+            this.rejectReason = "";
+        },
+        preSetReject()
+        {
+            if (this.rejectReason == "")
+                return;
+            this.proposal_id = this.rejectProposalId;
+            this.rejectProposal = false;
+            this.rejectProposalId = null;
+            this.editConfirmation.visible = true;
+            this.editConfirmation.function = this.setReject;
         },
         async loadProposals()
         {
