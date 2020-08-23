@@ -249,6 +249,7 @@ class QueryType extends ObjectType
                  `child`.`surname` AS `childSurname`,
                  `child`.`midname` AS `childMidname`,
                  `child`.`sex` AS `childSex`,
+                 `child`.`birthday` AS `childBirthday`,
                  `child`.`email` AS `childEmail`,
                  `child`.`phone_number` AS `childPhone`,
                  `child`.`registration_address` AS `childRegistrationAddress`,

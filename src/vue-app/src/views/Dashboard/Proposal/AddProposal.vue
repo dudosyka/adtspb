@@ -125,18 +125,18 @@ export default {
         },
     },
     async mounted() {
-        let data = await this.$graphql_client.request('query { getAllChildren { id, getFullname } }');
+        let data = await this.$graphql_client.request('query { getAllChildren { id, getFullname, birthday } }');
         this.children = data.getAllChildren.map(el => {
             return {
                 value: el.id,
-                text: el.getFullname
+                text: el.getFullname + " (" + el.birthday + ")"
             };
         });
-        data = await this.$graphql_client.request('query { getAllParents { id, getFullname } }');
+        data = await this.$graphql_client.request('query { getAllParents { id, getFullname, phone_number } }');
         this.parents = data.getAllParents.map(el => {
             return {
                 value: el.id,
-                text: el.getFullname
+                text: el.getFullname + " (" + el.phone_number + ")"
             };
         });
         data = await this.$graphql_client.request('query { associations { id, name } }');

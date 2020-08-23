@@ -28,12 +28,12 @@
             :current-page="currentPage"
         >
             <template v-slot:cell(parentFullname)="row">
-                {{ row.value }}
+                {{ row.value }} ({{ row.item.parentPhone }})
                 <b-button @click="editParent(row.item)">Изменить</b-button>
             </template>
 
             <template v-slot:cell(childFullname)="row">
-                {{ row.value }}
+                {{ row.value }} ({{ row.item.childBirthday }})
                 <b-button @click="editChild(row.item);">Изменить</b-button>
                 <b-button @click="generateResolutionForm(row.item)">Согласие</b-button>
             </template>
