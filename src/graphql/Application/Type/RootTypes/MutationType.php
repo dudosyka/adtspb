@@ -261,8 +261,8 @@ class MutationType extends ObjectType
                         'name' => Types::nonNull(Types::string()),
                         'surname' => Types::nonNull(Types::string()),
                         'midname' => Types::string(),
-                        'email' => Types::nonNull(Types::email()),
-                        'phone_number' => Types::nonNull(Types::phoneNumber()),
+                        'email' => Types::string(), //string() вместо email() Иначе пустой не проходит
+                        'phone_number' => Types::string(), //string() вместо phoneNumber() Иначе пустой не проходит
                         'sex' => Types::nonNull(Types::sex()),
                         'registration_address' => Types::nonNull(Types::string()),
                         'registration_flat' => Types::nonNull(Types::string()),

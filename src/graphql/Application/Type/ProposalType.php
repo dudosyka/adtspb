@@ -36,6 +36,8 @@ class ProposalType extends ObjectType
                     'getParent' => ['type' => Types::user()],
                     'parentStatus' => ['type' => Types::string()],
                     'adminStatus' => ['type' => Types::string()],
+                    'parentFullname' => ['type' => Types::string()],
+                    'childFullname' => ['type' => Types::string()]
                 ];
             },
             'interfaces' => [
@@ -111,5 +113,31 @@ class ProposalType extends ObjectType
     public function resolveAdminStatus(Proposal $proposal, array $args, AppContext $context, ResolveInfo $info)
     {
         return DataSource::findOne("SettingsProposal", 'id = :id', [':id' => $proposal->status_admin_id])->name;
+    }
+
+    /**
+     * @param Proposal $proposal
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return string
+     */
+    public function resolveParentFullname(Proposal $proposal, array $args, AppContext $context, ResolveInfo $info)
+    {
+        $user = DataSource::findOne('User', 'id = :id', [':id' => $proposal->parent_id]);
+        return $user->surname . " " . $user->name . ($user->midname != null ? " " . $user->midname : "");
+    }
+
+    /**
+     * @param Proposal $proposal
+     * @param array $args
+     * @param AppContext $context
+     * @param ResolveInfo $info
+     * @return string
+     */
+    public function resolveChildFullname(Proposal $proposal, array $args, AppContext $context, ResolveInfo $info)
+    {
+        $user = DataSource::findOne('User', 'id = :id', [':id' => $proposal->child_id]);
+        return $user->surname . " " . $user->name . ($user->midname != null ? " " . $user->midname : "");
     }
 }

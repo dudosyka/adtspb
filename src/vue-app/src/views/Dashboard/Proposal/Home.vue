@@ -8,29 +8,40 @@
                 </div>
             </template>
         </b-table>
-        <b-input :type="'search'" v-model="search" placeholder="Поиск заявления (по ФИО родителя \ ребенка)"></b-input>
+        <b-pagination
+            v-if="proposalsLoaded"
+            v-model="currentPage"
+            :total-rows="proposals_data.length"
+            :per-page="perPage"
+            aria-controls="proposalsTable"
+        ></b-pagination>
+        <b-container class="d-flex flex-row">
+            <b-input :disabled="!proposalsLoaded" class="w-50" :type="'search'" v-model="search" placeholder="Поиск заявления (по ФИО родителя \ ребенка)"></b-input>
+            <b-button :disabled="!proposalsLoaded" class="h-50 mt-2 ml-2" @click="loadProposals()">Поиск</b-button>
+        </b-container>
         <b-table
             v-if="proposalsLoaded"
+            id="proposalsTable"
             :items="proposals_data"
             :fields="proposals_fields"
-            :filter="search"
-            :filter-included-fields="['parent_data', 'child_data']"
+            :per-page="perPage"
+            :current-page="currentPage"
         >
-
-            <template v-slot:cell(parent_data)="row">
+            <template v-slot:cell(parentFullname)="row">
                 {{ row.value }}
-                <b-button @click="editParent(row.item.getParent)">Изменить</b-button>
+                <b-button @click="editParent(row.item)">Изменить</b-button>
             </template>
 
-            <template v-slot:cell(child_data)="row">
-                {{ row.item.getChild.surname + " " + row.item.getChild.name + (row.item.getChild.midname != "" ? " " + row.item.getChild.midname : "") }}
-                <b-button @click="editChild(row.item.getChild);">Изменить</b-button>
+            <template v-slot:cell(childFullname)="row">
+                {{ row.value }}
+                <b-button @click="editChild(row.item);">Изменить</b-button>
+                <b-button @click="generateResolutionForm(row.item)">Согласие</b-button>
             </template>
 
             <template v-slot:cell(controls)="row">
                 <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="setBrought(row.item.id)">Принесено</b-button>
                 <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="setReject(row.item.id)">Отклонить</b-button>
-                <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="generateForm(row.item.getChild, row.item.getAssociation.id, row.item.getParent)">Печать</b-button>
+                <b-button v-if="(row.item.status_admin_id == 1 || row.item.status_admin_id == 6) && row.item.status_parent_id != 3" @click="generateForm(row.item)">Заявление</b-button>
             </template>
         </b-table>
 
@@ -211,7 +222,7 @@
                 </b-form-row>
             </validation-observer>
             <template v-slot:modal-footer>
-                <b-button @click="editConfirmation.visible = true;editConfirmation.type = 'c'">Сохранить</b-button>
+                <b-button @click="editConfirmation.visible = true;editConfirmation.function = closeEditingChild">Сохранить</b-button>
             </template>
         </b-modal>
 
@@ -392,14 +403,14 @@
                 </b-form-row>
             </validation-observer>
             <template v-slot:modal-footer>
-                <b-button @click="editConfirmation.visible = true;editConfirmation.type = 'p'">Сохранить</b-button>
+                <b-button @click="editConfirmation.visible = true;editConfirmation.function = closeEditingParent">Сохранить</b-button>
             </template>
         </b-modal>
 
         <b-modal v-model="editConfirmation.visible">
             Подтверждаете сохранение изменений? Отменить данное действие будет невозможно.
             <template v-slot:modal-footer>
-                <b-button @click="closeEditing(editConfirmation.type)">Продолжить</b-button>
+                <b-button @click="editConfirmation.visible = false;editConfirmation.function()">Продолжить</b-button>
                 <b-button @click="editConfirmation.visible = false;">Отмена</b-button>
             </template>
         </b-modal>
@@ -412,7 +423,7 @@ export default {
     name: 'DashboardProposalHome',
     data: function () {
         return {
-            proposals_data: Array,
+            proposals_data: [],
             proposals_fields: [
                 {
                     key: 'id',
@@ -420,22 +431,27 @@ export default {
                     tdClass: 'd-none'
                 },
                 {
-                    key: 'parent_data',
+                    key: 'associationName',
+                    label: 'Название объединения',
+                    sortable: true
+                },
+                {
+                    key: 'parentFullname',
                     label: 'Родитель',
                     sortable: true
                 },
                 {
-                    key: 'child_data',
+                    key: 'childFullname',
                     label: 'Ребенок',
                     sortable: true
                 },
                 {
-                    key: 'parentStatus',
+                    key: 'statusParentName',
                     label: 'Статус родителя',
                     sortable: true
                 },
                 {
-                    key: 'adminStatus',
+                    key: 'statusAdminName',
                     label: 'Статус администрации',
                     sortable: true
                 },
@@ -459,72 +475,43 @@ export default {
                 { value: "ж", text: 'Женский' },
             ],
             search: null,
-            proposalsLoaded: false
+            proposalsLoaded: true,
+            currentPage: 1,
+            perPage: 10,
         }
     },
-    async mounted() {
-        await this.loadProposals();
+    mounted() {
+        window.onkeydown = e => {
+            console.log(e);
+            if (e.key == "Enter" && this.proposalsLoaded)
+            {
+                this.loadProposals();
+            }
+        }
     },
     methods: {
-        async setBrought(id) {
-            console.log(await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + id + ", status_admin_id: 6) }"));
+        async setBrought(id)
+        {
+            await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + id + ", status_admin_id: 6) }");
+            await this.loadProposals();
         },
-        async setReject(id) {
-            console.log(await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + id + ", status_admin_id: 7) }"));
-        },
-        generateForm(child, association_id, parent){
-            const _this = this;
-
-            //TODO: фетчинг не graphql файла через что-то цивильное?
-
-            fetch(this.$request_endpoint+"?__module=ProposalGenerate&child_id="+child.id+"&association_id="+association_id+"&parent_id="+parent.id, {
-                method: 'GET',
-                headers: new Headers({
-                    "Authorization": "Bearer " + this.$token
-                })
-            })
-                .then(response => response.blob())
-                .then(blob => {
-                    let url = window.URL.createObjectURL(blob);
-                    let a = document.createElement('a');
-                    a.href = url;
-                    // a.download = "Заявление "++"("+child.name+" "+child.surname+").pdf";
-                    a.download = "Заявление("+child.surname + "_" + child.name + "_" + child.midname + ").pdf";
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                });
-
+        async setReject(id)
+        {
+            await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + id + ", status_admin_id: 7) }");
+            await this.loadProposals();
         },
         async loadProposals()
         {
+            if (this.search == "")
+                return;
             this.proposalsLoaded = false;
-            let data = await this.$graphql_client.request("query{ proposals { id, status_admin_id, status_parent_id, parentStatus, adminStatus, getAssociation { id, name }, getChild { id, name, surname, midname, email, phone_number, sex, registration_address, registration_flat, residence_address, residence_flat, birthday }, getParent { id, name, surname, midname, email, phone_number, sex, registration_address, registration_flat, residence_address, residence_flat, birthday } } }");
-            console.log(data.proposals);
-            this.proposals_data = data.proposals.map(el => {
-                el.parent_data = el.getParent.surname + " " + el.getParent.name + (el.getParent.midname != "" ? " " + el.getParent.midname : "");
-                el.child_data = el.getChild.surname + " " + el.getChild.name + (el.getChild.midname != "" ? " " + el.getChild.midname : "");
-                return el;
-            });
+            let data = await this.$graphql_client.request("query{ proposals (search: \"" + this.search + "\") }");
+            this.proposals_data = JSON.parse(data.proposals);
             this.proposalsLoaded = true;
         },
-        editChild(child)
+        async editUserData(userData)
         {
-            this.editChildModal = true;
-            this.child_data = child;
-        },
-        editParent(parent)
-        {
-            this.editParentModal = true;
-            this.parent_data = parent;
-        },
-        async closeEditing(type)
-        {
-            let data;
-            if (type == 'c')
-                data = this.child_data;
-            else
-                data = this.parent_data;
+            let data = userData;
 
             await this.$graphql_client.request(`mutation {
                 adminEditUserData (
@@ -541,15 +528,102 @@ export default {
                     residence_flat: "` + data.residence_flat + `",
                 )
             }`);
-
-            if (type == 'c')
-                this.editChildModal = false;
-            else
-                this.editParentModal = false;
-
+            await this.loadProposals();
+        },
+        editChild(proposal)
+        {
+            this.editChildModal = true;
+            this.child_data = {
+                id: proposal.child_id,
+                surname: proposal.childSurname,
+                name: proposal.childName,
+                midname: proposal.childMidname,
+                email: proposal.childEmail,
+                phone_number: proposal.childPhone,
+                sex: proposal.childSex,
+                registration_address: proposal.childRegistrationAddress,
+                registration_flat: proposal.childRegistrationFlat,
+                residence_address: proposal.childResidenceAddress,
+                residence_flat: proposal.childResidenceFlat,
+            };
+            console.log(this.child_data);
+        },
+        editParent(proposal)
+        {
+            console.log(proposal);
+            this.editParentModal = true;
+            this.parent_data = {
+                id: proposal.parent_id,
+                surname: proposal.parentSurname,
+                name: proposal.parentName,
+                midname: proposal.parentMidname,
+                email: proposal.parentEmail,
+                phone_number: proposal.parentPhone,
+                sex: proposal.parentSex,
+                registration_address: proposal.parentRegistrationAddress,
+                registration_flat: proposal.parentRegistrationFlat,
+                residence_address: proposal.parentResidenceAddress,
+                residence_flat: proposal.parentResidenceFlat,
+            };
+            console.log(this.parent_data);
+        },
+        async closeEditingParent()
+        {
+            await this.editUserData(this.parent_data);
+            this.editParentModal = false;
             this.editConfirmation.visible = false;
         },
+        async closeEditingChild()
+        {
+            await this.editUserData(this.child_data);
+            this.editChildModal = false;
+            this.editConfirmation.visible = false;
+        },
+        generateForm(proposal)
+        {
+            const _this = this;
 
+            //TODO: фетчинг не graphql файла через что-то цивильное?
+
+            fetch(this.$request_endpoint+"?__module=ProposalGenerate&child_id="+proposal.child_id+"&parent_id="+proposal.parent_id+"&association_id="+proposal.association_id, {
+                method: 'GET',
+                headers: new Headers({
+                    "Authorization": "Bearer " + this.$token
+                })
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    let url = window.URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    // a.download = "Заявление "++"("+child.name+" "+child.surname+").pdf";
+                    a.download = "Заявление("+proposal.childSurname + "_" + proposal.childName + "_" + proposal.childMidname + ").pdf";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                });
+
+        },
+        generateResolutionForm(proposal)
+        {
+            fetch(this.$request_endpoint+"?__module=ResolutionGenerate&child_id="+proposal.child_id+"&parent_id="+proposal.parent_id, {
+                method: 'GET',
+                headers: new Headers({
+                    "Authorization": "Bearer " + this.$token
+                })
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    let url = window.URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    // a.download = "Заявление "++"("+child.name+" "+child.surname+").pdf";
+                    a.download = "Согласие_"+proposal.childSurname + "_" + proposal.childName + "_" + proposal.childMidname + ".pdf";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                });
+        },
         getValidationState({ dirty, validated, valid = null }) {
             return dirty || validated ? valid : null;
         },

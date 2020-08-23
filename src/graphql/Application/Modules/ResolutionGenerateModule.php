@@ -32,15 +32,22 @@ class ResolutionGenerateModule implements Module {
         $context->viewer->hasAccessOrError(6);
 
         $child_id = $_GET["child_id"];
+        if (isset($_GET['parent_id']))
+            $parent_id = $_GET['parent_id'];
+        else
+            $parent_id = $context->viewer->id;
+
 
         /** @var User $child */
         $child = DataSource::find("User", $child_id);
+        /** @var User $parent */
+        $parent = DataSource::find("User", $parent_id);
 
         $mpdf = new Mpdf();
 
-        $parent_surname = $context->viewer->surname;
-        $parent_name = $context->viewer->name;
-        $parent_midname = $context->viewer->midname ?? "";
+        $parent_surname = $parent->surname;
+        $parent_name = $parent->name;
+        $parent_midname = $parent->midname ?? "";
 //        $parent_phone_number = $context->viewer->phone_number;
 //        $parent_email = $context->viewer->email;
 

@@ -70,9 +70,11 @@ class QueryType extends ObjectType
                 ],
 
                 'proposals' => [
-                    'type' => Types::listOf(Types::proposal()),
+                    'type' => Types::string(),
                     'description' => 'Получение всех заявлений',
-                    'args' => []
+                    'args' => [
+                        'search' => Types::string()
+                    ]
                 ],
 
                 'getAllChildren' => [
@@ -237,7 +239,57 @@ class QueryType extends ObjectType
     {
         $context->viewer->hasAccessOrError(17);
 
-        return DataSource::findAll("Proposal", "1");
+        $search = $args['search'];
+
+          $data = DataSource::_query("
+                SELECT
+                 `association`.`name` AS `associationName`,
+                 `proposal`.*,
+                 `child`.`name` AS `childName`,
+                 `child`.`surname` AS `childSurname`,
+                 `child`.`midname` AS `childMidname`,
+                 `child`.`sex` AS `childSex`,
+                 `child`.`email` AS `childEmail`,
+                 `child`.`phone_number` AS `childPhone`,
+                 `child`.`registration_address` AS `childRegistrationAddress`,
+                 `child`.`registration_flat` AS `childRegistrationFlat`,
+                 `child`.`registration_flat` AS `childResidenceAddress`,
+                 `child`.`residence_flat` AS `childResidenceFlat`,
+                 `parent`.`name` AS `parentName`,
+                 `parent`.`surname` AS `parentSurname`,
+                 `parent`.`midname` AS `parentMidname`,
+                 `parent`.`sex` AS `parentSex`,
+                 `parent`.`email` AS `parentEmail`,
+                 `parent`.`phone_number` AS `parentPhone`,
+                 `parent`.`registration_address` AS `parentRegistrationAddress`,
+                 `parent`.`registration_flat` AS `parentRegistrationFlat`,
+                 `parent`.`residence_address` AS `parentResidenceAddress`,
+                 `parent`.`residence_flat` AS `parentResidenceFlat`,
+                 `status_admin`.`name` AS `statusAdminName`,
+                 `status_parent`.`name` AS `statusParentName`
+                FROM `proposal`
+                LEFT JOIN `association` ON `proposal`.`association_id` = `association`.`id`
+                LEFT JOIN `settings_proposal` as `status_admin` ON `proposal`.`status_admin_id` = `status_admin`.`id`
+                LEFT JOIN `settings_proposal` as `status_parent` ON `proposal`.`status_parent_id` = `status_parent`.`id`
+                LEFT JOIN `user` as `child` ON `proposal`.`child_id` = `child`.`id`
+                LEFT JOIN `user` as `parent` ON `proposal`.`parent_id` = `parent`.`id` 
+                ");
+
+        $res = [];
+        foreach ($data as $item)
+        {
+            $item->childFullname = trim($item->childSurname) . " " . trim($item->childName) . ( $item->childMidname != "" ? " " . trim($item->childMidname) : "");
+            $item->parentFullname = trim($item->parentSurname) . " " . trim($item->parentName) . ( $item->parentMidname != "" ? " " . trim($item->parentMidname) : "");
+            if (
+                preg_match("/.{0,}".$search.".{0,}/um", trim($item->childFullname)) ||
+                preg_match("/.{0,}".$search.".{0,}/um", trim($item->parentFullname))
+            )
+            {
+                $res[] = $item;
+            }
+        }
+
+        return json_encode($res, JSON_UNESCAPED_UNICODE);
     }
 
     /**

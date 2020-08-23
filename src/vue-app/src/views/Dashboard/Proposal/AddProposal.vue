@@ -116,6 +116,7 @@ export default {
                     this.ignored = false;
                 })
                 .catch(err => {
+
                     console.log(err);
                 });
         },
