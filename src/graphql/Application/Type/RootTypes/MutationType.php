@@ -665,13 +665,7 @@ HTML;
         $child_id = $args['child_id'];
         $association_id = $args['association_id'];
 
-        //Смотрим, если группы уже заполенны, то помечаем заявление как "резерв"
-        $broughtCounter = count(DataSource::findAll("Proposal", "`association_id` = :id, `status_admin_id=6`", [':id' => $findProposal->association_id]));
-        $max = $findAssoc->group_count * 20;
-        if ($broughtCounter >= $max)
-            $this->createProposal($child_id, $parent_id, $association_id, 1);
-        else
-            $this->createProposal($child_id, $parent_id, $association_id);
+        $this->createProposal($child_id, $parent_id, $association_id);
 
         return true;
     }
@@ -1326,6 +1320,13 @@ HTML;
         //checking if we rollback proposal to the "waiting" state, we also must empty it`s reject reason
         if ($status->id == 1)
             $proposal->reject_reason = "";
+
+        //checking if groups already full set the 'reserve' status to proposal
+        $broughtCounter = count(DataSource::findAll("Proposal", "`association_id` = :id, `status_admin_id=6`", [':id' => $findProposal->association_id]));
+        $findAssoc = DataSource::findOne('Association', "id = :id", [':id' => $proposal->association_id]);
+        $max = $findAssoc->group_count * 20;
+        if ($broughtCounter >= $max)
+            $proposal->isReserve = 1;
 
         $proposal->status_admin_id = $status->id;
 

@@ -13,6 +13,7 @@ class Proposal extends EntityBase
     public $status_admin_id;
     public $status_parent_id;
     public $status_teacher_id;
+    public $isReserve;
 
     public function __getTable()
     {
