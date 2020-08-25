@@ -254,6 +254,15 @@ class MutationType extends ObjectType
                     ]
                 ],
 
+                'teacherChangeProposalStatus' => [
+                    'type' => Types::boolean(),
+                    'description' => 'Change proposal`s status_teacher_id by id',
+                    'args' => [
+                        'id' => Types::nonNull(Types::int()),
+                        'status' => Types::nonNull(Types::int()),
+                    ]
+                ],
+
                 'adminEditUserData' => [
                     'type' => Types::boolean(),
                     'description' => 'Edit user`s data by id',
@@ -263,12 +272,15 @@ class MutationType extends ObjectType
                         'surname' => Types::nonNull(Types::string()),
                         'midname' => Types::string(),
                         'email' => Types::string(), //string() вместо email() Иначе пустой не проходит
-                        'phone_number' => Types::string(), //string() вместо phoneNumber() Иначе пустой не проходит
+                        'birthday' => Types::string(), // string() аналогично
+                        'phone_number' => Types::string(), //string() аналогично
                         'sex' => Types::nonNull(Types::sex()),
                         'registration_address' => Types::nonNull(Types::string()),
                         'registration_flat' => Types::nonNull(Types::string()),
                         'residence_address' => Types::nonNull(Types::string()),
                         'residence_flat' => Types::nonNull(Types::string()),
+                        'study_class' => Types::string(),
+                        'study_place' => Types::string()
                     ]
                 ],
 
@@ -649,14 +661,17 @@ HTML;
             }
         }
 
-        // Проверка на количество часов
         $parent_id = $args['parent_id'];
         $child_id = $args['child_id'];
         $association_id = $args['association_id'];
-//        if (!$this->checkChildLoad($parent_id, $child_id))
-//            throw new RequestError("Загруженность ребенка превышает 10 часов");
 
-        $this->createProposal($child_id, $parent_id, $association_id);
+        //Смотрим, если группы уже заполенны, то помечаем заявление как "резерв"
+        $broughtCounter = count(DataSource::findAll("Proposal", "`association_id` = :id, `status_admin_id=6`", [':id' => $findProposal->association_id]));
+        $max = $findAssoc->group_count * 20;
+        if ($broughtCounter >= $max)
+            $this->createProposal($child_id, $parent_id, $association_id, 1);
+        else
+            $this->createProposal($child_id, $parent_id, $association_id);
 
         return true;
     }
@@ -1183,15 +1198,15 @@ HTML;
         $result = [
             'proposal_statistic' => DataSource::_query("
                    SELECT association.id                         as id,
-                   association.name                              AS \"Название объединения\",
+                   association.name                              AS `association_name`,
                    COUNT(*)                                      AS `allProposalCount`, 
                    SUM(proposal.status_admin_id = 6)             AS `brought`,
-                   association.group_count                       AS \"Количество групп\", 
-                   association.group_count*20                    AS \"Плановые цифры\", 
-                   COUNT(*) - SUM(proposal.status_parent_id = 3) AS \"Фактические цифры\", 
-                   (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS \"% наполненности\", 
-                   association.isHidden                          AS \"special\",
-                   association.isCLosed                          AS 'isClosed'
+                   association.group_count                       AS `association_group_count`, 
+                   association.group_count*20                    AS `planned_numbers`, 
+                   COUNT(*) - SUM(proposal.status_parent_id = 3) AS `fact_numbers`, 
+                   (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS `fullness_percent`, 
+                   association.isHidden                          AS `special`,
+                   association.isCLosed                          AS `isClosed`
                    FROM proposal RIGHT JOIN association ON association.id = proposal.association_id GROUP BY association.id"),
             'parent_statistic' => $parent_statistic,
             'child_statistic' => $children_statistic,
@@ -1308,7 +1323,39 @@ HTML;
         if ($status->id == 7)
             $proposal->reject_reason = $args['comment'];
 
+        //checking if we rollback proposal to the "waiting" state, we also must empty it`s reject reason
+        if ($status->id == 1)
+            $proposal->reject_reason = "";
+
         $proposal->status_admin_id = $status->id;
+
+        return DataSource::update($proposal);
+    }
+
+    /**
+     * @param $rootValue
+     * @param $args
+     * @param AppContext $context
+     * @return bool
+     * @throws RequestError
+     */
+    public function teacherChangeProposalStatus($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(16);
+
+        //checking if proposal exists
+        $proposal = DataSource::findOne("Proposal", "id = :id", [':id' => $args['id']]);
+
+        if ($proposal == null)
+            throw new RequestError("Proposal not found");
+
+        //checking if status valid
+        $status = DataSource::findOne("SettingsProposal", "id = :id", ['id' => $args['status']]);
+
+        if ($status == null)
+            throw new RequestError("Invalid status");
+
+        $proposal->status_teacher_id = $status->id;
 
         return DataSource::update($proposal);
     }
@@ -1433,7 +1480,26 @@ HTML;
         if ($association == null)
             throw new RequestError("Association with id ".$args['id']."not found");
 
-        $res = json_encode(DataSource::_query("SELECT child.name AS child_name, child.midname AS child_midname, child.surname AS child_surname, child.email as child_email, child.phone_number as child_phone, parent.name AS parent_name, parent.midname AS parent_midname, parent.surname AS parent_surname, parent.email as parent_email, parent.phone_number as parent_phone, association.id AS association_id, association.name AS association_name, proposal.timestamp, parent_s.name AS status_parent, admin_s.name AS status_admin, teacher_s.name AS status_teacher FROM proposal INNER JOIN association ON association.id = proposal.association_id INNER JOIN user AS child ON proposal.child_id = child.id INNER JOIN user AS parent ON proposal.parent_id = parent.id INNER JOIN settings_proposal AS parent_s ON proposal.status_parent_id = parent_s.id INNER JOIN settings_proposal AS admin_s ON proposal.status_admin_id = admin_s.id INNER JOIN settings_proposal AS teacher_s ON proposal.status_teacher_id = teacher_s.id WHERE proposal.association_id = :id", [':id' => $args['id']]), JSON_UNESCAPED_UNICODE);
+        $res = json_encode(DataSource::_query("
+        SELECT 
+        association.id as association_id,
+        proposal.id as id,
+        child.name AS child_name, 
+        child.midname AS child_midname, 
+        child.surname AS child_surname, 
+        child.email as child_email, 
+        child.phone_number as child_phone,
+        child.birthday as child_birthday,
+        parent.name AS parent_name, 
+        parent.midname AS parent_midname, 
+        parent.surname AS parent_surname, 
+        parent.email as parent_email, 
+        parent.phone_number as parent_phone, 
+        association.id AS association_id, 
+        association.name AS association_name, 
+        proposal.timestamp, parent_s.name AS status_parent, 
+        admin_s.name AS status_admin, teacher_s.name AS status_teacher 
+        FROM proposal INNER JOIN association ON association.id = proposal.association_id INNER JOIN user AS child ON proposal.child_id = child.id INNER JOIN user AS parent ON proposal.parent_id = parent.id INNER JOIN settings_proposal AS parent_s ON proposal.status_parent_id = parent_s.id INNER JOIN settings_proposal AS admin_s ON proposal.status_admin_id = admin_s.id INNER JOIN settings_proposal AS teacher_s ON proposal.status_teacher_id = teacher_s.id WHERE proposal.association_id = :id", [':id' => $args['id']]), JSON_UNESCAPED_UNICODE);
 
         return $res ? $res : "";
     }
@@ -1493,7 +1559,7 @@ HTML;
      * @param int $association_id
      * @throws RequestError
      */
-    public function createProposal(int $child_id, int $parent_id, int $association_id)
+    public function createProposal(int $child_id, int $parent_id, int $association_id, $isReserve = 0)
     {
         DataSource::insert(new Proposal([
             "timestamp" => DataSource::timeInMYSQLFormat(),
@@ -1502,7 +1568,8 @@ HTML;
             'association_id' => $association_id,
             'status_admin_id' => 1, //TODO: константы статусов ожидания запроса?
             'status_parent_id' => 4, //TODO: константы статусов ожидания запроса?
-            'status_teacher_id' => 1 //TODO: константы статусов ожидания запроса?
+            'status_teacher_id' => 1, //TODO: константы статусов ожидания запроса?
+            'isReserve' => $isReserve
         ]));
     }
 

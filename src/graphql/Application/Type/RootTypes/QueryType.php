@@ -93,6 +93,14 @@ class QueryType extends ObjectType
                     'type' => Types::listOf(Types::association()),
                     'description' => 'Return list of associations with proposal statistic',
                     'args' => []
+                ],
+
+                'teacherLoadProposalStat' => [
+                    'type' => Types::string(),
+                    'description' => 'Получение статистики по всем заявлениям',
+                    'args' => [
+                        'search' => Types::string()
+                    ]
                 ]
 
 
@@ -260,8 +268,10 @@ class QueryType extends ObjectType
                  `child`.`phone_number` AS `childPhone`,
                  `child`.`registration_address` AS `childRegistrationAddress`,
                  `child`.`registration_flat` AS `childRegistrationFlat`,
-                 `child`.`registration_flat` AS `childResidenceAddress`,
+                 `child`.`residence_address` AS `childResidenceAddress`,
                  `child`.`residence_flat` AS `childResidenceFlat`,
+                 `child`.`study_class` AS `childStudyClass`,
+                 `child`.`study_place` AS `childStudyPlace`,
                  `parent`.`name` AS `parentName`,
                  `parent`.`surname` AS `parentSurname`,
                  `parent`.`midname` AS `parentMidname`,
@@ -296,7 +306,61 @@ class QueryType extends ObjectType
             }
         }
 
-        return json_encode($res, JSON_UNESCAPED_UNICODE);
+        $res = json_encode($res, JSON_UNESCAPED_UNICODE);
+
+        return $res ? $res : "";
+    }
+
+    public function teacherLoadProposalStat($rootValue, $args, AppContext $context)
+    {
+        $context->viewer->hasAccessOrError(18);
+
+        $search = $args['search'];
+
+        $data = DataSource::_query("
+                SELECT
+                 `association`.`name` AS `associationName`,
+                 `proposal`.*,
+                 `child`.`name` AS `childName`,
+                 `child`.`surname` AS `childSurname`,
+                 `child`.`midname` AS `childMidname`,
+                 `child`.`sex` AS `childSex`,
+                 `child`.`birthday` AS `childBirthday`,
+                 `child`.`email` AS `childEmail`,
+                 `child`.`phone_number` AS `childPhone`,
+                 `parent`.`name` AS `parentName`,
+                 `parent`.`surname` AS `parentSurname`,
+                 `parent`.`midname` AS `parentMidname`,
+                 `parent`.`sex` AS `parentSex`,
+                 `parent`.`email` AS `parentEmail`,
+                 `parent`.`phone_number` AS `parentPhone`,
+                 `status_admin`.`name` AS `statusAdminName`,
+                 `status_parent`.`name` AS `statusParentName`
+                FROM `proposal`
+                LEFT JOIN `association` ON `proposal`.`association_id` = `association`.`id`
+                LEFT JOIN `settings_proposal` as `status_admin` ON `proposal`.`status_admin_id` = `status_admin`.`id`
+                LEFT JOIN `settings_proposal` as `status_parent` ON `proposal`.`status_parent_id` = `status_parent`.`id`
+                LEFT JOIN `user` as `child` ON `proposal`.`child_id` = `child`.`id`
+                LEFT JOIN `user` as `parent` ON `proposal`.`parent_id` = `parent`.`id` 
+                ");
+
+        $res = [];
+        foreach ($data as $item)
+        {
+            $item->childFullname = trim($item->childSurname) . " " . trim($item->childName) . ( $item->childMidname != "" ? " " . trim($item->childMidname) : "");
+            $item->parentFullname = trim($item->parentSurname) . " " . trim($item->parentName) . ( $item->parentMidname != "" ? " " . trim($item->parentMidname) : "");
+            if (
+                preg_match("/.{0,}".mb_strtolower($search).".{0,}/um", mb_strtolower(trim($item->childFullname))) ||
+                preg_match("/.{0,}".mb_strtolower($search).".{0,}/um", mb_strtolower(trim($item->parentFullname)))
+            )
+            {
+                $res[] = $item;
+            }
+        }
+
+        $res = json_encode($res, JSON_UNESCAPED_UNICODE);
+
+        return $res ? $res : "";
     }
 
     /**

@@ -6,7 +6,6 @@
         <router-link class="text-dark bg-light rounded p-2 text-decoration-none ml-2" to="/dashboard/statistic">Выгрузка статистики</router-link>
         <router-link class="text-dark bg-light rounded p-2 text-decoration-none ml-2" to="/dashboard/associations">Управление объединениями</router-link>
         <router-link class="text-dark bg-light rounded p-2 text-decoration-none ml-2" to="/dashboard/proposals">Управление заявлениями</router-link>
-
     </div>
 </template>
 

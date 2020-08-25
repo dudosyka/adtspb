@@ -289,7 +289,9 @@ const $globals = Vue.observable({
   $token: {},
   $graphql_client: {},
   $file_upload: {},
-  $action_list: null
+  $access_control: {
+      actions: [],
+  },
 })
 
 Object.defineProperty(Vue.prototype, '$token', {
@@ -322,14 +324,14 @@ Object.defineProperty(Vue.prototype, '$file_upload', {
   }
 })
 
-Object.defineProperty(Vue.prototype, '$action_list', {
-  get () {
-    return $globals.$action_list
-  },
+Object.defineProperty(Vue.prototype, '$access_control', {
+    get () {
+        return $globals.$access_control
+    },
 
-  set (value) {
-    $globals.$action_list = value
-  }
+    set (value) {
+      $globals.$access_control = value;
+    }
 })
 
 async function hasAccess (action_id, action_list_id = 1) {
@@ -341,11 +343,11 @@ async function hasAccess (action_id, action_list_id = 1) {
   let result = false
   try {
     await $globals.$graphql_client.request(request, {}).then(data => {
-      $globals.$action_list = JSON.parse(data.getViewerRights).map(el => {
+      $globals.$access_control.actions = JSON.parse(data.getViewerRights).map(el => {
         return parseInt(el)
       })
       console.log(action_id)
-      result = ($globals.$action_list.indexOf(action_id) > -1)
+      result = ($globals.$access_control.actions.indexOf(action_id) > -1)
       console.log(result)
     }).catch(err => {
       console.log(err)
@@ -354,12 +356,19 @@ async function hasAccess (action_id, action_list_id = 1) {
   return result
 }
 
+function checkAccess()
+{
+    return $globals.$access_control.actions.indexOf(action) != -1;
+}
+
+
 Vue.mixin({
   mounted () {
     this.$token = localStorage.$token
   },
   methods: {
     hasAccess: hasAccess,
+    checkAccess: checkAccess,
     $recreateClient () {
       if (this.$token) {
         this.$graphql_client = new GraphQLClient(this.$request_endpoint, {
@@ -402,6 +411,7 @@ Vue.mixin({
 const config = [
   { regExp: /\/dashboard\//, actionId: 13 },
   { regExp: /\/dashboard\/statistic.*/, actionId: 12 },
+  { regExp: /\/dashboard\/statistic.*/, actionId: 18 },
   { regExp: /\/dashboard\/associations\/closed.*/, actionId: 11 },
   { regExp: /\/dashboard\/associations\/add.*/, actionId: 14 },
   { regExp: /\/dashboard\/associations\/hidden.*/, actionId: 15 }

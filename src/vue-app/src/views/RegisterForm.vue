@@ -3094,13 +3094,7 @@ export default {
 .top-panel-button:active, .top-panel-button-darker:active {
     background-color: #0f3061 !important;
 }
-
 .spacer{
     margin: auto;
 }
-
-
-
-
-
 </style>

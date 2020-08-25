@@ -4,14 +4,15 @@
         <vue-headful title="Панель управления | Выгрузка статистики"/>
 
         <h3 class="text-center">Выгрузка статистики: </h3>
-        <b-container class="mb-5">
-            <h5>По пользователям: </h5>
-            <b-table
-                :fields="user_statistic_table_fields"
-                :items="user_statistic"
-            >
-
-            </b-table>
+        <b-container class="mb-5" v-if="!hasAccess(18)">
+            <template>
+                <h5>По пользователям: </h5>
+                <b-table
+                    :fields="user_statistic_table_fields"
+                    :items="user_statistic"
+                >
+                </b-table>
+            </template>
         </b-container>
         <hr>
         <b-container class="mt-5">
@@ -47,7 +48,7 @@
                     {{ row.item.parent_surname }} {{ row.item.parent_name }} {{ row.item.parent_midname }}
                 </template>
                 <template v-slot:cell(child_fullname)="row">
-                    {{ row.item.child_surname }} {{ row.item.child_name }} {{ row.item.child_midname }}
+                    {{ row.item.child_surname }} {{ row.item.child_name }} {{ row.item.child_midname }} ({{ row.item.child_birthday }})
                 </template>
                 <template v-slot:cell(child_contacts)="row">
                     <span>Email: {{ row.item.child_email }}</span><br><span>Мобильный: {{ row.item.child_phone }}</span>
@@ -55,7 +56,19 @@
                 <template v-slot:cell(parent_contacts)="row">
                     <span>Email: {{ row.item.parent_email }}</span><br><span>Мобильный: {{ row.item.parent_phone }}</span>
                 </template>
+                <template v-slot:cell(status_teacher)="row">
+                    {{ row.value }}
+                    <b-button v-if="row.value == 'Ожидание'" @click="preSetReceived(row.item.id, row.item.association_id)">Принято</b-button>
+                </template>
             </b-table>
+        </b-modal>
+
+        <b-modal v-model="showWarn">
+            Подтверждаете сохранение изменений? Отменить данное действие будет невозможно.
+            <template v-slot:modal-footer>
+                <b-button @click="showWarn = false;setReceived()">Продолжить</b-button>
+                <b-button @click="showWarn = false;">Отмена</b-button>
+            </template>
         </b-modal>
     </div>
 </template>
@@ -66,7 +79,16 @@ export default {
 
     data(){
         return {
-            association_statistic_table_fields: [{key: 'id', thClass: 'd-none', tdClass: 'd-none'}, {key: 'Название объединения', sortable: true}, {key: 'Количество групп', sortable: true}, {key: 'Плановые цифры', sortable: true}, {key: 'Фактические цифры', sortable: true}, {key: '% наполненности', sortable: true}, {key: 'brought', label: 'Заявлений принесено', sortable:  true}, {key: 'controls', 'label': 'Подробнее'}],
+            association_statistic_table_fields: [
+                {key: 'id', thClass: 'd-none', tdClass: 'd-none'},
+                {key: 'association_name', sortable: true, label: "Название объединения"},
+                {key: 'association_group_count', sortable: true, label: 'Кол-во групп'},
+                (!this.hasAccess(18) ? {key: 'planned_numbers', sortable: true, label: "Плановые цифры"} : {}),
+                (!this.hasAccess(18) ? {key: 'fact_numbers', sortable: true, label: "Фактические цифры"} : {}),
+                (!this.hasAccess(18) ? {key: 'fullness_percent', sortable: true, label: "% наполненности"} : {}),
+                (!this.hasAccess(18) ? {key: 'brought', label: 'Заявлений принесено', sortable:  true} : {}),
+                {key: 'controls', 'label': 'Подробнее'}
+            ],
             allProposalCount: 0,
             user_statistic_table_fields: ['Всего зарегистрировано детей', 'Всего зарегистрировано родителей'],
             association_statistic: [],
@@ -94,7 +116,7 @@ export default {
                 },
                 {
                     key: 'child_fullname',
-                    label: 'ФИО ребенка',
+                    label: 'Данные ребенка',
                     sortable: true
                 },
                 {
@@ -123,6 +145,9 @@ export default {
                     sortable: true
                 },
             ],
+            proposalToReceived: null,
+            showWarn: false,
+            editedAssociation: null,
         }
     },
     mounted() {
@@ -144,11 +169,11 @@ export default {
                     this.broughtProposalCount += parseInt(el['brought']);
                     this.association_statistic.push({
                         'id': el['id'],
-                        'Название объединения': el['Название объединения'],
-                        'Количество групп': el['Количество групп'],
-                        'Плановые цифры': el['Плановые цифры'],
-                        'Фактические цифры': el['Фактические цифры'],
-                        '% наполненности': el['% наполненности'],
+                        'association_name': el['association_name'],
+                        'association_group_count': el['association_group_count'],
+                        'planned_numbers': el['planned_numbers'],
+                        'fact_numbers': el['fact_numbers'],
+                        'fullness_percent': el['fullness_percent'],
                         'isHidden': el['special'],
                         'isClosed': el['isClosed'],
                         'brought': el['brought'],
@@ -163,15 +188,17 @@ export default {
             });
     },
     methods: {
-        rowStyler(item, type) {
+        rowStyler(item, type)
+        {
             if (!item || type !== 'row') return
             if (item['isHidden'] != 0) return 'table-success'
             if (item['isClosed'] != 0) return 'table-secondary'
-            if (item['% наполненности'] <= 20) return 'table-primary'
-            if (item['% наполненности'] > 300) return 'table-danger'
-            if (item['% наполненности'] > 200) return 'table-warning'
+            if (item['fullness_percent'] <= 20) return 'table-primary'
+            if (item['fullness_percent'] > 300) return 'table-danger'
+            if (item['fullness_percent'] > 200) return 'table-warning'
         },
-        getAssociationDetails(id) {
+        getAssociationDetails(id)
+        {
             this.association_detail_stat_visible = true;
 
             let request = `
@@ -183,11 +210,25 @@ export default {
                 .then(data => {
                     this.association_details.push(JSON.parse(data.getAssociationDetails));
                     this.association_detail_stat = JSON.parse(data.getAssociationDetails);
+                    console.log(this.association_detail_stat);
                 })
                 .catch(err => {
                     console.log(err);
                 });
+        },
+        preSetReceived(id, association_id)
+        {
+            this.proposalToReceived = id;
+            this.editedAssociation = association_id;
+            this.showWarn = true;
+        },
+        async setReceived()
+        {
+            console.log(await this.$graphql_client.request("mutation { teacherChangeProposalStatus ( id: " + this.proposalToReceived + ", status: 2 ) }"));
+            this.getAssociationDetails(this.editedAssociation);
+            this.proposalToReceived = this.editedAssociation = null;
         }
+
 
     }
 

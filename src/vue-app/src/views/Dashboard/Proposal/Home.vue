@@ -42,6 +42,7 @@
                 <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="preSetBrought(row.item.id)">Принесено</b-button>
                 <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="rejectProposal = true; rejectProposalId = row.item.id">Отклонить</b-button>
                 <b-button v-if="(row.item.status_admin_id == 1 || row.item.status_admin_id == 6) && row.item.status_parent_id != 3" @click="generateForm(row.item)">Заявление</b-button>
+                <b-button v-if="row.item.status_admin_id != 1" @click="preSetWaiting(row.item.id)">Ожидание</b-button>
             </template>
         </b-table>
 
@@ -104,11 +105,29 @@
 
                     <validation-provider
                         style="width: 100%;"
+                        :rules="{ required: false }"
+                        v-slot="validationContext"
+                    >
+                        <b-form-group>
+                            Дата рождения ребенка
+                            <b-form-input
+                                class="icon person-lines-fill"
+                                v-model="child_data.birthday"
+                                placeholder="Дата рождения ребенка"
+                                :state="getValidationState(validationContext)"
+                                :aria-describedby="'cld-birthday-feedback'"
+                            ></b-form-input>
+                            <b-form-invalid-feedback :id="'cld-birthday-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                        </b-form-group>
+                    </validation-provider>
+
+                    <validation-provider
+                        style="width: 100%;"
                         :rules="{ required: false, email: true }"
                         v-slot="validationContext"
                     >
                         <b-form-group>
-                            E-mail ребенка
+                            E-mail ребенка (необязательное)
                             <b-form-input
                                 class="icon envelope"
                                 v-model="child_data.email"
@@ -227,6 +246,42 @@
                                 :aria-describedby="'cld-residence-flat-feedback'"
                             ></b-form-input>
                             <b-form-invalid-feedback :id="'cld-residence-flat-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                        </b-form-group>
+                    </validation-provider>
+
+                    <validation-provider
+                        style="width: 100%;"
+                        :rules="{ required: false }"
+                        v-slot="validationContext"
+                    >
+                        <b-form-group>
+                            Место обучения
+                            <b-form-input
+                                class="icon person-lines-fill"
+                                v-model="child_data.study_place"
+                                placeholder="Место обучения"
+                                :state="getValidationState(validationContext)"
+                                :aria-describedby="'cld-study-place-feedback'"
+                            ></b-form-input>
+                            <b-form-invalid-feedback :id="'cld-study-place-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                        </b-form-group>
+                    </validation-provider>
+
+                    <validation-provider
+                        style="width: 100%;"
+                        :rules="{ required: false }"
+                        v-slot="validationContext"
+                    >
+                        <b-form-group>
+                            Класс обучения
+                            <b-form-input
+                                class="icon person-lines-fill"
+                                v-model="child_data.study_class"
+                                placeholder="Класс обучения"
+                                :state="getValidationState(validationContext)"
+                                :aria-describedby="'cld-study-class-feedback'"
+                            ></b-form-input>
+                            <b-form-invalid-feedback :id="'cld-study-class-feedback'">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                         </b-form-group>
                     </validation-provider>
                 </b-form-row>
@@ -535,6 +590,18 @@ export default {
             this.editConfirmation.visible = true;
             this.editConfirmation.function = this.setBrought;
         },
+        async setWaiting()
+        {
+            await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + this.proposal_id + ", status_admin_id: 1) }");
+            await this.loadProposals();
+            this.editConfirmation = {visible:false, function: false};
+        },
+        preSetWaiting(id)
+        {
+            this.proposal_id = id;
+            this.editConfirmation.visible = true;
+            this.editConfirmation.function = this.setWaiting;
+        },
         async setReject()
         {
             await this.$graphql_client.request("mutation { adminChangeProposalStatus ( id: " + this.proposal_id + ", status_admin_id: 7, comment: \"" + this.rejectReason + "\") }");
@@ -565,12 +632,17 @@ export default {
         {
             let data = userData;
 
-            await this.$graphql_client.request(`mutation {
+            let birthday = data.birthday ? data.birthday : "";
+            let study_class = data.study_class ? data.study_class : "";
+            let study_place = data.study_place ? data.study_place : "";
+
+            let request = `mutation {
                 adminEditUserData (
                     id: ` + data.id + `,
                     name: "` + data.name + `",
                     surname: "` + data.surname + `",
                     ` + (data.midname != "" ? "midname:\"" + data.midname + "\"," : "") + `
+                    birthday: "` + birthday + `",
                     email: "` + data.email + `",
                     phone_number: "` + data.phone_number + `",
                     sex: "` + data.sex + `",
@@ -578,8 +650,12 @@ export default {
                     registration_flat: "` + data.registration_flat + `",
                     residence_address: "` + data.residence_address + `",
                     residence_flat: "` + data.residence_flat + `",
+                    study_class: "` + study_class + `",
+                    study_place: "` + study_place + `"
                 )
-            }`);
+            }`;
+
+            await this.$graphql_client.request(request);
             await this.loadProposals();
         },
         editChild(proposal)
@@ -590,6 +666,7 @@ export default {
                 surname: proposal.childSurname,
                 name: proposal.childName,
                 midname: proposal.childMidname,
+                birthday: proposal.childBirthday,
                 email: proposal.childEmail,
                 phone_number: proposal.childPhone,
                 sex: proposal.childSex,
@@ -597,6 +674,8 @@ export default {
                 registration_flat: proposal.childRegistrationFlat,
                 residence_address: proposal.childResidenceAddress,
                 residence_flat: proposal.childResidenceFlat,
+                study_place: proposal.childStudyPlace,
+                study_class: proposal.childStudyClass
             };
             console.log(this.child_data);
         },
@@ -609,6 +688,7 @@ export default {
                 surname: proposal.parentSurname,
                 name: proposal.parentName,
                 midname: proposal.parentMidname,
+                birthday: false,
                 email: proposal.parentEmail,
                 phone_number: proposal.parentPhone,
                 sex: proposal.parentSex,
@@ -616,6 +696,8 @@ export default {
                 registration_flat: proposal.parentRegistrationFlat,
                 residence_address: proposal.parentResidenceAddress,
                 residence_flat: proposal.parentResidenceFlat,
+                study_place: false,
+                study_class: false
             };
             console.log(this.parent_data);
         },
