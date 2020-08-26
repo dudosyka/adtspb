@@ -350,15 +350,10 @@ async function hasAccess (action_id, action_list_id = 1) {
       result = ($globals.$access_control.actions.indexOf(action_id) > -1)
       console.log(result)
     }).catch(err => {
-      console.log(err)
+      // console.log(err)
     })
   } catch (e) {}
   return result
-}
-
-function checkAccess()
-{
-    return $globals.$access_control.actions.indexOf(action) != -1;
 }
 
 
@@ -368,7 +363,6 @@ Vue.mixin({
   },
   methods: {
     hasAccess: hasAccess,
-    checkAccess: checkAccess,
     $recreateClient () {
       if (this.$token) {
         this.$graphql_client = new GraphQLClient(this.$request_endpoint, {
@@ -409,20 +403,29 @@ Vue.mixin({
 })
 
 const config = [
-  { regExp: /\/dashboard\//, actionId: 13 },
-  { regExp: /\/dashboard\/statistic.*/, actionId: 12 },
-  { regExp: /\/dashboard\/statistic.*/, actionId: 18 },
-  { regExp: /\/dashboard\/associations\/closed.*/, actionId: 11 },
-  { regExp: /\/dashboard\/associations\/add.*/, actionId: 14 },
-  { regExp: /\/dashboard\/associations\/hidden.*/, actionId: 15 }
+  { regExp: /\/dashboard\//, actions: [13] },
+  { regExp: /\/dashboard\/statistic.*/, actions: [12, 18] },
+  { regExp: /\/dashboard\/associations\/closed.*/, actionId: [11] },
+  { regExp: /\/dashboard\/associations\/add.*/, actionId: [14] },
+  { regExp: /\/dashboard\/associations\/hidden.*/, actionId: [15] }
 
 ]
 
-const checkConfig = () => {
+const checkConfig = async () => {
   config.map(async el => {
-    if (requested.path.match(el.regExp)) {
-      console.log(el.actionId)
-      if (!await hasAccess(el.actionId)) { redirect() }
+    if (requested.path.match(el.regExp))
+    {
+        let success = false;
+          let act = el.actions.map(async action => {
+              if (await hasAccess(action))
+              {
+                  success = true;
+              }
+          });
+          act[el.actions.length - 1].finally(() => {
+              if (!success)
+                  redirect();
+          });
     }
   }
   )
@@ -433,7 +436,7 @@ let requested
 let redirect
 
 router.beforeEach(async function (to, from, next) {
-  console.log(1)
+  // console.log(1)
   requested = to
   redirect = () => {
     router.push('/')

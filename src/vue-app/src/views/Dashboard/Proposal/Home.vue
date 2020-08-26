@@ -42,7 +42,7 @@
                 <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="preSetBrought(row.item.id)">Принесено</b-button>
                 <b-button v-if="row.item.status_admin_id == 1 && row.item.status_parent_id != 3" @click="rejectProposal = true; rejectProposalId = row.item.id">Отклонить</b-button>
                 <b-button v-if="(row.item.status_admin_id == 1 || row.item.status_admin_id == 6) && row.item.status_parent_id != 3" @click="generateForm(row.item)">Заявление</b-button>
-                <b-button v-if="row.item.status_admin_id != 1" @click="preSetWaiting(row.item.id)">Ожидание</b-button>
+                <b-button v-if="row.item.status_admin_id != 1" @click="preSetWaiting(row.item.id)">Отмена</b-button>
             </template>
         </b-table>
 

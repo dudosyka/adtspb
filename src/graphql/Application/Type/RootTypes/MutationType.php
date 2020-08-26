@@ -1181,7 +1181,10 @@ HTML;
      */
     public function adminLoadStatistic($rootValue, $args, AppContext $context)
     {
-        $context->viewer->hasAccessOrError(12);
+        if (!$context->viewer->hasAccess(12))
+        {
+            $context->viewer->hasAccessOrError(18);
+        }
 
         $query = DataSource::_query("SELECT COUNT(DISTINCT(`parent_id`)) AS parents FROM `user_child` WHERE 1");
         $parent_statistic = $query[0]->parents;
@@ -1197,8 +1200,8 @@ HTML;
                    SUM(proposal.status_admin_id = 6)             AS `brought`,
                    association.group_count                       AS `association_group_count`, 
                    association.group_count*20                    AS `planned_numbers`, 
-                   COUNT(*) - SUM(proposal.status_parent_id = 3) AS `fact_numbers`, 
-                   (100*(COUNT(*) - SUM(proposal.status_parent_id = 3))div(association.group_count*20)) AS `fullness_percent`, 
+                   COUNT(*) - SUM(proposal.status_parent_id = 3)- SUM(proposal.status_admin_id = 7) AS `fact_numbers`, 
+                   (100*(COUNT(*) - SUM(proposal.status_parent_id = 3) - SUM(proposal.status_admin_id = 7))div(association.group_count*20)) AS `fullness_percent`, 
                    association.isHidden                          AS `special`,
                    association.isCLosed                          AS `isClosed`
                    FROM proposal RIGHT JOIN association ON association.id = proposal.association_id GROUP BY association.id"),
@@ -1322,11 +1325,11 @@ HTML;
             $proposal->reject_reason = "";
 
         //checking if groups already full set the 'reserve' status to proposal
-        $broughtCounter = count(DataSource::findAll("Proposal", "`association_id` = :id, `status_admin_id=6`", [':id' => $findProposal->association_id]));
+        $broughtCounter = count(DataSource::findAll("Proposal", "`association_id` = :id AND `status_admin_id`= 6", [':id' => $proposal->association_id]));
         $findAssoc = DataSource::findOne('Association', "id = :id", [':id' => $proposal->association_id]);
         $max = $findAssoc->group_count * 20;
         if ($broughtCounter >= $max)
-            $proposal->isReserve = 1;
+            $proposal->isReserve = time();
 
         $proposal->status_admin_id = $status->id;
 
@@ -1475,7 +1478,10 @@ HTML;
      */
     public function getAssociationDetails($rootValue, $args, AppContext $context)
     {
-        $context->viewer->hasAccessOrError(12);
+        if (!$context->viewer->hasAccess(12))
+        {
+            $context->viewer->hasAccessOrError(18);
+        }
 
         $association = DataSource::findOne("Association", 'id = :id', [':id' => $args['id']]);
         if ($association == null)
@@ -1485,6 +1491,9 @@ HTML;
         SELECT 
         association.id as association_id,
         proposal.id as id,
+        proposal.status_admin_id AS status_admin_id, 
+        proposal.status_parent_id AS status_parent_id, 
+        proposal.status_teacher_id AS status_teacher_id,
         child.name AS child_name, 
         child.midname AS child_midname, 
         child.surname AS child_surname, 
@@ -1499,8 +1508,17 @@ HTML;
         association.id AS association_id, 
         association.name AS association_name, 
         proposal.timestamp, parent_s.name AS status_parent, 
-        admin_s.name AS status_admin, teacher_s.name AS status_teacher 
-        FROM proposal INNER JOIN association ON association.id = proposal.association_id INNER JOIN user AS child ON proposal.child_id = child.id INNER JOIN user AS parent ON proposal.parent_id = parent.id INNER JOIN settings_proposal AS parent_s ON proposal.status_parent_id = parent_s.id INNER JOIN settings_proposal AS admin_s ON proposal.status_admin_id = admin_s.id INNER JOIN settings_proposal AS teacher_s ON proposal.status_teacher_id = teacher_s.id WHERE proposal.association_id = :id", [':id' => $args['id']]), JSON_UNESCAPED_UNICODE);
+        admin_s.name AS status_admin, 
+        teacher_s.name AS status_teacher,
+        parent_s.name AS status_parent
+         
+        FROM proposal 
+        INNER JOIN association ON association.id = proposal.association_id 
+        INNER JOIN user AS child ON proposal.child_id = child.id 
+        INNER JOIN user AS parent ON proposal.parent_id = parent.id 
+        INNER JOIN settings_proposal AS parent_s ON proposal.status_parent_id = parent_s.id 
+        INNER JOIN settings_proposal AS admin_s ON proposal.status_admin_id = admin_s.id 
+        INNER JOIN settings_proposal AS teacher_s ON proposal.status_teacher_id = teacher_s.id WHERE proposal.association_id = :id", [':id' => $args['id']]), JSON_UNESCAPED_UNICODE);
 
         return $res ? $res : "";
     }

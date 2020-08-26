@@ -4,7 +4,7 @@
         <vue-headful title="Панель управления | Выгрузка статистики"/>
 
         <h3 class="text-center">Выгрузка статистики: </h3>
-        <b-container class="mb-5" v-if="!hasAccess(18)">
+        <b-container class="mb-5" v-if="!isTeacher">
             <template>
                 <h5>По пользователям: </h5>
                 <b-table
@@ -17,8 +17,10 @@
         <hr>
         <b-container class="mt-5">
             <h5>По объединениям: </h5>
-            <h6>Общее количество заявлений: {{ allProposalCount }}</h6>
-            <h6>Количество принесенных заявлений: {{ broughtProposalCount }}</h6>
+            <template v-if="!isTeacher">
+                <h6>Общее количество заявлений: {{ allProposalCount }}</h6>
+                <h6>Количество принесенных заявлений: {{ broughtProposalCount }}</h6>
+            </template>
             <b-input :type="'search'" v-model="associations_filter" placeholder="Поиск объединения"></b-input>
             <div class="mt-1 mb-2">
                 <b-badge class="mr-1 p-1" variant="secondary">Запись приостановлена</b-badge>
@@ -33,9 +35,10 @@
                 :filter-included-fields="['Название объединения']"
                 :items="association_statistic"
                 :tbody-tr-class="rowStyler"
+                responsive="true"
             >
                 <template v-slot:cell(controls)="row">
-                    <button @click="getAssociationDetails(row.item.id); row.toggleDetails">Показать</button>
+                    <b-button @click="getAssociationDetails(row.item.id); row.toggleDetails">Показать</b-button>
                 </template>
             </b-table>
         </b-container>
@@ -58,7 +61,7 @@
                 </template>
                 <template v-slot:cell(status_teacher)="row">
                     {{ row.value }}
-                    <b-button v-if="row.value == 'Ожидание'" @click="preSetReceived(row.item.id, row.item.association_id)">Принято</b-button>
+                    <b-button v-if="row.item.status_teacher_id == 1 && (row.item.status_admin_id != 7) && (row.item.status_parent_id != 3)" @click="preSetReceived(row.item.id, row.item.association_id)">Принято</b-button>
                 </template>
             </b-table>
         </b-modal>
@@ -79,16 +82,7 @@ export default {
 
     data(){
         return {
-            association_statistic_table_fields: [
-                {key: 'id', thClass: 'd-none', tdClass: 'd-none'},
-                {key: 'association_name', sortable: true, label: "Название объединения"},
-                {key: 'association_group_count', sortable: true, label: 'Кол-во групп'},
-                (!this.hasAccess(18) ? {key: 'planned_numbers', sortable: true, label: "Плановые цифры"} : {}),
-                (!this.hasAccess(18) ? {key: 'fact_numbers', sortable: true, label: "Фактические цифры"} : {}),
-                (!this.hasAccess(18) ? {key: 'fullness_percent', sortable: true, label: "% наполненности"} : {}),
-                (!this.hasAccess(18) ? {key: 'brought', label: 'Заявлений принесено', sortable:  true} : {}),
-                {key: 'controls', 'label': 'Подробнее'}
-            ],
+            association_statistic_table_fields: Array,
             allProposalCount: 0,
             user_statistic_table_fields: ['Всего зарегистрировано детей', 'Всего зарегистрировано родителей'],
             association_statistic: [],
@@ -136,7 +130,7 @@ export default {
                 },
                 {
                     key: 'status_teacher',
-                    label: 'Статус преподователя',
+                    label: 'Статус преподавателя',
                     sortable: true
                 },
                 {
@@ -148,9 +142,10 @@ export default {
             proposalToReceived: null,
             showWarn: false,
             editedAssociation: null,
+            isTeacher: true,
         }
     },
-    mounted() {
+    async mounted() {
         let request = `
                 mutation {
                     adminLoadStatistic
@@ -186,6 +181,20 @@ export default {
             .catch(err=>{
                 console.log(err);
             });
+
+        if (await this.hasAccess(12))
+            this.isTeacher = false;
+
+        this.association_statistic_table_fields = [
+            {key: 'id', thClass: 'd-none', tdClass: 'd-none'},
+                {key: 'association_name', sortable: true, label: "Название объединения"},
+                {key: 'association_group_count', sortable: true, label: 'Кол-во групп'},
+                (!this.isTeacher ? {key: 'planned_numbers', sortable: true, label: "Плановые цифры"} : {}),
+                (!this.isTeacher ? {key: 'fact_numbers', sortable: true, label: "Фактические цифры"} : {}),
+                (!this.isTeacher ? {key: 'fullness_percent', sortable: true, label: "% наполненности"} : {}),
+                {key: 'brought', label: 'Заявлений принесено', sortable:  true},
+                {key: 'controls', 'label': 'Подробнее'}
+            ]
     },
     methods: {
         rowStyler(item, type)

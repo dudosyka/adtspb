@@ -52,12 +52,16 @@ class AssociationType extends ObjectType
     public function resolveStatistic(Association $association, array $args, AppContext $context, ResolveInfo $info)
     {
         $max = $association->group_count * 20;
-        $proposal_count = DataSource::_query("SELECT COUNT(*) AS `all`, SUM(`proposal`.`status_admin_id` = 6) AS `brought`, (SUM(`proposal`.`status_parent_id` = 3) + SUM(`proposal`.`status_admin_id` = 7)) AS `reject`  FROM `proposal` WHERE `association_id` = :id", [':id' => $association->id]);
+        $proposal_count = DataSource::_query("SELECT 
+            COUNT(*) AS `all`, 
+            SUM(`proposal`.`status_admin_id` = 6) AS `brought`, 
+            (SUM(`proposal`.`status_parent_id` = 3) + SUM(`proposal`.`status_admin_id` = 7)) AS `reject`  
+            FROM `proposal` WHERE `association_id` = :id", [':id' => $association->id]);
         $reject = $proposal_count[0]->reject;
         $all = $proposal_count[0]->all;
         $brought = $proposal_count[0]->brought;
         return json_encode([
-            'fullness_percent' => floor(100 * $reject / $max),
+            'fullness_percent' => $max == 0 ? $max : floor(100 * ($all - $reject) / $max),
             'brought_percent' => floor(100 * $brought / $all)
         ]);
     }

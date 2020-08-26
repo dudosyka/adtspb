@@ -298,8 +298,8 @@ class QueryType extends ObjectType
             $item->childFullname = trim($item->childSurname) . " " . trim($item->childName) . ( $item->childMidname != "" ? " " . trim($item->childMidname) : "");
             $item->parentFullname = trim($item->parentSurname) . " " . trim($item->parentName) . ( $item->parentMidname != "" ? " " . trim($item->parentMidname) : "");
             if (
-                preg_match("/.{0,}".$search.".{0,}/um", trim($item->childFullname)) ||
-                preg_match("/.{0,}".$search.".{0,}/um", trim($item->parentFullname))
+                preg_match("/.{0,}".mb_strtolower($search, 'UTF-8').".{0,}/um", mb_strtolower(trim($item->childFullname), 'UTF-8')) ||
+                preg_match("/.{0,}".mb_strtolower($search, 'UTF-8').".{0,}/um", mb_strtolower(trim($item->parentFullname), 'UTF-8'))
             )
             {
                 $res[] = $item;
@@ -349,9 +349,10 @@ class QueryType extends ObjectType
         {
             $item->childFullname = trim($item->childSurname) . " " . trim($item->childName) . ( $item->childMidname != "" ? " " . trim($item->childMidname) : "");
             $item->parentFullname = trim($item->parentSurname) . " " . trim($item->parentName) . ( $item->parentMidname != "" ? " " . trim($item->parentMidname) : "");
+
             if (
-                preg_match("/.{0,}".mb_strtolower($search).".{0,}/um", mb_strtolower(trim($item->childFullname))) ||
-                preg_match("/.{0,}".mb_strtolower($search).".{0,}/um", mb_strtolower(trim($item->parentFullname)))
+                preg_match("/.{0,}".mb_strtolower($search, 'UTF-8').".{0,}/um", mb_strtolower(trim($item->childFullname), 'UTF-8')) ||
+                preg_match("/.{0,}".mb_strtolower($search, 'UTF-8').".{0,}/um", mb_strtolower(trim($item->parentFullname), 'UTF-8'))
             )
             {
                 $res[] = $item;
